@@ -27,11 +27,21 @@ function addGitIgnore(ignoreStrings) {
 function generateTSFile(targetDir) {
   const generatedFilePath = targetDir + "generated.ts";
 
-  fs.writeFileSync(generatedFilePath, 
-`export const ROOT_PATH = "${ADMIN_ROOT}";
+  fs.writeFileSync(generatedFilePath, `export const ROOT_PATH = "${ADMIN_ROOT}";
 
 export const API_ENDPOINT = "/" + ROOT_PATH + "/api/";
 `);
+}
+
+const { exec } = require("child_process");
+
+function installDependencies() {
+  const packageFilePath = `${__dirname}/package.json`;
+  const jsonData = JSON.parse(fs.readFileSync(packageFilePath));
+  // console.log(jsonData);
+  const deps = ["@artempoletsky/easyrpc", "../mydb", "@mantine/core", "@mantine/hooks", "tabler-icons-react"];
+
+  exec(`npm install --save ${deps.join(" ")}`);
 }
 
 function main() {
@@ -42,6 +52,8 @@ function main() {
   generateTSFile(targetDir);
 
   addGitIgnore([`/app/${ADMIN_ROOT}/`]);
+
+  installDependencies();
 }
 
 if (require.main === module) {

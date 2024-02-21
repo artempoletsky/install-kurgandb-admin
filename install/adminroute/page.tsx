@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { query } from "~/db";
+import { query } from "./db";
 import Layout from "./comp/layout";
 import CreateNewTable from "./comp/CreateNewTable";
 import { ROOT_PATH } from "./generated";

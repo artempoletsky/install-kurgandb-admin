@@ -1,17 +1,16 @@
 "use client";
 import type { TableScheme } from "@artempoletsky/kurgandb/table";
-import type { PlainObject } from "~/lib/util";
 
 // import Button from "./Button";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import type { FCreateDocument, FDeleteDocument, FUpdateDocument } from "../api/route";
-import { blinkBoolean, formDataToDict } from "~/lib/utils_client";
 
 import { formToDocument } from "@artempoletsky/kurgandb/client";
 import FieldLabel from "./FieldLabel";
 import { Button, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { API_ENDPOINT } from "../generated";
+import { PlainObject, blinkBoolean } from "../utils_client";
 
 
 const updateDocument = getAPIMethod<FUpdateDocument>(API_ENDPOINT, "updateDocument");
