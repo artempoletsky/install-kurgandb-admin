@@ -4,7 +4,9 @@
   "description": "KurganDB admin panel for next.js",
   "main": "cli.js",
   "bin": "cli.js",
-  "scripts": {},
+  "scripts": {
+    "update": "node ./update.js"
+  },
   "keywords": [],
   "author": "Artem Poletsky",
   "license": "ISC",

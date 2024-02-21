@@ -1,11 +1,9 @@
-#! /usr/bin/env node
-'use strict';
 
-function main() {
-  console.log("Hello from main");
-}
 
-if (require.main === module) {
-  main();
-}
+const sourceDir = `${__dirname}/install/adminroute/`;
+const targetDir = `${__dirname}/app/kurgandb/`;
 
+const fs = require("fs");
+// console.log(sourceDir, targetDir);
+
+fs.cpSync(targetDir, sourceDir, { recursive: true });
