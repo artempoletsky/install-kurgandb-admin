@@ -10,8 +10,8 @@ import { FieldTag, FieldType, FieldTypes } from "@artempoletsky/kurgandb/globals
 import CreateNewField from "./CreateNewField";
 import { ChevronDown, ChevronUp, Edit, Trash } from 'tabler-icons-react';
 import RequestError from "../../comp/RequestError";
-import { blinkBoolean } from "~/lib/utils_client";
 import { API_ENDPOINT } from "../../generated";
+import { blinkBoolean } from "../../utils_client";
 
 const toggleTag = getAPIMethod<FToggleTag>(API_ENDPOINT, "toggleTag");
 const removeField = getAPIMethod<FRemoveField>(API_ENDPOINT, "removeField");

@@ -2,15 +2,16 @@ import { NextPOST, ValidationRule, Validator, validateArrayUnionFabric, validate
 import { Predicate } from "@artempoletsky/kurgandb";
 import { TableScheme } from "@artempoletsky/kurgandb/table";
 import { NextResponse } from "next/server";
-import { Tables, query } from "~/db";
-import { PlainObject } from "~/lib/util";
-import { FieldTag, FieldType, FieldTypes } from "@artempoletsky/kurgandb/globals";
+import { query } from "../db";
 
-function methodFactory<PayloadType extends Record<string, any>, ReturnType>(predicate: Predicate<Tables, PayloadType>) {
+import { FieldTag, FieldType, FieldTypes } from "@artempoletsky/kurgandb/globals";
+import { PlainObject } from "../utils_client";
+
+function methodFactory<PayloadType extends Record<string, any>, ReturnType>(predicate: Predicate<any, PayloadType>) {
   return async function (payload: PayloadType): Promise<ReturnType> {
     let res;
     try {
-      res = await query<PayloadType>(predicate, payload);
+      res = await query(predicate, payload);
     } catch (err: any) {
       throw {
         message: err.message || err,
