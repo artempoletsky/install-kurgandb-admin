@@ -1,4 +1,5 @@
-import Link from "next/link";
+
+import { MouseEvent } from "react";
 import css from "./paginator.module.css";
 
 type Props = {
@@ -54,16 +55,20 @@ export default function Paginator({ page, pagesCount, span, onSetPage }: Props) 
       }
     }
   }
-  return <ul className="flex">
-    {elems.map(el => <li key={el.key}>
-      {el.link
-        ? <a href="#" onClick={e => {
-          e.preventDefault();
-          if (onSetPage)
-            onSetPage(el.page as number);
-        }} className={css.element}>{el.content}</a>
-        : <span className={css.element + (el.type == "gap" ? "" : " font-bold")}>{el.content}</span>
-      }
-    </li>)}
-  </ul>
+
+  function onLink(page: any) {
+    return function (e: MouseEvent<HTMLAnchorElement>) {
+      e.preventDefault();
+      if (onSetPage)
+        onSetPage(page);
+    }
+  }
+
+  return <div className="my-3">
+    {elems.map(el =>
+    (el.link
+      ? <a key={el.key} href="#" onClick={onLink(el.page)} className={css.link}>{el.content}</a>
+      : <span key={el.key} className={el.type == "gap" ? css.gap : css.current}>{el.content}</span>)
+    )}
+  </div>
 }

@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 import type { FGetDraft, FGetFreeId, FGetPage, FGetScheme, FReadDocument, FRemoveTable, RGetPage } from "../api/route";
 import { ValiationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
 import type { TableScheme } from "@artempoletsky/kurgandb/table";
-import type { PlainObject } from "~/lib/util";
 import { Button, Textarea } from "@mantine/core";
 import Link from "next/link";
 import RequestError from "../comp/RequestError";
 import { API_ENDPOINT } from "../generated";
+import { PlainObject } from "../utils_client";
 
 
 
@@ -133,8 +133,8 @@ export default function ({ tableName, scheme }: Props) {
         <Button className="align-top" onClick={insert}>New</Button>
       </div>
       <div className="flex">
-        <ul className="mt-3 flex-shrink pr-3 border-r border-stone-600 border-solid min-w-[350px]">
-          {pageData.documents.map(id => <li key={id} onClick={e => openDocument(id)}>{id}</li>)}
+        <ul className="mt-3 flex-shrink pr-3 border-r border-stone-600 border-solid min-w-[350px] min-h-[675px]">
+          {pageData.documents.map(id => <li className="cursor-pointer py-1 border-b border-gray-500" key={id} onClick={e => openDocument(id)}>{id}</li>)}
         </ul>
         {scheme && doc && <EditDocumentForm
           insertMode={insertMode}

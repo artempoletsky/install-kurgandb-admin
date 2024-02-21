@@ -1,4 +1,3 @@
-import { query } from "~/db";
 
 import Layout, { BreadrumbsArray } from "../comp/layout";
 

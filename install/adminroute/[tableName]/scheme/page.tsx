@@ -19,8 +19,7 @@ export default async function ({ params }: Props) {
     { href: `/${tableName}/`, title: tableName },
     { href: "", title: "Edit scheme" },
   ];
-  console.log(scheme.fields);
-  
+    
   return <Layout breadcrumbs={crumbs}>
     <EditTableScheme tableName={tableName} scheme={scheme}></EditTableScheme>
   </Layout>
