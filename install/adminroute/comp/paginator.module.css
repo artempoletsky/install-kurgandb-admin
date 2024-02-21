@@ -1,0 +1,4 @@
+
+.element {
+  @apply inline-block px-1 py-[3px];
+}

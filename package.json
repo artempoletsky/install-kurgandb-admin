@@ -1,0 +1,14 @@
+{
+  "name": "@artempoletsky/install-kurgandb-admin",
+  "version": "1.0.0",
+  "description": "KurganDB admin panel for next.js",
+  "main": "cli.js",
+  "bin": "cli.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "Artem Poletsky",
+  "license": "ISC",
+  "devDependencies": {},
+  "exports": {},
+  "files": []
+}
