@@ -6,6 +6,7 @@ import { query } from "../db";
 
 import { FieldTag, FieldType, FieldTypes } from "@artempoletsky/kurgandb/globals";
 import { PlainObject } from "../utils_client";
+import { login, logout as userLogoout } from "@/app/kurgandb_admin/auth";
 
 function methodFactory<PayloadType extends Record<string, any>, ReturnType>(predicate: Predicate<any, PayloadType>) {
   return async function (payload: PayloadType): Promise<ReturnType> {
@@ -380,6 +381,33 @@ const removeTable = methodFactory<ATableOnly, void>(({ }, { db, payload }) => {
 export type FRemoveTable = typeof removeTable;
 
 ///////////////////////////////////////////
+type AAuthorize = {
+  userName: string
+  password: string
+};
+
+const VAuthorize: ValidationRule<AAuthorize> = {
+  userName: "string",
+  password: "string",
+};
+
+const authorize = async ({ userName, password }: AAuthorize) => {
+  return login(userName, password);
+}
+
+export type FAuthorize = typeof authorize;
+
+///////////////////////////////////////////
+
+
+const logout: () => Promise<void> = async () => {
+  userLogoout();
+}
+
+export type FLogout = typeof logout;
+
+///////////////////////////////////////////
+
 
 export const POST = NextPOST(NextResponse, {
   createDocument: VCreateDocument,
@@ -397,6 +425,8 @@ export const POST = NextPOST(NextResponse, {
   renameField: VRenameField,
   createTable: VCreateTable,
   removeTable: VTableOnly,
+  authorize: VAuthorize,
+  logout: {},
 }, {
   createDocument,
   readDocument,
@@ -413,4 +443,6 @@ export const POST = NextPOST(NextResponse, {
   renameField,
   createTable,
   removeTable,
+  authorize,
+  logout,
 });
