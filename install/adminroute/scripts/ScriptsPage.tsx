@@ -3,6 +3,7 @@
 import { ReactNode, useState } from "react";
 import FunctionComponent from "./FunctionComponent";
 import Log from "./Log";
+import type { ScriptsLogRecord } from "../api/route";
 
 
 
@@ -55,11 +56,9 @@ function formatCamelCase(str: string) {
 
 export default function ScriptsPage({ scripts }: Props) {
 
-  const [log, setLog] = useState<string[]>([]);
-  function onScriptExecuted(output: string) {
-    if (output) {
-      setLog([...log, output]);
-    }
+  const [log, setLog] = useState<ScriptsLogRecord[]>([]);
+  function onScriptExecuted(record: ScriptsLogRecord) {
+    setLog([...log, record]);
   }
 
   function printGroup(group: Group, path: string, key: string) {

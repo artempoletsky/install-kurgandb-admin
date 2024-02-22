@@ -8,9 +8,11 @@ import type { FCreateDocument, FDeleteDocument, FUpdateDocument } from "../api/r
 
 import { formToDocument } from "@artempoletsky/kurgandb/client";
 import FieldLabel from "./FieldLabel";
-import { Button, TextInput, Textarea, Tooltip } from "@mantine/core";
+import { Button, Checkbox, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { API_ENDPOINT } from "../generated";
 import { PlainObject, blinkBoolean } from "../utils_client";
+import { FieldTag, FieldType } from "@artempoletsky/kurgandb/globals";
+
 
 
 const updateDocument = getAPIMethod<FUpdateDocument>(API_ENDPOINT, "updateDocument");
@@ -64,22 +66,31 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
       .then(onCreated);
   }
 
-  const formTextDefaults: Record<string, string> = {};
-  for (const fieldName of scheme.fieldsOrderUser) {
-    let value = doc[fieldName];
-    const type = scheme.fields[fieldName];
-    if (type == "json") {
-      value = JSON.stringify(value, null, 0);
-    }
-    formTextDefaults[fieldName] = value;
-  }
+  // const formTextDefaults: Record<string, any> = {};
+  // for (const fieldName of scheme.fieldsOrderUser) {
+  //   let value: any = "";
+  //   const type = scheme.fields[fieldName];
+  //   if (type == "json") {
+  //     value = JSON.stringify(value, null, 0);
+  //   } else if (type == "boolean") {
+  //     value = false;
+  //   }
+  //   formTextDefaults[fieldName] = value;
+  // }
 
   useEffect(() => {
     if (!form.current) throw new Error("no form ref");
-    for (const fieldName in formTextDefaults) {
-      const input = form.current.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${fieldName}"]`);
+    for (const fieldName in scheme.fields) {
+      const type = scheme.fields[fieldName];
+      const input: HTMLInputElement | HTMLTextAreaElement | null = form.current.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${fieldName}"]`);
       if (!input) continue;
-      input.value = formTextDefaults[fieldName];
+      if (type == "boolean") {
+        (input as HTMLInputElement).checked = doc[fieldName];
+      } else if (type == "json") {
+        input.value = JSON.stringify(doc[fieldName]);
+      } else {
+        input.value = doc[fieldName];
+      }
     }
   }, [doc, id, scheme]);
 
@@ -93,17 +104,25 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
   //     });
   //   }
   // }
+
+  function printField(fieldName: string, type: FieldType, tags: Set<FieldTag>): ReactNode {
+    const isArea = type == "json" || tags.has("textarea");
+    if (isArea) return <Textarea resize="both" name={fieldName} />;
+
+    if (type == "boolean") {
+      return <Checkbox name={fieldName} />
+    }
+    return <TextInput autoComplete="off" size="sm" variant="default" type="text" name={fieldName} />;
+  }
+
   const fields: ReactNode[] = [];
   for (const fieldName of scheme.fieldsOrderUser) {
     const type = scheme.fields[fieldName];
     const tags = new Set(scheme.tags[fieldName] || []);
-    const isArea = type == "json" || tags.has("textarea");
 
     fields.push(<div className="mr-1" key={fieldName}>
       <FieldLabel fieldName={fieldName} scheme={scheme} />
-      {isArea
-        ? <Textarea resize="both" name={fieldName} />
-        : <TextInput autoComplete="off" size="sm" variant="default" type="text" name={fieldName} />}
+      {printField(fieldName, type, tags)}
     </div>);
   }
   <TextInput

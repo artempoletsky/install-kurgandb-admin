@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react"
+import type { ScriptsLogRecord } from "../api/route";
 
 type Props = {
-  log: string[]
+  log: ScriptsLogRecord[]
 }
 
 export default function Log({ log }: Props) {
@@ -15,7 +16,7 @@ export default function Log({ log }: Props) {
   return <div className="mt-3">
     <p className="mb-3">Output:</p>
     <ul ref={scrollContainerRef} className="overflow-y-scroll max-w-[750px] h-[150px] bg-slate-700 text-gray-300 rounded">
-      {log.map((str, i) => <li key={i}>{str}</li>)}
+      {log.map((el, i) => <li key={i} className="flex px-1"><div className="grow">{el.result}</div><div className="">{el.time}ms</div></li>)}
     </ul>
   </div>
 }

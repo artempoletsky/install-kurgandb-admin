@@ -13,16 +13,23 @@ import ScriptsPage, { Group, ParsedFunction } from "./ScriptsPage";
 
 function parseFunction(f: Function): ParsedFunction | false {
   const str = f.toString();
-  const matched = /\(([^\)]+)\)/.exec(str);
-  // console.log(matched);
+  let start = str.match(/[^\{]+/);
+  if (!start) return false;
+
+  const matched = /\(([^\)]+)\)/.exec(start[0]);
   let args: string[] = [];
   if (matched) {
     args = matched[1].replace(/\s/, "").split(",");
   }
+
+  let body = str.slice(start[0].length + 1).trim();
+
   let description = "";
-  const descMatched = /\{\s*\/\/([^\n]+)/.exec(str);
-  if (descMatched) {
-    description = descMatched[1];
+  if (body.startsWith("//")) {
+    const descMatched = /\{\s*\/\/([^\n]+)/.exec(str);
+    if (descMatched) {
+      description = descMatched[1];
+    }
   }
 
   return {

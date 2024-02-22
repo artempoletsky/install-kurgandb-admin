@@ -1,12 +1,9 @@
 "use client";
 
-
-
-
 import { Button, TextInput } from "@mantine/core";
 import { API_ENDPOINT } from "../generated";
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
-import type { FExecuteScript } from "../api/route";
+import type { FExecuteScript, ScriptsLogRecord } from "../api/route";
 import { useRef } from "react";
 
 const executeScript = getAPIMethod<FExecuteScript>(API_ENDPOINT, "executeScript");
@@ -18,7 +15,7 @@ type Props = {
   path: string
   name: string
   className?: string
-  onExecuted: (result: string) => void
+  onExecuted: (args: ScriptsLogRecord) => void
 }
 
 export default function FunctionComponent({ className, description, args, path, name, onExecuted }: Props) {

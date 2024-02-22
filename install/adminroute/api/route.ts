@@ -421,27 +421,43 @@ const VExecuteScript: ValidationRule<AExecuteScript> = {
   path: "string",
 };
 
-const executeScript = async ({ args, path }: AExecuteScript): Promise<string> => {
+export type ScriptsLogRecord = {
+  time: number
+  result: string
+};
+
+const executeScript = async ({ args, path }: AExecuteScript): Promise<ScriptsLogRecord> => {
   const steps = path.split(".");
   let current: PlainObject | Function = scripts as PlainObject;
   while (steps.length > 1) {
     if (typeof current === "function") {
-      return `function has been found to early at '${steps[0]}' in '${path}'`;
+      return {
+        result: `function has been found to early at '${steps[0]}' in '${path}'`,
+        time: 0,
+      };
     }
 
     steps.shift();
     current = current[steps[0]];
   }
   if (typeof current != "function") {
-    return `Script path '${path}' hasn't been found`;
+    return {
+      result: `Script path '${path}' hasn't been found`,
+      time: 0,
+    };
   }
+  const t1 = performance.now();
+  const result = await current(...args);
 
-  const result = current(...args);
-
-  return result || "";
+  return {
+    time: Math.floor(performance.now() - t1),
+    result: result || "",
+  }
 }
 
 export type FExecuteScript = typeof executeScript;
+
+
 
 ///////////////////////////////////////////
 
