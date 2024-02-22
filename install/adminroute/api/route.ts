@@ -6,7 +6,7 @@ import { query } from "../db";
 
 import { FieldTag, FieldType, FieldTypes } from "@artempoletsky/kurgandb/globals";
 import { PlainObject } from "../utils_client";
-import { login, logout as userLogoout } from "@/app/kurgandb_admin/auth";
+import { login, logout as userLogoout } from "../../kurgandb_admin/auth";
 
 function methodFactory<PayloadType extends Record<string, any>, ReturnType>(predicate: Predicate<any, PayloadType>) {
   return async function (payload: PayloadType): Promise<ReturnType> {
@@ -392,7 +392,7 @@ const VAuthorize: ValidationRule<AAuthorize> = {
 };
 
 const authorize = async ({ userName, password }: AAuthorize) => {
-  return login(userName, password);
+  return await login(userName, password);
 }
 
 export type FAuthorize = typeof authorize;
@@ -401,7 +401,7 @@ export type FAuthorize = typeof authorize;
 
 
 const logout: () => Promise<void> = async () => {
-  userLogoout();
+  await userLogoout();
 }
 
 export type FLogout = typeof logout;
