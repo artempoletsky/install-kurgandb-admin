@@ -1,10 +1,12 @@
 
-import Layout, { BreadrumbsArray } from "../comp/layout";
+import { getScheme } from "../../api/route";
+import TableMenu from "../../comp/TableMenu";
+import Layout, { BreadrumbsArray } from "../../comp/layout";
 
 // import type { FGetScheme, FReadDocument } from "../api/route";
-import { getScheme } from "../api/route";
+
 import { TableScheme } from "@artempoletsky/kurgandb/table";
-import EditTable from "./EditTable";
+
 
 
 
@@ -34,15 +36,15 @@ export default async function ({ params }: Props) {
 
   const crumbs: BreadrumbsArray = [
     { href: "/", title: "Tables" },
-    { href: "", title: tableName },
+    { href: `/${tableName}/`, title: tableName },
+    { href: "", title: "Events" },
   ];
-  
+
   return (
     <Layout breadcrumbs={crumbs}>
-      {scheme
-        ? <EditTable tableName={tableName} scheme={scheme} page={1}></EditTable>
-        : <div>Table '{tableName}' doesn't exist</div>
-      }
+      not implemented yet
+      <TableMenu tableName={tableName} />
+
     </Layout>
   );
 }

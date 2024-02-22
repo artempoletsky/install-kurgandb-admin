@@ -11,6 +11,7 @@ import Link from "next/link";
 import RequestError from "../comp/RequestError";
 import { API_ENDPOINT } from "../generated";
 import { PlainObject } from "../utils_client";
+import TableMenu from "../comp/TableMenu";
 
 
 
@@ -19,7 +20,6 @@ const readDocument = getAPIMethod<FReadDocument>(API_ENDPOINT, "readDocument");
 const getPage = getAPIMethod<FGetPage>(API_ENDPOINT, "getPage");
 const getDraft = getAPIMethod<FGetDraft>(API_ENDPOINT, "getDraft");
 const getFreeId = getAPIMethod<FGetFreeId>(API_ENDPOINT, "getFreeId");
-const removeTable = getAPIMethod<FRemoveTable>(API_ENDPOINT, "removeTable");
 
 
 type Props = {
@@ -99,20 +99,6 @@ export default function ({ tableName, scheme }: Props) {
       .catch(setRequestError);
   }
 
-  function confirmRemoveTable() {
-    setRequestError(undefined);
-
-    const delStr = prompt(`Type '${tableName}' to confirm removing this table`);
-    if (delStr != tableName) return;
-    removeTable({
-      tableName,
-    })
-      .then(() => {
-        window.location.href = "./";
-      })
-      .catch(setRequestError);
-  }
-
 
   useEffect(() => {
     loadPage(1);
@@ -149,10 +135,7 @@ export default function ({ tableName, scheme }: Props) {
       <Paginator page={page} pagesCount={pageData.pagesCount} onSetPage={loadPage}></Paginator>
       <RequestError requestError={requestError} />
 
-      <div className="flex gap-3">
-        <Link href={`./${tableName}/scheme`}><Button>Edit scheme</Button></Link>
-        <Button onClick={confirmRemoveTable}>Remove table</Button>
-      </div>
+      <TableMenu tableName={tableName} />
     </div>
 
   );

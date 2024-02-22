@@ -38,7 +38,7 @@ const { exec } = require("child_process");
 function installDependencies() {
   const packageFilePath = `${__dirname}/package.json`;
   const jsonData = JSON.parse(fs.readFileSync(packageFilePath));
-  // console.log(jsonData);
+  console.log("installing dependencies, please wait...");
   const deps = ["@artempoletsky/easyrpc", "../mydb", "@mantine/core", "@mantine/hooks", "tabler-icons-react"];
 
   exec(`npm install --save ${deps.join(" ")}`);

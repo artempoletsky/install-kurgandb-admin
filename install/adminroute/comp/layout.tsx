@@ -7,6 +7,7 @@ import Link from "./Link";
 import { isAdmin } from "../../kurgandb_admin/auth";
 import LoginForm from "./LoginForm";
 import LogoutButton from "./LogoutButton";
+import Header from "./Header";
 
 export type BreadrumbsArray = { title: string, href: string }[];
 
@@ -35,7 +36,7 @@ export default async function Layout({ children, breadcrumbs }: Props) {
     }
     {authorised || setupRequired
       ? <div className="relative p-3 bg-stone-200 min-h-screen">
-        {!setupRequired && <div className="absolute top-5 right-5"><LogoutButton /></div>}
+        {!setupRequired && <Header />}
         {breadcrumbs && <Breadcrumbs>{items}</Breadcrumbs>}
         {children}
       </div>
