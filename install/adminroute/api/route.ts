@@ -409,6 +409,44 @@ export type FLogout = typeof logout;
 ///////////////////////////////////////////
 
 
+import * as scripts from "../../kurgandb_admin/scripts";
+
+type AExecuteScript = {
+  args: string[]
+  path: string
+};
+
+const VExecuteScript: ValidationRule<AExecuteScript> = {
+  args: "stringEmpty[]",
+  path: "string",
+};
+
+const executeScript = async ({ args, path }: AExecuteScript): Promise<string> => {
+  const steps = path.split(".");
+  let current: PlainObject | Function = scripts as PlainObject;
+  while (steps.length > 1) {
+    if (typeof current === "function") {
+      return `function has been found to early at '${steps[0]}' in '${path}'`;
+    }
+
+    steps.shift();
+    current = current[steps[0]];
+  }
+  if (typeof current != "function") {
+    return `Script path '${path}' hasn't been found`;
+  }
+
+  const result = current(...args);
+
+  return result || "";
+}
+
+export type FExecuteScript = typeof executeScript;
+
+///////////////////////////////////////////
+
+
+
 export const POST = NextPOST(NextResponse, {
   createDocument: VCreateDocument,
   readDocument: VReadDocument,
@@ -427,6 +465,7 @@ export const POST = NextPOST(NextResponse, {
   removeTable: VTableOnly,
   authorize: VAuthorize,
   logout: {},
+  executeScript: VExecuteScript,
 }, {
   createDocument,
   readDocument,
@@ -445,4 +484,5 @@ export const POST = NextPOST(NextResponse, {
   removeTable,
   authorize,
   logout,
+  executeScript,
 });

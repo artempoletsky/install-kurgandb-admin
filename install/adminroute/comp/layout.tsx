@@ -37,7 +37,7 @@ export default async function Layout({ children, breadcrumbs }: Props) {
     {authorised || setupRequired
       ? <div className="relative p-3 bg-stone-200 min-h-screen">
         {!setupRequired && <Header />}
-        {breadcrumbs && <Breadcrumbs>{items}</Breadcrumbs>}
+        {breadcrumbs && <Breadcrumbs className="mb-3">{items}</Breadcrumbs>}
         {children}
       </div>
       : <LoginForm />}

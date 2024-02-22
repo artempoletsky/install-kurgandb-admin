@@ -37,7 +37,7 @@ export default async function ({ params }: Props) {
   const crumbs: BreadrumbsArray = [
     { href: "/", title: "Tables" },
     { href: `/${tableName}/`, title: tableName },
-    { href: "", title: "Events" },
+    { href: "", title: "Validation rules" },
   ];
 
   return (
