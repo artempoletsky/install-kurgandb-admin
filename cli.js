@@ -51,7 +51,7 @@ function main() {
 
   const sourceDir1 = `${__dirname}/install/kurgandb_admin/`;
   const targetDir1 = `${CWD}/app/kurgandb_admin/`;
-  fs.cpSync(sourceDir1, targetDir1, { recursive: true });
+  fs.cpSync(sourceDir1, targetDir1, { recursive: true, force: false });
 
   generateTSFile(targetDir);
 
