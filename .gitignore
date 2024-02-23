@@ -38,3 +38,17 @@ next-env.d.ts
 /.env
 /app/kurgandb_admin/
 
+
+/app/kurgandb/
+.env
+/next.config.mjs
+/postcss.config.js
+/public/next.svg
+/public/vercel.svg
+/tailwind.config.ts
+/tsconfig.json
+/.eslintrc.json
+/app/favicon.ico
+/app/globals.css
+/app/layout.tsx
+/app/page.tsx
