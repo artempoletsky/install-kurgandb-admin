@@ -8,7 +8,7 @@
     "update": "node ./update.js",
     "next": "next dev -p 3001"
   },
-  "keywords": [],
+  "keywords": ["admin-panel", "nextjs"],
   "author": "Artem Poletsky",
   "license": "ISC",
   "dependencies": {
