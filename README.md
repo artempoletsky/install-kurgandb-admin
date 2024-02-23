@@ -4,12 +4,12 @@ This is a [KurganDB](https://github.com/artempoletsky/kurgandb) admin panel for 
 
 ## Getting Started
 
-First, create a fresh next.js app. If you want add the admin panel to existing next.js project skip this step, but your project have to use settings listed below. 
+First, create a fresh next.js app. If you want add the admin panel to the existing next.js project skip this step, but your project have to use settings listed below. 
 ```bash
 npx create-next-app
 ```
 
-Then follow the instructions. You can keep all default settings.
+Follow the instructions of the installation wizard. You can keep all the settings default.
 
 **REQURED SETTINGS** that you can't change: 
 -  **use Typescript**,
@@ -22,17 +22,18 @@ https://nextjs.org/docs/app/api-reference/create-next-app
 
 https://github.com/vercel/next.js/tree/canary/packages/create-next-app
 
-Second, move to your created app. 
+Second, move to your app's directory
 ```bash
 cd ./your_app_name
 ```
-and run 
+and run:
 ```bash
 npx @artempoletsky/install-kurgandb-admin
 ```
-this will install the admin panel to the default `/kurgandb/` route. 
 
-if you want change the location pass an argument
+This will install the admin panel to the default `/kurgandb/` route. 
+
+if you want to change the location pass an argument
 ```bash
 npx @artempoletsky/install-kurgandb-admin your_address
 ```
