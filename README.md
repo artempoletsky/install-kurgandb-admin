@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+This is a [KurganDB]([https://nextjs.org/](https://github.com/artempoletsky/kurgandb)) admin panel for [Next.js](https://nextjs.org/)
+ 
 
 ## Getting Started
 
-First, run the development server:
-
+First, create a fresh next.js app. If you want add the admin panel to existing next.js project skip this step, but your project have to use settings listed below. 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx create-next-app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then follow the instructions. You can keep all default settings.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**REQURED SETTINGS** that you can't change: 
+-  **use Typescript**,
+-  **use Tailwind CSS**, 
+-  **use App router**
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Read more about `create-next-app`:
 
-## Learn More
+https://nextjs.org/docs/app/api-reference/create-next-app
 
-To learn more about Next.js, take a look at the following resources:
+https://github.com/vercel/next.js/tree/canary/packages/create-next-app
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Second, move to your created app. 
+```bash
+cd ./your_app_name
+```
+and run 
+```bash
+npx @artempoletsky/install-kurgandb-admin
+```
+this will install the admin panel to the default `/kurgandb/` route. 
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+if you want change the location pass an argument
+```bash
+npx @artempoletsky/install-kurgandb-admin your_address
+```
 
-## Deploy on Vercel
+Third, run the next dev server:
+```bash
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Open [http://localhost:3000/kurgandb](http://localhost:3000/kurgandb) with your browser to enter the admin panel.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
