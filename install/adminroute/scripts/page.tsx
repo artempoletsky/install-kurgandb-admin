@@ -4,9 +4,6 @@ import Layout, { BreadrumbsArray } from "../comp/layout";
 
 import * as scriptsRaw from "../../kurgandb_admin/scripts";
 import { PlainObject } from "../utils_client";
-import { Button, TextInput } from "@mantine/core";
-import { ReactNode } from "react";
-import FunctionComponent from "./FunctionComponent";
 import ScriptsPage, { Group, ParsedFunction } from "./ScriptsPage";
 
 
