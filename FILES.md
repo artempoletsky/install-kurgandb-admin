@@ -1,3 +1,5 @@
+[Back to main page](./README.md)
+
 ```bash
 npx install-kurgandb-admin 
 ```
