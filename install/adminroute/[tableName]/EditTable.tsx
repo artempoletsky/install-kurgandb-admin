@@ -1,13 +1,12 @@
 "use client";
 
 import Paginator from "../comp/paginator";
-import EditDocumentForm from "../comp/EditDocumentForm";
+import EditDocumentForm from "./EditDocumentForm";
 import { useEffect, useState } from "react";
 import type { FGetDraft, FGetFreeId, FGetPage, FGetScheme, FReadDocument, FRemoveTable, RGetPage } from "../api/route";
 import { ValiationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
 import type { TableScheme } from "@artempoletsky/kurgandb/table";
 import { Button, Textarea } from "@mantine/core";
-import Link from "next/link";
 import RequestError from "../comp/RequestError";
 import { API_ENDPOINT } from "../generated";
 import { PlainObject } from "../utils_client";
@@ -116,7 +115,8 @@ export default function ({ tableName, scheme }: Props) {
       <div className="mt-3 mb-1 flex gap-1">
         <Textarea className="min-w-[500px]" resize="vertical" value={queryString} onChange={e => setQueryString(e.target.value)} />
         <Button className="align-top" onClick={e => loadPage(1)}>Select</Button>
-        <Button className="align-top" onClick={insert}>New</Button>
+        <div className="border-l border-gray-500 mx-3 h-[34px]"></div>
+        <Button className="align-top" onClick={insert}>New document</Button>
       </div>
       <div className="flex">
         <ul className="mt-3 flex-shrink pr-3 border-r border-stone-600 border-solid min-w-[350px] min-h-[675px]">

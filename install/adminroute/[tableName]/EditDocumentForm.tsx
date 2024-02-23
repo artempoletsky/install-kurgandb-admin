@@ -7,7 +7,7 @@ import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import type { FCreateDocument, FDeleteDocument, FUpdateDocument } from "../api/route";
 
 import { formToDocument } from "@artempoletsky/kurgandb/client";
-import FieldLabel from "./FieldLabel";
+import FieldLabel from "../comp/FieldLabel";
 import { Button, Checkbox, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { API_ENDPOINT } from "../generated";
 import { PlainObject, blinkBoolean } from "../utils_client";
@@ -54,7 +54,9 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
   }
 
   function create() {
-    createDocument({ tableName, document: getData() })
+    const data = getData();
+
+    createDocument({ tableName, document: data })
       .then(onCreated);
   }
 
@@ -119,6 +121,8 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
   for (const fieldName of scheme.fieldsOrderUser) {
     const type = scheme.fields[fieldName];
     const tags = new Set(scheme.tags[fieldName] || []);
+    if (tags.has("autoinc") && insertMode) continue;
+
 
     fields.push(<div className="mr-1" key={fieldName}>
       <FieldLabel fieldName={fieldName} scheme={scheme} />
