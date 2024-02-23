@@ -44,6 +44,34 @@ function installDependencies() {
   exec(`npm install --save ${deps.join(" ")}`);
 }
 
+
+function editEnvFile() {
+  const filePath = `${CWD}/.env`;
+
+  const fileText = fs.existsSync(filePath) ? fs.readFileSync(filePath, { encoding: "utf8" }) : "";
+  const lines = fileText.split(/\r?\n|\r|\n/g);
+
+  const linesToAdd = {
+    KURGANDB_DATA_DIR: "D:/type/your/address/here",
+    KURGANDB_REMOTE_ADDRESS: "http://localhost:8080"
+  };
+
+  function hasKey(key) {
+    for (const l of lines) {
+      if (l.includes(key)) return true;
+    }
+    return false;
+  }
+
+  for (const key in linesToAdd) {
+    if (!hasKey(key)) {
+      lines.push(`# ${key} = "${linesToAdd[key]}"`);
+    }
+  }
+
+  fs.writeFileSync(filePath, lines.join("\r\n"));
+}
+
 function main() {
   const sourceDir = `${__dirname}/install/adminroute/`;
   const targetDir = `${CWD}/app/${ADMIN_ROOT}/`;
@@ -55,8 +83,10 @@ function main() {
 
   generateTSFile(targetDir);
 
-  addGitIgnore([`/app/${ADMIN_ROOT}/`]);
+  addGitIgnore([`/app/${ADMIN_ROOT}/`, "/.env"]);
 
+  editEnvFile();
+  
   installDependencies();
 }
 
