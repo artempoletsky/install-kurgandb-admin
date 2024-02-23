@@ -11,7 +11,7 @@ import FieldLabel from "../comp/FieldLabel";
 import { Button, Checkbox, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { API_ENDPOINT } from "../generated";
 import { PlainObject, blinkBoolean } from "../utils_client";
-import { FieldTag, FieldType } from "@artempoletsky/kurgandb/globals";
+import { $, FieldTag, FieldType } from "@artempoletsky/kurgandb/globals";
 
 
 
@@ -110,6 +110,14 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
   //     });
   //   }
   // }
+  function cypherField(fieldName: string) {
+    if (!form.current) throw new Error("no form ref");
+
+    const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
+    if (!input) throw new Error("input not found");
+
+    input.value = $.encodePassword(input.value);
+  }
 
   function printField(fieldName: string, type: FieldType, tags: Set<FieldTag>): ReactNode {
     const isArea = type == "json" || tags.has("textarea");
@@ -118,6 +126,18 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
     if (type == "boolean") {
       return <Checkbox name={fieldName} />
     }
+
+    if (type == "string" && tags.has("hidden")) {
+      return <div className="flex gap-3">
+        <div className="grow">
+          <TextInput autoComplete="off" size="sm" variant="default" type="text" name={fieldName} />
+        </div>
+        <div className="shrink">
+          <Button onClick={e => cypherField(fieldName)} className="shrink">Cypher</Button>
+        </div>
+      </div>
+    }
+
     return <TextInput autoComplete="off" size="sm" variant="default" type="text" name={fieldName} />;
   }
 

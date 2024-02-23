@@ -7,21 +7,27 @@ const ADMIN_ROOT = args[0] || "kurgandb";
 
 const CWD = process.cwd();
 
-function addGitIgnore(ignoreStrings) {
+function editGitignore(linesToAdd) {
+  const filePath = `${CWD}/.gitignore`;
 
-  const gitignoreFilePath = `${CWD}/.gitignore`;
+  const fileText = fs.existsSync(filePath) ? fs.readFileSync(filePath, { encoding: "utf8" }) : "";
+  const lines = fileText.split(/\r?\n|\r|\n/g);
 
-  let gitignoreContents = "";
-  if (fs.existsSync(gitignoreFilePath)) {
-    gitignoreContents = fs.readFileSync(gitignoreFilePath, { encoding: "utf8" })
+
+  function hasLine(key) {
+    for (const l of lines) {
+      if (l == key) return true;
+    }
+    return false;
   }
-  let lines = gitignoreContents.split(/\r?\n|\r|\n/g);
-  ignoreStrings = ignoreStrings.filter(str => !lines.includes(str));
 
-  for (const str of ignoreStrings) {
-    gitignoreContents += str + "\r\n";
+  for (const key of linesToAdd) {
+    if (!hasLine(key)) {
+      lines.push(key);
+    }
   }
-  fs.writeFileSync(gitignoreFilePath, gitignoreContents);
+
+  fs.writeFileSync(filePath, lines.join("\r\n"));
 }
 
 function generateTSFile(targetDir) {
@@ -83,10 +89,10 @@ function main() {
 
   generateTSFile(targetDir);
 
-  addGitIgnore([`/app/${ADMIN_ROOT}/`, "/.env"]);
+  editGitignore([`/app/${ADMIN_ROOT}/`, ".env"]);
 
   editEnvFile();
-  
+
   installDependencies();
 }
 
