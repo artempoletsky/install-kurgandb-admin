@@ -1,5 +1,5 @@
 
-This is a [KurganDB]([https://nextjs.org/](https://github.com/artempoletsky/kurgandb)) admin panel for [Next.js](https://nextjs.org/)
+This is a [KurganDB](https://github.com/artempoletsky/kurgandb) admin panel for [Next.js](https://nextjs.org/)
  
 
 ## Getting Started
