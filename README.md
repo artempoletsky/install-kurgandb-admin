@@ -49,4 +49,4 @@ Open [http://localhost:3000/kurgandb](http://localhost:3000/kurgandb) with your 
 
 Set up you tables structure with admin panel. 
 
-[Implement authorization, scripts, events and validation rules)(./FILES.md)
+[Implement authorization, scripts, events and validation rules](./FILES.md)
