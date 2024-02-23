@@ -45,3 +45,8 @@ npm run dev
 
 Open [http://localhost:3000/kurgandb](http://localhost:3000/kurgandb) with your browser to enter the admin panel.
 
+## Wbat do I do next?
+
+Set up you tables structure with admin panel. 
+
+[Implement authorization, scripts, events and validation rules)(./FILES.md)
