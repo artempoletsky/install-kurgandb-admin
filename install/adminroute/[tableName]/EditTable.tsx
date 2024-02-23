@@ -44,7 +44,7 @@ export default function ({ tableName, scheme }: Props) {
     return scheme.tags[id]?.includes("primary") || false;
   }) || "";
   if (!primaryKey) throw new Error("primary key is undefined");
-
+  let autoincId = scheme.tags[primaryKey].includes("autoinc");
 
   function openDocument(id: string | number) {
     setRequestError(undefined);
@@ -86,6 +86,13 @@ export default function ({ tableName, scheme }: Props) {
   }
 
   function onDuplicate() {
+    if (autoincId) {
+      const newDoc = { ...doc };
+      delete newDoc[primaryKey];
+      setDocument(newDoc);
+      setInsertMode(true);
+      return;
+    }
     setRequestError(undefined);
     getFreeId({ tableName })
       .then(newId => {
@@ -130,6 +137,7 @@ export default function ({ tableName, scheme }: Props) {
           document={doc}
           onCreated={onDocCreated}
           onDuplicate={onDuplicate}
+          onRequestError={setRequestError}
         />}
       </div>
       <Paginator page={page} pagesCount={pageData.pagesCount} onSetPage={loadPage}></Paginator>

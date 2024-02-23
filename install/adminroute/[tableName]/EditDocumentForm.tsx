@@ -3,7 +3,7 @@ import type { TableScheme } from "@artempoletsky/kurgandb/table";
 
 // import Button from "./Button";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { ValiationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
 import type { FCreateDocument, FDeleteDocument, FUpdateDocument } from "../api/route";
 
 import { formToDocument } from "@artempoletsky/kurgandb/client";
@@ -28,10 +28,11 @@ type Props = {
   id: string | number | undefined
   onCreated: (id: string | number) => void
   onDuplicate: () => void
+  onRequestError: (e: ValiationErrorResponce) => void
 };
 
 
-export default function EditDocumentForm({ id, document: doc, scheme, insertMode, tableName, onCreated, onDuplicate }: Props) {
+export default function EditDocumentForm({ id, document: doc, scheme, insertMode, tableName, onCreated, onDuplicate, onRequestError }: Props) {
 
   const form = useRef<HTMLFormElement>(null);
 
@@ -50,14 +51,16 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
       id,
       tableName,
       document: getData()
-    }).then(() => blinkBoolean(setSavedTooltip));
+    }).then(() => blinkBoolean(setSavedTooltip))
+      .catch(onRequestError);
   }
 
   function create() {
     const data = getData();
 
     createDocument({ tableName, document: data })
-      .then(onCreated);
+      .then(onCreated)
+      .catch(onRequestError);
   }
 
   function remove() {
@@ -65,7 +68,8 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
 
     if (!confirm("Are you sure you want delete this document?")) return;
     deleteDocument({ tableName, id })
-      .then(onCreated);
+      .then(onCreated)
+      .catch(onRequestError);
   }
 
   // const formTextDefaults: Record<string, any> = {};
