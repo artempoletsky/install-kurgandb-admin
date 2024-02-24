@@ -4,6 +4,7 @@ import { ReactNode, useState } from "react";
 import FunctionComponent from "./FunctionComponent";
 import Log from "./Log";
 import type { ScriptsLogRecord } from "../api/route";
+import { formatCamelCase } from "../globals";
 
 
 
@@ -23,36 +24,6 @@ type Props = {
   scripts: Group
 }
 
-
-function formatCamelCase(str: string) {
-  let result = "";
-  let i = 0;
-  let lastCharLetter = false;
-  let lastCharLowerCase = false;
-  for (let char of str) {
-    if (i == 0) {
-      char = char.toUpperCase();
-    }
-
-    const currentCharNumber = char.match(/[0-9]/);
-    if (lastCharLetter && currentCharNumber) {
-      char = " " + char;
-    }
-
-    const currentCharCapital = char.match(/[A-Z]/);
-
-    if (lastCharLowerCase && currentCharCapital) {
-      char = " " + char;
-    }
-
-    result += char;
-    i++;
-    lastCharLetter = !currentCharNumber;
-    lastCharLowerCase = !currentCharCapital;
-  }
-
-  return result;
-}
 
 export default function ScriptsPage({ scripts }: Props) {
 

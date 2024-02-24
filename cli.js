@@ -78,6 +78,14 @@ function editEnvFile() {
   fs.writeFileSync(filePath, lines.join("\r\n"));
 }
 
+function editImports(files) {
+  for (const filename of files) {
+    let contents = fs.readFileSync(filename, { encoding: "utf8" });
+    contents = contents.replace(/\/adminroute\//g, "/" + ADMIN_ROOT + "/");
+    fs.writeFileSync(filename, contents);
+  }
+}
+
 function main() {
   const sourceDir = `${__dirname}/install/adminroute/`;
   const targetDir = `${CWD}/app/${ADMIN_ROOT}/`;
@@ -93,7 +101,12 @@ function main() {
 
   editEnvFile();
 
-  installDependencies();
+  const compDir = `${targetDir1}components/`;
+  const files = fs.readdirSync(compDir).map(f => compDir + f);
+
+  editImports([`${targetDir1}field_scripts.ts`, ...files]);
+
+  // installDependencies();
 }
 
 if (require.main === module) {

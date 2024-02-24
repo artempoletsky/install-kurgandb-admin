@@ -31,5 +31,3 @@ export function blinkBoolean(setter: (b: boolean) => void, timeout = 1000) {
     setter(false);
   }, timeout);
 }
-
-export type PlainObject = Record<string, any>;

@@ -1,12 +1,11 @@
-import { NextPOST, ValidationRule, Validator, validateArrayUnionFabric, validateUnionFabric } from "@artempoletsky/easyrpc";
+import validate, { APIRequest, InvalidResult, ValidationRule, Validator, validateUnionFabric } from "@artempoletsky/easyrpc";
 import { Predicate } from "@artempoletsky/kurgandb";
 import { TableScheme } from "@artempoletsky/kurgandb/table";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { query } from "../db";
 
-import { FieldTag, FieldType, FieldTypes } from "@artempoletsky/kurgandb/globals";
-import { PlainObject } from "../utils_client";
-import { login, logout as userLogoout } from "../../kurgandb_admin/auth";
+import { FieldTag, FieldType, FieldTypes, PlainObject } from "@artempoletsky/kurgandb/globals";
+import { isAdmin, login, logout as userLogout } from "../../kurgandb_admin/auth";
 
 function methodFactory<PayloadType extends Record<string, any>, ReturnType>(predicate: Predicate<any, PayloadType>) {
   return async function (payload: PayloadType): Promise<ReturnType> {
@@ -401,7 +400,7 @@ export type FAuthorize = typeof authorize;
 
 
 const logout: () => Promise<void> = async () => {
-  await userLogoout();
+  await userLogout();
 }
 
 export type FLogout = typeof logout;
@@ -461,44 +460,65 @@ export type FExecuteScript = typeof executeScript;
 
 ///////////////////////////////////////////
 
+import { customAPI, customRules } from "../../kurgandb_admin/api";
+import { ValiationErrorResponce } from "@artempoletsky/easyrpc/client";
+
+export const POST = async function name(request: NextRequest) {
+  const req: APIRequest = await request.json();
+  if (!isAdmin() && req.method !== "authorize") {
+    const err: ValiationErrorResponce = {
+      message: "You must authorize to perform this action",
+      invalidFields: {}
+    };
+    return NextResponse.json(err, {
+      status: 403
+    });
+  }
 
 
-export const POST = NextPOST(NextResponse, {
-  createDocument: VCreateDocument,
-  readDocument: VReadDocument,
-  updateDocument: VUpdateDocument,
-  deleteDocument: VDeleteDocument,
-  getScheme: VTableOnly,
-  getPage: VGetPage,
-  toggleTag: VToggleTag,
-  getFreeId: VTableOnly,
-  getDraft: VTableOnly,
-  addField: VAddField,
-  removeField: VRemoveField,
-  changeFieldIndex: VChangeFieldIndex,
-  renameField: VRenameField,
-  createTable: VCreateTable,
-  removeTable: VTableOnly,
-  authorize: VAuthorize,
-  logout: {},
-  executeScript: VExecuteScript,
-}, {
-  createDocument,
-  readDocument,
-  updateDocument,
-  deleteDocument,
-  getScheme,
-  getPage,
-  toggleTag,
-  getFreeId,
-  getDraft,
-  addField,
-  removeField,
-  changeFieldIndex,
-  renameField,
-  createTable,
-  removeTable,
-  authorize,
-  logout,
-  executeScript,
-});
+
+  const [result, status] = await validate(req, {
+    createDocument: VCreateDocument,
+    readDocument: VReadDocument,
+    updateDocument: VUpdateDocument,
+    deleteDocument: VDeleteDocument,
+    getScheme: VTableOnly,
+    getPage: VGetPage,
+    toggleTag: VToggleTag,
+    getFreeId: VTableOnly,
+    getDraft: VTableOnly,
+    addField: VAddField,
+    removeField: VRemoveField,
+    changeFieldIndex: VChangeFieldIndex,
+    renameField: VRenameField,
+    createTable: VCreateTable,
+    removeTable: VTableOnly,
+    authorize: VAuthorize,
+    logout: {},
+    executeScript: VExecuteScript,
+    ...customRules,
+  }, {
+    createDocument,
+    readDocument,
+    updateDocument,
+    deleteDocument,
+    getScheme,
+    getPage,
+    toggleTag,
+    getFreeId,
+    getDraft,
+    addField,
+    removeField,
+    changeFieldIndex,
+    renameField,
+    createTable,
+    removeTable,
+    authorize,
+    logout,
+    executeScript,
+    ...customAPI,
+  });
+
+  return NextResponse.json(result, status);
+}
+

@@ -33,6 +33,7 @@ export default function TableMenu({ tableName }: Props) {
     <Link href={`/${ROOT_PATH}/${tableName}/scheme`}><Button>Edit scheme</Button></Link>
     <Link href={`/${ROOT_PATH}/${tableName}/events`}><Button>Browse events</Button></Link>
     <Link href={`/${ROOT_PATH}/${tableName}/validation`}><Button>Validation rules</Button></Link>
+    <Link href={`/${ROOT_PATH}/${tableName}/custom`}><Button>Custom</Button></Link>
     <Button onClick={confirmRemoveTable}>Remove table</Button>
   </div>
 }

@@ -10,10 +10,12 @@ import { formToDocument } from "@artempoletsky/kurgandb/client";
 import FieldLabel from "../comp/FieldLabel";
 import { Button, Checkbox, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { API_ENDPOINT } from "../generated";
-import { PlainObject, blinkBoolean } from "../utils_client";
-import { $, FieldTag, FieldType } from "@artempoletsky/kurgandb/globals";
+import { blinkBoolean } from "../utils_client";
+import { $, FieldTag, FieldType, PlainObject } from "@artempoletsky/kurgandb/globals";
 
-
+import { fieldScripts } from "../../kurgandb_admin/field_scripts";
+import { FieldScriptArgs, ScriptsRecord, formatCamelCase } from "../globals";
+import CustomDocumentComponent from "../../kurgandb_admin/components/CustomComponentRecord";
 
 const updateDocument = getAPIMethod<FUpdateDocument>(API_ENDPOINT, "updateDocument");
 const createDocument = getAPIMethod<FCreateDocument>(API_ENDPOINT, "createDocument");
@@ -21,18 +23,20 @@ const deleteDocument = getAPIMethod<FDeleteDocument>(API_ENDPOINT, "deleteDocume
 
 
 type Props = {
-  document: PlainObject
+  record: PlainObject
   scheme: TableScheme
   insertMode?: boolean
   tableName: string
-  id: string | number | undefined
+  recordId: string | number | undefined
   onCreated: (id: string | number) => void
   onDuplicate: () => void
   onRequestError: (e: ValiationErrorResponce) => void
 };
 
 
-export default function EditDocumentForm({ id, document: doc, scheme, insertMode, tableName, onCreated, onDuplicate, onRequestError }: Props) {
+
+
+export default function EditDocumentForm({ recordId, record, scheme, insertMode, tableName, onCreated, onDuplicate, onRequestError }: Props) {
 
   const form = useRef<HTMLFormElement>(null);
 
@@ -45,10 +49,10 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
   }
   function save() {
 
-    if (id === undefined) throw new Error("id is undefined");
+    if (recordId === undefined) throw new Error("id is undefined");
 
     updateDocument({
-      id,
+      id: recordId,
       tableName,
       document: getData()
     }).then(() => blinkBoolean(setSavedTooltip))
@@ -64,14 +68,15 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
   }
 
   function remove() {
-    if (id === undefined) throw new Error("id is undefined");
+    if (recordId === undefined) throw new Error("id is undefined");
 
     if (!confirm("Are you sure you want delete this document?")) return;
-    deleteDocument({ tableName, id })
+    deleteDocument({ tableName, id: recordId })
       .then(onCreated)
       .catch(onRequestError);
   }
 
+  const currentFieldScripts = fieldScripts[tableName] || {};
   // const formTextDefaults: Record<string, any> = {};
   // for (const fieldName of scheme.fieldsOrderUser) {
   //   let value: any = "";
@@ -91,14 +96,14 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
       const input: HTMLInputElement | HTMLTextAreaElement | null = form.current.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${fieldName}"]`);
       if (!input) continue;
       if (type == "boolean") {
-        (input as HTMLInputElement).checked = doc[fieldName];
+        (input as HTMLInputElement).checked = record[fieldName];
       } else if (type == "json") {
-        input.value = JSON.stringify(doc[fieldName]);
+        input.value = JSON.stringify(record[fieldName]);
       } else {
-        input.value = doc[fieldName];
+        input.value = record[fieldName];
       }
     }
-  }, [doc, id, scheme]);
+  }, [record, recordId, scheme]);
 
   // const [formText, formTextSetter] = useState<Record<string, string>>(formTextDefaults);
 
@@ -119,6 +124,39 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
     input.value = $.encodePassword(input.value);
   }
 
+  function printScripts(scripts: ScriptsRecord, fieldName: string) {
+
+    const scriptNames: Record<string, string> = {};
+    for (const key in scripts) {
+      scriptNames[key] = formatCamelCase(key);
+    }
+    const scriptKeys = Object.keys(scriptNames);
+
+
+    if (scriptKeys.length == 0) {
+      return "";
+    }
+
+    function onScriptTrigger(key: string) {
+
+      if (!form.current) throw new Error("no form ref");
+      const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
+      if (!input) throw new Error("input not found");
+      scripts[key]({
+        form: form.current,
+        input,
+        tableName,
+        doc: record,
+        value: input.value,
+      });
+    }
+    if (scriptKeys.length == 1) {
+      const key = scriptKeys[0];
+      return <Button onClick={e => onScriptTrigger(key)} className="shrink">{scriptNames[key]}</Button>
+    }
+    return "non implemented yet";
+  }
+
   function printField(fieldName: string, type: FieldType, tags: Set<FieldTag>): ReactNode {
     const isArea = type == "json" || tags.has("textarea");
     if (isArea) return <Textarea resize="both" name={fieldName} />;
@@ -127,13 +165,14 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
       return <Checkbox name={fieldName} />
     }
 
-    if (type == "string" && tags.has("hidden")) {
+    const scriptsObject = currentFieldScripts[fieldName];
+    if (scriptsObject) {
       return <div className="flex gap-3">
         <div className="grow">
           <TextInput autoComplete="off" size="sm" variant="default" type="text" name={fieldName} />
         </div>
         <div className="shrink">
-          <Button onClick={e => cypherField(fieldName)} className="shrink">Cypher</Button>
+          {printScripts(scriptsObject, fieldName)}
         </div>
       </div>
     }
@@ -161,17 +200,42 @@ export default function EditDocumentForm({ id, document: doc, scheme, insertMode
 
   />
   const [savedTooltip, setSavedTooltip] = useState(false);
-  return <div className="pl-5 min-w-[500px]">
-    <form className="mb-5" ref={form}>{fields}</form>
-    {insertMode
-      ? <div><Button onClick={create}>Create</Button></div>
-      : <div className="flex gap-1">
-        <Tooltip opened={savedTooltip} label="Saved!">
-          <Button onClick={save}>Save</Button>
-        </Tooltip>
-        <Button onClick={remove}>Remove</Button>
-        <Button onClick={onDuplicate}>Duplicate</Button>
-      </div>
+
+  function onUpdateRecord(record: PlainObject) {
+    for (const key in record) {
+      const input = document.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name=${key}]`);
+      if (!input) continue;
+      const value = record[key];
+      if (input.type == "checkbox" && "checked" in input) {
+        input.checked = value;
+      } else {
+        input.value = value;
+      }
     }
-  </div>;
+  }
+
+  return <div className="pl-5 flex gap-3 grow">
+    <div className="min-w-[500px]">
+      <form className="mb-5" ref={form}>{fields}</form>
+      {insertMode
+        ? <div><Button onClick={create}>Create</Button></div>
+        : <div className="flex gap-1">
+          <Tooltip opened={savedTooltip} label="Saved!">
+            <Button onClick={save}>Save</Button>
+          </Tooltip>
+          <Button onClick={remove}>Remove</Button>
+          <Button onClick={onDuplicate}>Duplicate</Button>
+        </div>
+      }
+    </div>
+    <div className="grow">
+      <CustomDocumentComponent
+        onRequestError={onRequestError}
+        onUpdateRecord={onUpdateRecord}
+        tableName={tableName}
+        record={record}
+        recordId={recordId}
+      />
+    </div>
+  </div>
 }

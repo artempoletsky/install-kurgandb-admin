@@ -9,8 +9,9 @@ import type { TableScheme } from "@artempoletsky/kurgandb/table";
 import { Button, Textarea } from "@mantine/core";
 import RequestError from "../comp/RequestError";
 import { API_ENDPOINT } from "../generated";
-import { PlainObject } from "../utils_client";
+
 import TableMenu from "../comp/TableMenu";
+import { PlainObject } from "@artempoletsky/kurgandb/globals";
 
 
 
@@ -31,7 +32,7 @@ type Props = {
 export default function ({ tableName, scheme }: Props) {
 
 
-  let [doc, setDocument] = useState<PlainObject | undefined>(undefined);
+  let [record, setRecord] = useState<PlainObject | undefined>(undefined);
   let [currentId, setCurrentId] = useState<string | number | undefined>(undefined);
   let [pageData, setPageData] = useState<RGetPage | undefined>(undefined);
   let [page, setPage] = useState<number>(1);
@@ -46,20 +47,20 @@ export default function ({ tableName, scheme }: Props) {
   if (!primaryKey) throw new Error("primary key is undefined");
   let autoincId = scheme.tags[primaryKey].includes("autoinc");
 
-  function openDocument(id: string | number) {
+  function openRecord(id: string | number) {
     setRequestError(undefined);
     setInsertMode(false);
     setCurrentId(id);
     readDocument({
       tableName,
       id
-    }).then(setDocument)
+    }).then(setRecord)
       .catch(setRequestError);
   }
 
   function loadPage(page: number) {
     setRequestError(undefined);
-    setDocument(undefined);
+    setRecord(undefined);
     setPage(page);
     getPage({
       page,
@@ -74,7 +75,7 @@ export default function ({ tableName, scheme }: Props) {
     setRequestError(undefined);
     getDraft({ tableName })
       .then((draft) => {
-        setDocument(draft);
+        setRecord(draft);
         setInsertMode(true);
       })
       .catch(setRequestError);
@@ -82,22 +83,22 @@ export default function ({ tableName, scheme }: Props) {
 
   function onDocCreated() {
     loadPage(page);
-    setDocument(undefined);
+    setRecord(undefined);
   }
 
   function onDuplicate() {
     if (autoincId) {
-      const newDoc = { ...doc };
+      const newDoc = { ...record };
       delete newDoc[primaryKey];
-      setDocument(newDoc);
+      setRecord(newDoc);
       setInsertMode(true);
       return;
     }
     setRequestError(undefined);
     getFreeId({ tableName })
       .then(newId => {
-        setDocument({
-          ...doc,
+        setRecord({
+          ...record,
           [primaryKey]: newId
         });
         setInsertMode(true);
@@ -114,7 +115,6 @@ export default function ({ tableName, scheme }: Props) {
     return <div>Loading...</div>;
   }
 
-  // console.log(pageData.documents);
 
 
   return (
@@ -123,18 +123,18 @@ export default function ({ tableName, scheme }: Props) {
         <Textarea className="min-w-[500px]" resize="vertical" value={queryString} onChange={e => setQueryString(e.target.value)} />
         <Button className="align-top" onClick={e => loadPage(1)}>Select</Button>
         <div className="border-l border-gray-500 mx-3 h-[34px]"></div>
-        <Button className="align-top" onClick={insert}>New document</Button>
+        <Button className="align-top" onClick={insert}>New record</Button>
       </div>
       <div className="flex">
         <ul className="mt-3 flex-shrink pr-3 border-r border-stone-600 border-solid min-w-[350px] min-h-[675px]">
-          {pageData.documents.map(id => <li className="cursor-pointer py-1 border-b border-gray-500" key={id} onClick={e => openDocument(id)}>{id}</li>)}
+          {pageData.documents.map(id => <li className="cursor-pointer py-1 border-b border-gray-500" key={id} onClick={e => openRecord(id)}>{id}</li>)}
         </ul>
-        {scheme && doc && <EditDocumentForm
+        {scheme && record && <EditDocumentForm
           insertMode={insertMode}
-          id={currentId}
+          recordId={currentId}
           tableName={tableName}
           scheme={scheme}
-          document={doc}
+          record={record}
           onCreated={onDocCreated}
           onDuplicate={onDuplicate}
           onRequestError={setRequestError}
