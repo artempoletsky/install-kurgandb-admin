@@ -1,7 +1,7 @@
-import { ValiationErrorResponce } from "@artempoletsky/easyrpc/client"
+import { ValidationErrorResponce } from "@artempoletsky/easyrpc/client"
 
 type Props = {
-  requestError?: ValiationErrorResponce
+  requestError?: ValidationErrorResponce
 }
 
 export default function RequestError({ requestError }: Props) {

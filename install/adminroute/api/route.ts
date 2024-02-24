@@ -461,12 +461,12 @@ export type FExecuteScript = typeof executeScript;
 ///////////////////////////////////////////
 
 import { customAPI, customRules } from "../../kurgandb_admin/api";
-import { ValiationErrorResponce } from "@artempoletsky/easyrpc/client";
+import { ValidationErrorResponce } from "@artempoletsky/easyrpc/client";
 
 export const POST = async function name(request: NextRequest) {
   const req: APIRequest = await request.json();
   if (!isAdmin() && req.method !== "authorize") {
-    const err: ValiationErrorResponce = {
+    const err: ValidationErrorResponce = {
       message: "You must authorize to perform this action",
       invalidFields: {}
     };

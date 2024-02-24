@@ -3,8 +3,9 @@
 import Layout, { BreadrumbsArray } from "../comp/layout";
 
 import * as scriptsRaw from "../../kurgandb_admin/scripts";
-import { PlainObject } from "../utils_client";
+
 import ScriptsPage, { Group, ParsedFunction } from "./ScriptsPage";
+import { PlainObject } from "@artempoletsky/kurgandb/globals";
 
 
 

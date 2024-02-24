@@ -3,7 +3,7 @@ import type { TableScheme } from "@artempoletsky/kurgandb/table";
 
 // import Button from "./Button";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { ValiationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { ValidationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
 import type { FCreateDocument, FDeleteDocument, FUpdateDocument } from "../api/route";
 
 import { formToDocument } from "@artempoletsky/kurgandb/client";
@@ -31,7 +31,7 @@ type Props = {
   recordId: string | number | undefined
   onCreated: (id: string | number) => void
   onDuplicate: () => void
-  onRequestError: (e: ValiationErrorResponce) => void
+  onRequestError: (e: ValidationErrorResponce) => void
   onClose: () => void
 };
 

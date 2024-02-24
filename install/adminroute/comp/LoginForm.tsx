@@ -3,7 +3,7 @@
 import { useState } from "react";
 import TextInput from "./TextInput";
 import { Button } from "@mantine/core";
-import { ValiationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { ValidationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { FAuthorize } from "../api/route";
 import { API_ENDPOINT } from "../generated";
 
@@ -14,7 +14,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [incorrect, setIncorrect] = useState(false);
 
-  let [requestError, setRequestError] = useState<ValiationErrorResponce | undefined>(undefined);
+  let [requestError, setRequestError] = useState<ValidationErrorResponce | undefined>(undefined);
 
   function onAutorize() {
     setIncorrect(false);

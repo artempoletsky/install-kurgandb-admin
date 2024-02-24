@@ -6,7 +6,6 @@ import '@mantine/core/styles.css';
 import Link from "./Link";
 import { isAdmin } from "../../kurgandb_admin/auth";
 import LoginForm from "./LoginForm";
-import LogoutButton from "./LogoutButton";
 import Header from "./Header";
 import TableMenu from "./TableMenu";
 

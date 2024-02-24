@@ -2,7 +2,7 @@
 
 import { Button, Checkbox, Select, Tooltip } from "@mantine/core";
 import TextInput from "./TextInput";
-import { ValiationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { ValidationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
 import type { FCreateTable } from "../api/route";
 import { useState } from "react";
 import CheckboxTooltip from "./CheckboxTooltip";
@@ -13,7 +13,7 @@ const createTable = getAPIMethod<FCreateTable>(API_ENDPOINT, "createTable");
 
 
 export default function CreateNewTable() {
-  let [requestError, setRequestError] = useState<ValiationErrorResponce | undefined>(undefined);
+  let [requestError, setRequestError] = useState<ValidationErrorResponce | undefined>(undefined);
   let [tableName, setTableName] = useState("");
   let [keyType, setKeyType] = useState<"string" | "number">("number");
   let [autoIncrement, setAutoIncrement] = useState(true);

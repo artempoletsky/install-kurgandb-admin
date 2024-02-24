@@ -1,5 +1,5 @@
 "use client";
-import { ValiationErrorResponce } from "@artempoletsky/easyrpc/client";
+import { ValidationErrorResponce } from "@artempoletsky/easyrpc/client";
 import type { TableScheme } from "@artempoletsky/kurgandb/table";
 
 import CustomComponentTable from "../../../kurgandb_admin/components/CustomComponentTable";
@@ -10,7 +10,7 @@ import { useState } from "react";
 
 export default function CustomComponentPage(props: { tableName: string, scheme: TableScheme }) {
 
-  const [requestError, setRequestError] = useState<ValiationErrorResponce | undefined>(undefined);
+  const [requestError, setRequestError] = useState<ValidationErrorResponce | undefined>(undefined);
 
   return (
     <div className="">

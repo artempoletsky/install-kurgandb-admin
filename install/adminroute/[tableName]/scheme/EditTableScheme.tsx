@@ -1,7 +1,7 @@
 "use client";
 import type { TableScheme } from "@artempoletsky/kurgandb/table";
 import { ReactNode, useState } from "react";
-import { getAPIMethod, ValiationErrorResponce } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod, ValidationErrorResponce } from "@artempoletsky/easyrpc/client";
 import type { AAddField, FAddField, FChangeFieldIndex, FRemoveField, FRenameField, FToggleTag } from "../../api/route";
 import FieldLabel from "../../comp/FieldLabel";
 import { ActionIcon, Button, Select, Tooltip } from "@mantine/core";
@@ -32,7 +32,7 @@ export default function EditTableScheme({ tableName, scheme: schemeInitial }: Pr
 
   let [scheme, setScheme] = useState(schemeInitial);
 
-  let [requestError, setRequestError] = useState<ValiationErrorResponce | undefined>(undefined);
+  let [requestError, setRequestError] = useState<ValidationErrorResponce | undefined>(undefined);
   const [typeCopiedTooltip, setTypeCopiedTooltip] = useState(false);
 
   function toggleHandler(fieldName: string, tagName: FieldTag) {

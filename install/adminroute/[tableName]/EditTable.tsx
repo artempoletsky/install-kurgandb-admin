@@ -4,7 +4,7 @@ import Paginator from "../comp/paginator";
 import EditDocumentForm from "./EditDocumentForm";
 import { useEffect, useState } from "react";
 import type { FGetDraft, FGetFreeId, FGetPage, FGetScheme, FReadDocument, FRemoveTable, RGetPage } from "../api/route";
-import { ValiationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { ValidationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
 import type { TableScheme } from "@artempoletsky/kurgandb/table";
 import { Button, Textarea } from "@mantine/core";
 import RequestError from "../comp/RequestError";
@@ -38,7 +38,7 @@ export default function ({ tableName, scheme }: Props) {
   let [page, setPage] = useState<number>(1);
   let [queryString, setQueryString] = useState<string>("table.all()");
   let [insertMode, setInsertMode] = useState<boolean>(false);
-  const [requestError, setRequestError] = useState<ValiationErrorResponce | undefined>(undefined);
+  const [requestError, setRequestError] = useState<ValidationErrorResponce | undefined>(undefined);
 
 
   let primaryKey = Object.keys(scheme.tags).find(id => {

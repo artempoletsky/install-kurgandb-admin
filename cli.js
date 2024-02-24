@@ -89,6 +89,7 @@ function editImports(files) {
 function main() {
   const sourceDir = `${__dirname}/install/adminroute/`;
   const targetDir = `${CWD}/app/${ADMIN_ROOT}/`;
+  console.log(`installing in '${targetDir}'`);
   fs.cpSync(sourceDir, targetDir, { recursive: true });
 
   const sourceDir1 = `${__dirname}/install/kurgandb_admin/`;
@@ -106,7 +107,7 @@ function main() {
 
   editImports([`${targetDir1}field_scripts.ts`, ...files]);
 
-  // installDependencies();
+  installDependencies();
 }
 
 if (require.main === module) {

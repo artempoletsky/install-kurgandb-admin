@@ -1,12 +1,12 @@
 import { Button, Checkbox, Select, Tooltip } from "@mantine/core";
 import TextInput from "../../comp/TextInput";
-import { ValiationErrorResponce } from "@artempoletsky/easyrpc/client";
+import { ValidationErrorResponce } from "@artempoletsky/easyrpc/client";
 import { AAddField } from "../../api/route";
 import { useState } from "react";
 import { FieldType, FieldTypes } from "@artempoletsky/kurgandb/globals";
 
 type Props = {
-  requestError?: ValiationErrorResponce
+  requestError?: ValidationErrorResponce
   onAddField: (args: AAddField) => void
   tableName: string
 };

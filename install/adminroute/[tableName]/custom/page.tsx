@@ -1,6 +1,5 @@
 
 import { getScheme } from "../../api/route";
-import TableMenu from "../../comp/TableMenu";
 import Layout, { BreadrumbsArray } from "../../comp/layout";
 
 // import type { FGetScheme, FReadDocument } from "../api/route";
