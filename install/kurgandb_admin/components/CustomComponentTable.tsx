@@ -4,7 +4,7 @@ import { Button } from "@mantine/core"
 
 
 
-export default function ({ scheme }: TableComponentProps) {
+export default function CustomComponentTable({ scheme }: TableComponentProps) {
 
   return (
     <div className="">

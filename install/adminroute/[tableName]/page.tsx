@@ -38,7 +38,7 @@ export default async function ({ params }: Props) {
   ];
   
   return (
-    <Layout breadcrumbs={crumbs}>
+    <Layout breadcrumbs={crumbs} tableName={tableName}>
       {scheme
         ? <EditTable tableName={tableName} scheme={scheme} page={1}></EditTable>
         : <div>Table '{tableName}' doesn't exist</div>

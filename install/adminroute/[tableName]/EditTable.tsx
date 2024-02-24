@@ -116,7 +116,9 @@ export default function ({ tableName, scheme }: Props) {
   }
 
 
-
+  function onClose() {
+    setRecord(undefined);
+  }
   return (
     <div>
       <div className="mt-3 mb-1 flex gap-1">
@@ -130,6 +132,7 @@ export default function ({ tableName, scheme }: Props) {
           {pageData.documents.map(id => <li className="cursor-pointer py-1 border-b border-gray-500" key={id} onClick={e => openRecord(id)}>{id}</li>)}
         </ul>
         {scheme && record && <EditDocumentForm
+          onClose={onClose}
           insertMode={insertMode}
           recordId={currentId}
           tableName={tableName}
@@ -142,8 +145,6 @@ export default function ({ tableName, scheme }: Props) {
       </div>
       <Paginator page={page} pagesCount={pageData.pagesCount} onSetPage={loadPage}></Paginator>
       <RequestError requestError={requestError} />
-
-      <TableMenu tableName={tableName} />
     </div>
 
   );

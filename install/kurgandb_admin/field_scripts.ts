@@ -17,7 +17,10 @@ export const fieldScripts: FieldScriptsObject = {
         }).then(reversed => {
           input.value = reversed;
         })
-      }
+      },
+      script() {
+
+      },
     }
   }
 }

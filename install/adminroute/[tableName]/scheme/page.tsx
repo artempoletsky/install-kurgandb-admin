@@ -2,7 +2,6 @@
 import EditTableScheme from "./EditTableScheme"
 import { getScheme } from "../../api/route"
 import Layout, { BreadrumbsArray } from "../../comp/layout"
-import TableMenu from "../../comp/TableMenu"
 
 
 type Payload = {
@@ -20,9 +19,8 @@ export default async function ({ params }: Props) {
     { href: `/${tableName}/`, title: tableName },
     { href: "", title: "Edit scheme" },
   ];
-    
-  return <Layout breadcrumbs={crumbs}>
+
+  return <Layout breadcrumbs={crumbs} tableName={tableName}>
     <EditTableScheme tableName={tableName} scheme={scheme}></EditTableScheme>
-    <TableMenu tableName={tableName} />
   </Layout>
 }

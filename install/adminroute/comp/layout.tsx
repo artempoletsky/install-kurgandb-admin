@@ -8,6 +8,7 @@ import { isAdmin } from "../../kurgandb_admin/auth";
 import LoginForm from "./LoginForm";
 import LogoutButton from "./LogoutButton";
 import Header from "./Header";
+import TableMenu from "./TableMenu";
 
 export type BreadrumbsArray = { title: string, href: string }[];
 
@@ -15,9 +16,10 @@ export type BreadrumbsArray = { title: string, href: string }[];
 type Props = {
   children: ReactNode
   breadcrumbs?: BreadrumbsArray
+  tableName?: string
 }
 
-export default async function Layout({ children, breadcrumbs }: Props) {
+export default async function Layout({ children, breadcrumbs, tableName }: Props) {
 
   let items: ReactNode[] = [];
   if (breadcrumbs) {
@@ -36,9 +38,15 @@ export default async function Layout({ children, breadcrumbs }: Props) {
     }
     {authorised || setupRequired
       ? <div className="relative p-3 bg-stone-200 min-h-screen">
-        {!setupRequired && <Header />}
-        {breadcrumbs && <Breadcrumbs className="mb-3">{items}</Breadcrumbs>}
-        {children}
+
+        <Header>{tableName && <TableMenu tableName={tableName} />}</Header>
+        <div className="">
+          <div className="">
+            {breadcrumbs && <Breadcrumbs className="mb-3">{items}</Breadcrumbs>}
+            {children}
+          </div>
+        </div>
+
       </div>
       : <LoginForm />}
 

@@ -8,14 +8,15 @@ import type { FCreateDocument, FDeleteDocument, FUpdateDocument } from "../api/r
 
 import { formToDocument } from "@artempoletsky/kurgandb/client";
 import FieldLabel from "../comp/FieldLabel";
-import { Button, Checkbox, TextInput, Textarea, Tooltip } from "@mantine/core";
+import { ActionIcon, Button, Checkbox, CloseButton, Menu, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { API_ENDPOINT } from "../generated";
 import { blinkBoolean } from "../utils_client";
 import { $, FieldTag, FieldType, PlainObject } from "@artempoletsky/kurgandb/globals";
 
 import { fieldScripts } from "../../kurgandb_admin/field_scripts";
-import { FieldScriptArgs, ScriptsRecord, formatCamelCase } from "../globals";
-import CustomDocumentComponent from "../../kurgandb_admin/components/CustomComponentRecord";
+import { ScriptsRecord, formatCamelCase } from "../globals";
+import CustomComponentRecord from "../../kurgandb_admin/components/CustomComponentRecord";
+import { Dots } from "tabler-icons-react";
 
 const updateDocument = getAPIMethod<FUpdateDocument>(API_ENDPOINT, "updateDocument");
 const createDocument = getAPIMethod<FCreateDocument>(API_ENDPOINT, "createDocument");
@@ -31,12 +32,13 @@ type Props = {
   onCreated: (id: string | number) => void
   onDuplicate: () => void
   onRequestError: (e: ValiationErrorResponce) => void
+  onClose: () => void
 };
 
 
 
 
-export default function EditDocumentForm({ recordId, record, scheme, insertMode, tableName, onCreated, onDuplicate, onRequestError }: Props) {
+export default function EditDocumentForm({ recordId, record, scheme, insertMode, tableName, onCreated, onDuplicate, onRequestError, onClose }: Props) {
 
   const form = useRef<HTMLFormElement>(null);
 
@@ -154,6 +156,15 @@ export default function EditDocumentForm({ recordId, record, scheme, insertMode,
       const key = scriptKeys[0];
       return <Button onClick={e => onScriptTrigger(key)} className="shrink">{scriptNames[key]}</Button>
     }
+
+    return <Menu>
+      <Menu.Target>
+        <ActionIcon size="lg"><Dots /></ActionIcon>
+      </Menu.Target>
+      <Menu.Dropdown>
+        {scriptKeys.map(key => <Menu.Item onClick={e => onScriptTrigger(key)} key={key}>{scriptNames[key]}</Menu.Item>)}
+      </Menu.Dropdown>
+    </Menu>
     return "non implemented yet";
   }
 
@@ -215,7 +226,11 @@ export default function EditDocumentForm({ recordId, record, scheme, insertMode,
   }
 
   return <div className="pl-5 flex gap-3 grow">
-    <div className="min-w-[500px]">
+    <div className="min-w-[500px] relative pt-5">
+      <div className="absolute right-0 top-0">
+        <CloseButton onClick={onClose} />
+        {/* <ActionIcon className="" size="md"></ActionIcon> */}
+      </div>
       <form className="mb-5" ref={form}>{fields}</form>
       {insertMode
         ? <div><Button onClick={create}>Create</Button></div>
@@ -229,7 +244,7 @@ export default function EditDocumentForm({ recordId, record, scheme, insertMode,
       }
     </div>
     <div className="grow">
-      <CustomDocumentComponent
+      <CustomComponentRecord
         onRequestError={onRequestError}
         onUpdateRecord={onUpdateRecord}
         tableName={tableName}

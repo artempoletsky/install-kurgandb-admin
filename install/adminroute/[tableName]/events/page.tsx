@@ -41,10 +41,8 @@ export default async function ({ params }: Props) {
   ];
 
   return (
-    <Layout breadcrumbs={crumbs}>
+    <Layout breadcrumbs={crumbs} tableName={tableName}>
       not implemented yet
-      <TableMenu tableName={tableName} />
-
     </Layout>
   );
 }

@@ -1,18 +1,57 @@
 "use client";
 
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
-import { Button } from "@mantine/core";
+import { ActionIcon, Button, Tooltip } from "@mantine/core";
 import Link from "next/link";
 import { API_ENDPOINT, ROOT_PATH } from "../generated";
 import type { FRemoveTable } from "../api/route";
 
+import { AirBalloon, Alarm, Asset, Edit, FileDatabase, Trash, ZoomExclamation } from 'tabler-icons-react';
+import { ReactNode } from "react";
 
 const removeTable = getAPIMethod<FRemoveTable>(API_ENDPOINT, "removeTable");
 
 type Props = {
   tableName: string
 }
+
+type Item = {
+  label: string
+  icon: ReactNode
+  href: string
+}
+
+
 export default function TableMenu({ tableName }: Props) {
+
+
+  const Items: Item[] = [
+    {
+      label: "Edit documents",
+      icon: <Edit />,
+      href: `/${ROOT_PATH}/${tableName}`,
+    },
+    {
+      label: "Edit scheme",
+      icon: <FileDatabase />,
+      href: `/${ROOT_PATH}/${tableName}/scheme`,
+    },
+    {
+      label: "Browse events",
+      icon: <Alarm />,
+      href: `/${ROOT_PATH}/${tableName}/events`,
+    },
+    {
+      label: "Validation rules",
+      icon: <ZoomExclamation />,
+      href: `/${ROOT_PATH}/${tableName}/validation`,
+    },
+    {
+      label: "Custom",
+      icon: <Asset />,
+      href: `/${ROOT_PATH}/${tableName}/custom`,
+    },
+  ];
 
   function confirmRemoveTable() {
     // setRequestError(undefined);
@@ -25,15 +64,18 @@ export default function TableMenu({ tableName }: Props) {
       .then(() => {
         window.location.href = "./";
       })
-      // .catch(setRequestError);
+    // .catch(setRequestError);
   }
 
-  return <div className="flex gap-3 mt-5">
-    <Link href={`/${ROOT_PATH}/${tableName}`}><Button>Edit documents</Button></Link>
-    <Link href={`/${ROOT_PATH}/${tableName}/scheme`}><Button>Edit scheme</Button></Link>
-    <Link href={`/${ROOT_PATH}/${tableName}/events`}><Button>Browse events</Button></Link>
-    <Link href={`/${ROOT_PATH}/${tableName}/validation`}><Button>Validation rules</Button></Link>
-    <Link href={`/${ROOT_PATH}/${tableName}/custom`}><Button>Custom</Button></Link>
-    <Button onClick={confirmRemoveTable}>Remove table</Button>
+  return <div className="flex gap-3">
+    {Items.map(e => (
+      <Tooltip key={e.href} label={e.label}>
+        <Link href={e.href}><ActionIcon size="xl">{e.icon}</ActionIcon></Link>
+      </Tooltip>
+    ))}
+    <div className="grow"></div>
+    <Tooltip key="remove" label="Remove table">
+      <ActionIcon className="" onClick={confirmRemoveTable} size="xl"><Trash /></ActionIcon>
+    </Tooltip>
   </div>
 }

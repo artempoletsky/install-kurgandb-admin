@@ -36,9 +36,8 @@ export default async function ({ params }: Props) {
   ];
 
   return (
-    <Layout breadcrumbs={crumbs}>
+    <Layout breadcrumbs={crumbs} tableName={tableName}>
       <CustomComponentPage scheme={scheme} tableName={tableName} />
-      <TableMenu tableName={tableName} />
     </Layout>
   );
 }
