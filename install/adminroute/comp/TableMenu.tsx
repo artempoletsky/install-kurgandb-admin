@@ -70,12 +70,12 @@ export default function TableMenu({ tableName }: Props) {
   return <div className="flex gap-3">
     {Items.map(e => (
       <Tooltip key={e.href} label={e.label}>
-        <Link href={e.href}><ActionIcon size="xl">{e.icon}</ActionIcon></Link>
+        <Link href={e.href}><ActionIcon size={36}>{e.icon}</ActionIcon></Link>
       </Tooltip>
     ))}
     <div className="grow"></div>
     <Tooltip key="remove" label="Remove table">
-      <ActionIcon className="" onClick={confirmRemoveTable} size="xl"><Trash /></ActionIcon>
+      <ActionIcon onClick={confirmRemoveTable} size={36}><Trash /></ActionIcon>
     </Tooltip>
   </div>
 }

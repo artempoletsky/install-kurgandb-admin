@@ -52,3 +52,6 @@ next-env.d.ts
 /app/globals.css
 /app/layout.tsx
 /app/page.tsx
+
+/app/adminroute/
+/install/adminroute/generated.ts

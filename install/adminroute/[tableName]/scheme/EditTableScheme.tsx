@@ -137,23 +137,23 @@ export default function EditTableScheme({ tableName, scheme: schemeInitial }: Pr
         <div className="border-l border-stone-800"></div>
         <ActionIcon
           className="p-1.5"
-          size="lg"
+          size={36}
           onClick={e => confirmRemoveField(fieldName)}>
           <Trash />
         </ActionIcon>
-
-        <div className="border-l border-stone-800 w-[40px] relative">
+        
+        <div className="border-l border-stone-800 w-[40px] flex flex-col pl-3">
           <ActionIcon
             disabled={i == 0}
-            className="absolute left-3 top-0"
-            size="xs"
+            // className="absolute left-3 top-0"
+            size={18}
             onClick={e => moveField(fieldName, -1)}>
             <ChevronUp />
           </ActionIcon>
           <ActionIcon
             disabled={i == scheme.fieldsOrderUser.length - 1}
-            className="absolute left-3 bottom-0"
-            size="xs"
+            // className="absolute left-3 bottom-0"
+            size={18}
             onClick={e => moveField(fieldName, 1)}>
             <ChevronDown />
           </ActionIcon>
