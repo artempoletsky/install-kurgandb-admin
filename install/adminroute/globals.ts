@@ -4,15 +4,9 @@ import type { TableScheme } from "@artempoletsky/kurgandb/table";
 
 
 
-export type FieldScriptArgs = {
-  input: HTMLInputElement
-  value: Date | string | boolean | number
-  form: HTMLFormElement
-  tableName: string
-  doc: PlainObject
-};
 
-export type ScriptsRecord = Record<string, (args: FieldScriptArgs) => void>;
+
+export type ScriptsRecord = Record<string, (args: any) => void>;
 export type FieldScriptsObject = Record<string, Record<string, ScriptsRecord>>;
 
 
@@ -55,7 +49,7 @@ export type TableComponentProps = {
 
 export type DocumentComponentProps = {
   onRequestError: (e: ValidationErrorResponce) => void
-  onUpdateRecord: (record: PlainObject) => void
+  // onUpdateRecord: (record: PlainObject) => void
   tableName: string
   record: PlainObject
   insertMode?: boolean

@@ -8,15 +8,18 @@ import type { FCreateDocument, FDeleteDocument, FUpdateDocument } from "../api/r
 
 import { formToDocument } from "@artempoletsky/kurgandb/client";
 import FieldLabel from "../comp/FieldLabel";
-import { ActionIcon, Button, Checkbox, CloseButton, Menu, TextInput, Textarea, Tooltip } from "@mantine/core";
+import { ActionIcon, Button, Checkbox, CloseButton, Menu, MenuTarget, Modal, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { API_ENDPOINT } from "../generated";
 import { blinkBoolean } from "../utils_client";
-import { $, FieldTag, FieldType, PlainObject } from "@artempoletsky/kurgandb/globals";
+import { $, FieldTag, FieldType, PlainObject, field } from "@artempoletsky/kurgandb/globals";
 
 import { fieldScripts } from "../../kurgandb_admin/field_scripts";
 import { ScriptsRecord, formatCamelCase } from "../globals";
 import CustomComponentRecord from "../../kurgandb_admin/components/CustomComponentRecord";
-import { Dots } from "tabler-icons-react";
+import { Calendar, Dots, Edit } from "tabler-icons-react";
+import { useDisclosure } from "@mantine/hooks";
+import { DateInput, DatePicker, DateTimePicker, DateValue } from "@mantine/dates";
+import EditJSON from "./EditJSON";
 
 const updateDocument = getAPIMethod<FUpdateDocument>(API_ENDPOINT, "updateDocument");
 const createDocument = getAPIMethod<FCreateDocument>(API_ENDPOINT, "createDocument");
@@ -35,17 +38,40 @@ type Props = {
   onClose: () => void
 };
 
+function createProxy<T>(record: T, setRecord: (newRecord: T) => void): T {
+  return new Proxy<any>(record, {
+    set(target, key, value) {
+      target[key] = value;
+      setRecord({
+        ...target
+      });
+      return true;
+    },
+    get(target, key) {
+      return target[key];
+    }
+  });
+}
 
 
 
-export default function EditDocumentForm({ recordId, record, scheme, insertMode, tableName, onCreated, onDuplicate, onRequestError, onClose }: Props) {
+export default function EditDocumentForm({ recordId, record: initialRecord, scheme, insertMode, tableName, onCreated, onDuplicate, onRequestError, onClose }: Props) {
 
   const form = useRef<HTMLFormElement>(null);
+  const [record, setRecord] = useState<PlainObject>({});
+  const proxy = createProxy(record, setRecord);
+  const [editJSONModalOpened, disclosureJSON] = useDisclosure(false);
+  const [editingJSON, setEditingJSON] = useState("");
 
+
+  function onChange(fieldName: string) {
+    return (e: any) => {
+      proxy[fieldName] = e.target.value;
+    }
+  }
 
   function getData() {
     if (!form.current) throw new Error("no form ref");
-
     const documentData = formToDocument(form.current, scheme);
     return documentData;
   }
@@ -56,7 +82,7 @@ export default function EditDocumentForm({ recordId, record, scheme, insertMode,
     updateDocument({
       id: recordId,
       tableName,
-      document: getData()
+      document: record
     }).then(() => blinkBoolean(setSavedTooltip))
       .catch(onRequestError);
   }
@@ -90,41 +116,34 @@ export default function EditDocumentForm({ recordId, record, scheme, insertMode,
   //   }
   //   formTextDefaults[fieldName] = value;
   // }
+  function updateDateInput(fieldName: string) {
+    if (!form.current) throw new Error("no form ref");
+    const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
+    if (input) {
+      input.value = record[fieldName].toUTCString();
+    }
+  }
 
   useEffect(() => {
     if (!form.current) throw new Error("no form ref");
+    const rec: PlainObject = {};
     for (const fieldName in scheme.fields) {
       const type = scheme.fields[fieldName];
-      const input: HTMLInputElement | HTMLTextAreaElement | null = form.current.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${fieldName}"]`);
-      if (!input) continue;
-      if (type == "boolean") {
-        (input as HTMLInputElement).checked = record[fieldName];
-      } else if (type == "json") {
-        input.value = JSON.stringify(record[fieldName]);
+
+      if (type == "date") {
+        const date = new Date(initialRecord[fieldName]);
+        rec[fieldName] = date;
+        const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
+        if (input) {
+          input.value = date.toUTCString();
+        }
       } else {
-        input.value = record[fieldName];
+        rec[fieldName] = initialRecord[fieldName];
       }
     }
-  }, [record, recordId, scheme]);
 
-  // const [formText, formTextSetter] = useState<Record<string, string>>(formTextDefaults);
-
-  // function setFormText(fieldName: string) {
-  //   return function (value: string) {
-  //     formTextSetter({
-  //       ...formText,
-  //       [fieldName]: value
-  //     });
-  //   }
-  // }
-  function cypherField(fieldName: string) {
-    if (!form.current) throw new Error("no form ref");
-
-    const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
-    if (!input) throw new Error("input not found");
-
-    input.value = $.encodePassword(input.value);
-  }
+    setRecord(rec);
+  }, [recordId, scheme, initialRecord]);
 
   function printScripts(scripts: ScriptsRecord, fieldName: string) {
 
@@ -144,13 +163,7 @@ export default function EditDocumentForm({ recordId, record, scheme, insertMode,
       if (!form.current) throw new Error("no form ref");
       const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
       if (!input) throw new Error("input not found");
-      scripts[key]({
-        form: form.current,
-        input,
-        tableName,
-        doc: record,
-        value: input.value,
-      });
+      scripts[key](proxy);
     }
     if (scriptKeys.length == 1) {
       const key = scriptKeys[0];
@@ -159,36 +172,90 @@ export default function EditDocumentForm({ recordId, record, scheme, insertMode,
 
     return <Menu>
       <Menu.Target>
-        <ActionIcon size="lg"><Dots /></ActionIcon>
+        <ActionIcon size={36}><Dots /></ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
         {scriptKeys.map(key => <Menu.Item onClick={e => onScriptTrigger(key)} key={key}>{scriptNames[key]}</Menu.Item>)}
       </Menu.Dropdown>
     </Menu>
-    return "non implemented yet";
   }
 
+  function onDateChange(fieldName: string) {
+    return (d: DateValue) => {
+      if (!d) return;
+      const date: Date = record[fieldName];
+      // console.log(d.getSeconds());
+
+      // date.setDate(d.getDate());
+      date.setFullYear(d.getFullYear(), d.getMonth(), d.getDate());
+      // console.log(d);
+
+      proxy[fieldName] = date;
+      updateDateInput(fieldName)
+    }
+  }
   function printField(fieldName: string, type: FieldType, tags: Set<FieldTag>): ReactNode {
-    const isArea = type == "json" || tags.has("textarea");
-    if (isArea) return <Textarea resize="both" name={fieldName} />;
+    if (record[fieldName] === undefined) return "";
+    if (type == "json") {
+      return <div className="flex"><div className="grow break-words overflow-hidden overflow-ellipsis max-w-[462px] max-h-[50px]">{JSON.stringify(record[fieldName])}</div>
+        <ActionIcon onClick={e => {
+          setEditingJSON(fieldName);
+          disclosureJSON.open();
+        }} size={32}><Edit /></ActionIcon>
+      </div>
+    }
+    if (type == "date") {
+      // const value = (record[fieldName] as Date).toUTCString();
+      return <div className="flex gap-3">
+        <Menu>
+          <Menu.Target>
+            <ActionIcon size={36}><Calendar /></ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown >
+            <DatePicker value={record[fieldName]} onChange={onDateChange(fieldName)} />
+          </Menu.Dropdown>
+        </Menu>
+        <div className="grow"><TextInput
+          name={fieldName}
+          onBlur={e => {
+            const d = new Date(e.target.value);
+            
+            if (!isNaN(d as any)) {
+              proxy[fieldName] = d;
+            } 
+            updateDateInput(fieldName);
+          }} autoComplete="off" size="sm" /></div>
+
+      </div>
+
+      // return <DateInput
+      //   defaultDate={record[fieldName]}
+      //   name={fieldName}
+      //   valueFormat="DD/MM/YYYY HH:mm:ss"
+      // />
+    }
+    if (tags.has("textarea")) return <Textarea resize="both" name={fieldName} value={record[fieldName]} onChange={onChange(fieldName)} />;
 
     if (type == "boolean") {
-      return <Checkbox name={fieldName} />
+      return <Checkbox checked={record[fieldName]} onChange={e => proxy[fieldName] = e.target.checked} name={fieldName} />
     }
 
+    return <TextInput value={record[fieldName]} onChange={onChange(fieldName)} autoComplete="off" size="sm" variant="default" type="text" name={fieldName} />;
+  }
+
+  function printFieldScripts(fieldName: string, type: FieldType, tags: Set<FieldTag>): ReactNode {
     const scriptsObject = currentFieldScripts[fieldName];
     if (scriptsObject) {
       return <div className="flex gap-3">
         <div className="grow">
-          <TextInput autoComplete="off" size="sm" variant="default" type="text" name={fieldName} />
+          {printField(fieldName, type, tags)}
         </div>
         <div className="shrink">
           {printScripts(scriptsObject, fieldName)}
         </div>
       </div>
     }
-
-    return <TextInput autoComplete="off" size="sm" variant="default" type="text" name={fieldName} />;
+    return printField(fieldName, type, tags);
   }
 
   const fields: ReactNode[] = [];
@@ -200,7 +267,7 @@ export default function EditDocumentForm({ recordId, record, scheme, insertMode,
 
     fields.push(<div className="mr-1" key={fieldName}>
       <FieldLabel fieldName={fieldName} scheme={scheme} />
-      {printField(fieldName, type, tags)}
+      {printFieldScripts(fieldName, type, tags)}
     </div>);
   }
   <TextInput
@@ -212,18 +279,6 @@ export default function EditDocumentForm({ recordId, record, scheme, insertMode,
   />
   const [savedTooltip, setSavedTooltip] = useState(false);
 
-  function onUpdateRecord(record: PlainObject) {
-    for (const key in record) {
-      const input = document.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name=${key}]`);
-      if (!input) continue;
-      const value = record[key];
-      if (input.type == "checkbox" && "checked" in input) {
-        input.checked = value;
-      } else {
-        input.value = value;
-      }
-    }
-  }
 
   return <div className="pl-5 flex gap-3 grow">
     <div className="min-w-[500px] relative pt-5">
@@ -246,11 +301,13 @@ export default function EditDocumentForm({ recordId, record, scheme, insertMode,
     <div className="grow">
       <CustomComponentRecord
         onRequestError={onRequestError}
-        onUpdateRecord={onUpdateRecord}
         tableName={tableName}
-        record={record}
+        record={proxy as any}
         recordId={recordId}
       />
     </div>
+    <Modal title="Edit JSON field" opened={editJSONModalOpened} onClose={disclosureJSON.close} size={750}>
+      <EditJSON close={disclosureJSON.close} fieldName={editingJSON} record={proxy} />
+    </Modal>
   </div>
 }

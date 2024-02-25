@@ -7,15 +7,15 @@ import { FieldScriptsObject } from "../adminroute/globals";
 
 const exampleCustomMethod = getAPIMethod<FExapleCustomMethod>(API_ENDPOINT, "exampleCustomMethod");
 
-
+type User = { username: string };
 export const fieldScripts: FieldScriptsObject = {
   users: { // the name of the table
     username: { // the name of the field
-      reverse({ value, input }) {
+      reverse(record: User) {
         exampleCustomMethod({
-          arg: value as string
+          arg: record.username
         }).then(reversed => {
-          input.value = reversed;
+          record.username = reversed;
         })
       },
       script() {
