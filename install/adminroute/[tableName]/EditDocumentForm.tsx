@@ -217,6 +217,7 @@ export default function EditDocumentForm({ recordId, record: initialRecord, sche
         </Menu>
         <div className="grow"><TextInput
           name={fieldName}
+          defaultValue={record[fieldName].toUTCString()}
           onBlur={e => {
             const d = new Date(e.target.value);
             

@@ -49,12 +49,14 @@ export default function ({ tableName, scheme }: Props) {
 
   function openRecord(id: string | number) {
     setRequestError(undefined);
-    setInsertMode(false);
     setCurrentId(id);
     readDocument({
       tableName,
       id
-    }).then(setRecord)
+    }).then(rec => {
+      setRecord(rec);
+      setInsertMode(false);
+    })
       .catch(setRequestError);
   }
 
