@@ -10,7 +10,7 @@ import Link from "./comp/Link";
 
 export default async function () {
 
-  const tableNames: string[] = await query(({ }, { db }) => {
+  const tableNames: string[] = await query(({ }, { }, { db }) => {
     const tables = db.getTables();
     return Object.keys(tables);
   });

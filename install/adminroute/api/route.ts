@@ -1,68 +1,35 @@
-import validate, { APIRequest, InvalidResult, ValidationRule, Validator, validateUnionFabric } from "@artempoletsky/easyrpc";
-import { Predicate } from "@artempoletsky/kurgandb";
-import { TableScheme } from "@artempoletsky/kurgandb/table";
+import validate, { APIRequest, ResponseError } from "@artempoletsky/easyrpc";
+import { Predicate, CallbackScope } from "@artempoletsky/kurgandb";
+import { Table, TableScheme } from "@artempoletsky/kurgandb/table";
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "../db";
 
-import { FieldTag, FieldType, FieldTypes, PlainObject } from "@artempoletsky/kurgandb/globals";
+import { FieldTag, PlainObject } from "@artempoletsky/kurgandb/globals";
 import { isAdmin, login, logout as userLogout } from "../../kurgandb_admin/auth";
 
-function methodFactory<PayloadType extends Record<string, any>, ReturnType>(predicate: Predicate<any, PayloadType>) {
-  return async function (payload: PayloadType): Promise<ReturnType> {
-    let res;
-    try {
-      res = await query(predicate, payload);
-    } catch (err: any) {
-      throw {
-        message: err.message || err,
-        invalidFields: {},
-        status: 400,
-      };
-    }
+import * as schemas from "./schemas";
 
-    if (res.$kurganDB_admin_error) {
-      throw res.$kurganDB_admin_error;
-    }
-    return res;
+
+type Tables = Record<string, Table<any, any, any>>;
+function methodFactory<PayloadType extends PlainObject, ReturnType>(predicate: Predicate<Tables, PayloadType, ReturnType>) {
+  return async function (payload: PayloadType): Promise<ReturnType> {
+    return await query(predicate, payload);
   }
 }
 
 
-
-type ACreateDocument = {
-  tableName: string
-  document: PlainObject
-}
-
-const VCreateDocument: ValidationRule<ACreateDocument> = {
-  tableName: "string",
-  document: "any",
-};
-
-const createDocument = methodFactory<ACreateDocument, string | number>(({ }, { db, payload }) => {
-  const { tableName, document } = payload;
+const createDocument = methodFactory<schemas.ACreateDocument, string | number>((T, { tableName, document }, { db }) => {
   let t = db.getTable(tableName);
   const id = t.insert(document);
   return id;
 });
 
-
 export type FCreateDocument = typeof createDocument;
 /////////////////////////////////////////////////////
 
-type AReadDocument = {
-  tableName: string,
-  id: string | number
-}
 
-const VReadDocument: ValidationRule<AReadDocument> = {
-  tableName: "string",
-  id: "any",
-};
-
-const readDocument = methodFactory<AReadDocument, PlainObject>(({ }, { db, payload, $ }) => {
-  const { tableName, id } = payload;
-  let t = db.getTable(tableName);
+const readDocument = methodFactory(({ }, { tableName, id }: schemas.AReadDocument, { db, $ }) => {
+  let t = db.getTable<any, any, any>(tableName);
   return t.at(id, $.full);
 });
 
@@ -71,20 +38,7 @@ export type FReadDocument = typeof readDocument;
 /////////////////////////////////////////////////////
 
 
-type AUpdateDocument = {
-  tableName: string
-  id: string | number
-  document: PlainObject
-}
-
-const VUpdateDocument: ValidationRule<AUpdateDocument> = {
-  tableName: "string",
-  id: "any",
-  document: "any",
-};
-
-const updateDocument = methodFactory<AUpdateDocument, undefined>(({ }, { db, payload }) => {
-  const { tableName, document, id } = payload;
+const updateDocument = methodFactory(({ }, { tableName, document, id }: schemas.AUpdateDocument, { db }) => {
 
   let t = db.getTable<string, any>(tableName);
 
@@ -100,19 +54,7 @@ export type FUpdateDocument = typeof updateDocument;
 /////////////////////////////////////////////////////
 
 
-type ADeleteDocument = {
-  tableName: string
-  id: string | number
-}
-
-const VDeleteDocument: ValidationRule<ADeleteDocument> = {
-  tableName: "string",
-  id: "any",
-};
-
-const deleteDocument = methodFactory<ADeleteDocument, "">(({ }, { db, payload }) => {
-  const { tableName, id } = payload;
-
+const deleteDocument = methodFactory(({ }, { tableName, id }: schemas.ADeleteDocument, { db }) => {
   let t = db.getTable<string, any>(tableName);
 
   t.where(<any>t.primaryKey, id).delete();
@@ -122,16 +64,8 @@ export type FDeleteDocument = typeof deleteDocument;
 
 /////////////////////////////////////////////////////
 
-type ATableOnly = {
-  tableName: string
-}
 
-const VTableOnly: ValidationRule<ATableOnly> = {
-  tableName: "string"
-}
-
-export const getScheme = methodFactory<ATableOnly, TableScheme>(({ }, { db, payload }) => {
-  const { tableName } = payload;
+export const getScheme = methodFactory(({ }, { tableName }: schemas.AGetScheme, { db }) => {
   let t = db.getTable(tableName);
   return t.scheme;
 });
@@ -140,25 +74,15 @@ export type FGetScheme = typeof getScheme;
 
 /////////////////////////////////////////////////////
 
-type AGetPage = {
-  tableName: string
-  queryString: string
-  page: number
-}
+
 
 export type RGetPage = {
   documents: any[]
   pagesCount: number
 }
 
-const VGetPage: ValidationRule<AGetPage> = {
-  tableName: "string",
-  queryString: "string",
-  page: "number",
-}
 
-const getPage = methodFactory<AGetPage, RGetPage>(({ }, { db, payload, $ }) => {
-  const { tableName, queryString, page } = payload;
+const getPage = methodFactory<schemas.AGetPage, RGetPage>(({ }, { tableName, queryString, page }, { db, $ }) => {
   let t = db.getTable(tableName);
   let table = t;
   let tq: any;
@@ -183,18 +107,8 @@ export type FGetPage = typeof getPage;
 
 /////////////////////////////////////////////////////
 
-type AToggleTag = {
-  tableName: string,
-  fieldName: string,
-  tagName: FieldTag,
-}
 
-const VToggleTag: ValidationRule<ATableOnly> = {
-  tableName: "string"
-}
-
-export const toggleTag = methodFactory<AToggleTag, TableScheme>(({ }, { db, payload }) => {
-  const { tableName, fieldName, tagName } = payload;
+export const toggleTag = methodFactory<schemas.AToggleTag, TableScheme>(({ }, { tableName, fieldName, tagName }, { db }) => {
   let t = db.getTable(tableName);
   t.toggleTag(fieldName, tagName);
 
@@ -208,8 +122,7 @@ export type FToggleTag = typeof toggleTag;
 
 
 
-const getFreeId = methodFactory<ATableOnly, number | string>(({ }, { db, payload }) => {
-  const { tableName } = payload;
+const getFreeId = methodFactory<schemas.AGetFreeId, number | string>(({ }, { tableName }, { db }) => {
   let t = db.getTable(tableName);
   return t.getFreeId();
 });
@@ -221,8 +134,7 @@ export type FGetFreeId = typeof getFreeId;
 ///////////////////////////////////////////
 
 
-const getDraft = methodFactory<ATableOnly, any>(({ }, { db, payload }) => {
-  const { tableName } = payload;
+const getDraft = methodFactory<schemas.AGetDraft, any>(({ }, { tableName }, { db }) => {
   let t = db.getTable(tableName);
   return t.getDocumentDraft();
 });
@@ -233,38 +145,25 @@ export type FGetDraft = typeof getDraft;
 
 ///////////////////////////////////////////
 
-export type AAddField = {
-  tableName: string
-  fieldName: string
-  type: FieldType
-  isHeavy: boolean
-}
 
-const VAddField: ValidationRule<AAddField> = {
-  tableName: "string",
-  fieldName: ["string"],
-  type: ["string", validateUnionFabric(FieldTypes)],
-  isHeavy: "boolean",
-}
-
-const addField = methodFactory<AAddField, TableScheme>(({ }, { db, payload }) => {
-  const { tableName, fieldName, type, isHeavy } = payload;
+const addField = methodFactory<schemas.AAddField, TableScheme>(({ }, { tableName, fieldName, type, isHeavy }, { db, ResponseError }) => {
   let t = db.getTable(tableName);
-  if (t.scheme.fields[fieldName]) {
-    return {
-      $kurganDB_admin_error: {
-        message: "Bad request",
-        invalidFields: {
-          fieldName: {
-            message: "already exists",
-            userMessage: "name is already taken",
-          }
-        },
-        status: 400,
+  try {
+    t.addField(fieldName, type, isHeavy);
+  } catch (err) {
+    // throw err;
+
+    throw new ResponseError({
+      invalidFields: {
+        fieldName: {
+          message: "Already taken {...} ({...})",
+          args: [t.scheme.fields[fieldName], t.scheme.tags[fieldName].join(", ")],
+        }
       }
-    }
+    });
+
   }
-  t.addField(fieldName, type, isHeavy);
+
   return t.scheme;
 });
 
@@ -272,18 +171,7 @@ export type FAddField = typeof addField;
 
 ///////////////////////////////////////////
 
-type ARemoveField = {
-  tableName: string
-  fieldName: string
-}
-
-const VRemoveField: ValidationRule<ARemoveField> = {
-  tableName: "string",
-  fieldName: "string",
-}
-
-const removeField = methodFactory<ARemoveField, TableScheme>(({ }, { db, payload }) => {
-  const { tableName, fieldName } = payload;
+const removeField = methodFactory<schemas.ARemoveField, TableScheme>(({ }, { tableName, fieldName }, { db }) => {
   let t = db.getTable(tableName);
   t.removeField(fieldName);
   return t.scheme;
@@ -294,20 +182,7 @@ export type FRemoveField = typeof removeField;
 
 ///////////////////////////////////////////
 
-type AChangeFieldIndex = {
-  tableName: string
-  fieldName: string
-  newIndex: number
-}
-
-const VChangeFieldIndex: ValidationRule<AChangeFieldIndex> = {
-  tableName: "string",
-  fieldName: "string",
-  newIndex: "number",
-}
-
-const changeFieldIndex = methodFactory<AChangeFieldIndex, TableScheme>(({ }, { db, payload }) => {
-  const { tableName, fieldName, newIndex } = payload;
+const changeFieldIndex = methodFactory<schemas.AChangeFieldIndex, TableScheme>(({ }, { tableName, fieldName, newIndex }, { db }) => {
   let t = db.getTable(tableName);
   t.changeFieldIndex(fieldName, newIndex);
   return t.scheme;
@@ -317,20 +192,8 @@ export type FChangeFieldIndex = typeof changeFieldIndex;
 
 ///////////////////////////////////////////
 
-type ARenameField = {
-  tableName: string
-  fieldName: string
-  newName: string
-}
 
-const VRenameField: ValidationRule<ARenameField> = {
-  tableName: "string",
-  fieldName: "string",
-  newName: "string",
-}
-
-const renameField = methodFactory<ARenameField, TableScheme>(({ }, { db, payload }) => {
-  const { tableName, fieldName, newName } = payload;
+const renameField = methodFactory<schemas.ARenameField, TableScheme>(({ }, { tableName, fieldName, newName }, { db }) => {
   let t = db.getTable(tableName);
   t.renameField(fieldName, newName)
   return t.scheme;
@@ -340,20 +203,11 @@ export type FRenameField = typeof renameField;
 
 ///////////////////////////////////////////
 
-type ACreateTable = {
-  tableName: string
-  keyType: "string" | "number"
-  autoIncrement: boolean
-}
 
-const VCreateTable: ValidationRule<ACreateTable> = {
-  tableName: "string",
-  keyType: ["string", validateUnionFabric(["string", "number"])],
-  autoIncrement: "boolean",
-}
 
-const createTable = methodFactory<ACreateTable, TableScheme>(({ }, { db, payload }) => {
-  const { tableName, keyType, autoIncrement } = payload;
+
+
+const createTable = methodFactory<schemas.ACreateTable, TableScheme>(({ }, { tableName, keyType, autoIncrement }, { db }) => {
   const primaryTags: FieldTag[] = autoIncrement ? ["primary", "autoinc"] : ["primary"];
   const t = db.createTable({
     name: tableName,
@@ -372,25 +226,17 @@ export type FCreateTable = typeof createTable;
 
 ///////////////////////////////////////////
 
-const removeTable = methodFactory<ATableOnly, void>(({ }, { db, payload }) => {
-  const { tableName } = payload;
+const removeTable = methodFactory<schemas.ARemoveTable, void>(({ }, { tableName }, { db }) => {
   db.removeTable(tableName);
 });
 
 export type FRemoveTable = typeof removeTable;
 
 ///////////////////////////////////////////
-type AAuthorize = {
-  userName: string
-  password: string
-};
 
-const VAuthorize: ValidationRule<AAuthorize> = {
-  userName: "string",
-  password: "string",
-};
 
-const authorize = async ({ userName, password }: AAuthorize) => {
+const authorize = async ({ userName, password }: schemas.AAuthorize) => {
+
   return await login(userName, password);
 }
 
@@ -410,47 +256,37 @@ export type FLogout = typeof logout;
 
 import * as scripts from "../../kurgandb_admin/scripts";
 
-type AExecuteScript = {
-  args: string[]
-  path: string
-};
-
-const VExecuteScript: ValidationRule<AExecuteScript> = {
-  args: "stringEmpty[]",
-  path: "string",
-};
-
 export type ScriptsLogRecord = {
   time: number
   result: string
 };
 
-const executeScript = async ({ args, path }: AExecuteScript): Promise<ScriptsLogRecord> => {
+const executeScript = async ({ args, path }: schemas.AExecuteScript): Promise<ScriptsLogRecord> => {
   const steps = path.split(".");
   let current: PlainObject | Function = scripts as PlainObject;
+  let self = current;
   while (steps.length > 1) {
-    if (typeof current === "function") {
-      return {
-        result: `function has been found to early at '${steps[0]}' in '${path}'`,
-        time: 0,
-      };
-    }
+    if (typeof current === "function")
+      throw new ResponseError(`function has been found to early at '${steps[0]}' in '${path}'`);
+
 
     steps.shift();
+    self = current;
     current = current[steps[0]];
   }
-  if (typeof current != "function") {
-    return {
-      result: `Script path '${path}' hasn't been found`,
-      time: 0,
-    };
-  }
+  if (typeof current != "function")
+    throw new ResponseError(`Script path '${path}' hasn't been found`);
+
+
   const t1 = performance.now();
-  const result = await current(...args);
+  let result = await current.apply(self, args);
+  if (result === undefined) {
+    result = "Success!";
+  }
 
   return {
     time: Math.floor(performance.now() - t1),
-    result: result || "",
+    result,
   }
 }
 
@@ -460,14 +296,19 @@ export type FExecuteScript = typeof executeScript;
 
 ///////////////////////////////////////////
 
+
+
 import { customAPI, customRules } from "../../kurgandb_admin/api";
-import { ValidationErrorResponce } from "@artempoletsky/easyrpc/client";
+import { ValidationErrorResponse } from "@artempoletsky/easyrpc/client";
+
 
 export const POST = async function name(request: NextRequest) {
   const req: APIRequest = await request.json();
   if (!isAdmin() && req.method !== "authorize") {
-    const err: ValidationErrorResponce = {
+    const err: ValidationErrorResponse = {
       message: "You must authorize to perform this action",
+      statusCode: 403,
+      args: [],
       invalidFields: {}
     };
     return NextResponse.json(err, {
@@ -476,26 +317,10 @@ export const POST = async function name(request: NextRequest) {
   }
 
 
+  let result, status;
 
-  const [result, status] = await validate(req, {
-    createDocument: VCreateDocument,
-    readDocument: VReadDocument,
-    updateDocument: VUpdateDocument,
-    deleteDocument: VDeleteDocument,
-    getScheme: VTableOnly,
-    getPage: VGetPage,
-    toggleTag: VToggleTag,
-    getFreeId: VTableOnly,
-    getDraft: VTableOnly,
-    addField: VAddField,
-    removeField: VRemoveField,
-    changeFieldIndex: VChangeFieldIndex,
-    renameField: VRenameField,
-    createTable: VCreateTable,
-    removeTable: VTableOnly,
-    authorize: VAuthorize,
-    logout: {},
-    executeScript: VExecuteScript,
+  [result, status] = await validate(req, {
+    ...schemas,
     ...customRules,
   }, {
     createDocument,
@@ -518,6 +343,7 @@ export const POST = async function name(request: NextRequest) {
     executeScript,
     ...customAPI,
   });
+
 
   return NextResponse.json(result, status);
 }

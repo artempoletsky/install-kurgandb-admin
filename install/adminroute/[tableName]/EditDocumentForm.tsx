@@ -3,15 +3,15 @@ import type { TableScheme } from "@artempoletsky/kurgandb/table";
 
 // import Button from "./Button";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { ValidationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import type { FCreateDocument, FDeleteDocument, FUpdateDocument } from "../api/route";
 
-import { formToDocument } from "@artempoletsky/kurgandb/client";
 import FieldLabel from "../comp/FieldLabel";
 import { ActionIcon, Button, Checkbox, CloseButton, Menu, MenuTarget, Modal, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { API_ENDPOINT } from "../generated";
 import { blinkBoolean } from "../utils_client";
-import { $, FieldTag, FieldType, PlainObject, field } from "@artempoletsky/kurgandb/globals";
+import { $, FieldTag, FieldType, PlainObject, formToDocument } from "@artempoletsky/kurgandb/globals";
+import { ValidationErrorResponse } from "@artempoletsky/easyrpc/client";
 
 import { fieldScripts } from "../../kurgandb_admin/field_scripts";
 import { ScriptsRecord, formatCamelCase } from "../globals";
@@ -33,8 +33,9 @@ type Props = {
   tableName: string
   recordId: string | number | undefined
   onCreated: (id: string | number) => void
+  onDeleted: () => void
   onDuplicate: () => void
-  onRequestError: (e: ValidationErrorResponce) => void
+  onRequestError: (e: ValidationErrorResponse) => void
   onClose: () => void
 };
 
@@ -55,7 +56,18 @@ function createProxy<T>(record: T, setRecord: (newRecord: T) => void): T {
 
 
 
-export default function EditDocumentForm({ recordId, record: initialRecord, scheme, insertMode, tableName, onCreated, onDuplicate, onRequestError, onClose }: Props) {
+export default function EditDocumentForm({
+  onDeleted,
+  recordId,
+  record: initialRecord,
+  scheme,
+  insertMode,
+  tableName,
+  onCreated,
+  onDuplicate,
+  onRequestError,
+  onClose
+}: Props) {
 
   const form = useRef<HTMLFormElement>(null);
   const [record, setRecord] = useState<PlainObject>({});
@@ -100,7 +112,7 @@ export default function EditDocumentForm({ recordId, record: initialRecord, sche
 
     if (!confirm("Are you sure you want delete this document?")) return;
     deleteDocument({ tableName, id: recordId })
-      .then(onCreated)
+      .then(onDeleted)
       .catch(onRequestError);
   }
 
@@ -220,10 +232,10 @@ export default function EditDocumentForm({ recordId, record: initialRecord, sche
           defaultValue={record[fieldName].toUTCString()}
           onBlur={e => {
             const d = new Date(e.target.value);
-            
+
             if (!isNaN(d as any)) {
               proxy[fieldName] = d;
-            } 
+            }
             updateDateInput(fieldName);
           }} autoComplete="off" size="sm" /></div>
 

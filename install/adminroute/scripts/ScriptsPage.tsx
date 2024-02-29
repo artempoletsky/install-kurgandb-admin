@@ -28,9 +28,10 @@ type Props = {
 export default function ScriptsPage({ scripts }: Props) {
 
   const [log, setLog] = useState<ScriptsLogRecord[]>([]);
-  function onScriptExecuted(record: ScriptsLogRecord) {
-    setLog([...log, record]);
+  function onLog(record: ScriptsLogRecord) {
+    setLog(log => log.concat(record));
   }
+
 
   function printGroup(group: Group, path: string, key: string) {
     const items: ReactNode[] = [];
@@ -44,7 +45,7 @@ export default function ScriptsPage({ scripts }: Props) {
         items.push(printGroup(item.children, newPath, key));
       } else {
         if (item.fun) {
-          items.push(<FunctionComponent onExecuted={onScriptExecuted} className="mb-3" key={newPath} {...item.fun} path={newPath} name={formatCamelCase(key)} />);
+          items.push(<FunctionComponent onLog={onLog} className="mb-3" key={newPath} {...item.fun} path={newPath} name={formatCamelCase(key)} />);
         } else {
           items.push(<div key={newPath} className="mb-3 text-red-600">Failed to parse function: '{newPath}'</div>);
         }

@@ -15,10 +15,10 @@ type Props = {
   path: string
   name: string
   className?: string
-  onExecuted: (args: ScriptsLogRecord) => void
+  onLog: (args: ScriptsLogRecord) => void
 }
 
-export default function FunctionComponent({ className, description, args, path, name, onExecuted }: Props) {
+export default function FunctionComponent({ className, description, args, path, name, onLog }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
 
   function onExecuteClick() {
@@ -26,14 +26,18 @@ export default function FunctionComponent({ className, description, args, path, 
     if (!form) throw new Error("form is undefined");
 
     let args = Array.from(form.querySelectorAll("input")).map(input => input.value);
+    onLog({
+      result: `Executing ${name}...`,
+      time: -1
+    });
     executeScript({
       args,
       path,
-    }).then(onExecuted);
+    }).then(onLog);
   }
 
   function printArguments(args: string[], path: string) {
-    return <div className="inline-flex gap-3">{args.map(key => <TextInput name={key} key={key} placeholder={key} />)}</div>;
+    return <div className="inline-flex gap-3">{args.map(key => <TextInput autoComplete="off" name={key} key={key} placeholder={key} />)}</div>;
   }
 
   return (

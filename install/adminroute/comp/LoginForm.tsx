@@ -3,43 +3,59 @@
 import { useState } from "react";
 import TextInput from "./TextInput";
 import { Button } from "@mantine/core";
-import { ValidationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod, useMantineRequestError } from "@artempoletsky/easyrpc/client";
 import { FAuthorize } from "../api/route";
 import { API_ENDPOINT } from "../generated";
 
+import { zodResolver } from 'mantine-form-zod-resolver';
+import z from 'zod';
+import { useForm } from '@mantine/form';
+import { AAuthorize, authorize as ZAuthorize } from "../api/schemas";
+
 const authorize = getAPIMethod<FAuthorize>(API_ENDPOINT, "authorize");
 
+
 export default function LoginForm() {
-  const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
   const [incorrect, setIncorrect] = useState(false);
 
-  let [requestError, setRequestError] = useState<ValidationErrorResponce | undefined>(undefined);
+  const form = useForm<AAuthorize>({
+    initialValues: {
+      userName: "",
+      password: "",
+    },
+    validate: zodResolver(ZAuthorize),
+  });
 
-  function onAutorize() {
+  const setRequestError = useMantineRequestError(form);
+
+  function onAutorize({ userName, password }: AAuthorize) {
     setIncorrect(false);
-    setRequestError(undefined);
+    setRequestError();
     authorize({ userName, password })
       .then((success) => {
         setIncorrect(!success);
-
         if (success) window.location.href += "";
       })
       .catch(setRequestError);
   }
+
+
   return <div className="h-screen bg-stone-200 flex items-center">
-    <div className="mx-auto w-[350px] h-[250px]">
+    <form className="mx-auto w-[350px] h-[250px]" onSubmit={form.onSubmit(onAutorize)} action="#" autoComplete="off">
       <p className="mb-1">Authorization is required</p>
       <TextInput
-        error={requestError?.invalidFields.userName?.userMessage}
-        value={userName} onChange={e => setUserName(e.target.value)} placeholder="username" />
+        {...form.getInputProps("userName")}
+        // error={requestError?.invalidFields.userName?.userMessage}
+        placeholder="username"
+      />
       <TextInput
-        error={requestError?.invalidFields.password?.userMessage}
-        value={password} onChange={e => setPassword(e.target.value)} placeholder="password" type="password" />
-      <Button onClick={onAutorize}>Login</Button>
+        {...form.getInputProps("password")}
+        // error={requestError?.invalidFields.password?.userMessage}
+        placeholder="password" type="password" />
+      <Button type="submit">Login</Button>
       {incorrect &&
         <div className="text-red-900">Incorrect username or password</div>
       }
-    </div>
+    </form>
   </div>
 }
