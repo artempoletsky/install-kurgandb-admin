@@ -45,7 +45,11 @@ function installDependencies() {
   const packageFilePath = `${__dirname}/package.json`;
   const jsonData = JSON.parse(fs.readFileSync(packageFilePath));
   console.log("installing dependencies, please wait...");
-  const deps = ["@artempoletsky/easyrpc", "@artempoletsky/kurgandb", "@mantine/core", "@mantine/hooks", "@mantine/dates", "tabler-icons-react"];
+  const deps = [
+    "@artempoletsky/easyrpc", "@artempoletsky/kurgandb",
+    "@mantine/core", "@mantine/hooks", "@mantine/dates", "@mantine/form",
+    "tabler-icons-react", "zod"
+  ];
 
   exec(`npm install --save ${deps.join(" ")}`);
 }
