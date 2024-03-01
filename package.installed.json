@@ -1,0 +1,45 @@
+{
+  "name": "@artempoletsky/install-kurgandb-admin",
+  "version": "1.0.3",
+  "description": "KurganDB admin panel for next.js",
+  "main": "cli.js",
+  "bin": "cli.js",
+  "scripts": {
+    "update": "node ./update.js",
+    "next": "next dev -p 3001"
+  },
+  "keywords": [
+    "admin-panel",
+    "nextjs"
+  ],
+  "author": "Artem Poletsky",
+  "license": "ISC",
+  "files": [
+    "/install/**/*",
+    "/cli.js"
+  ],
+  "dependencies": {
+    "@artempoletsky/easyrpc": "^1.1.3",
+    "@artempoletsky/kurgandb": "^1.1.0",
+    "@mantine/core": "^7.6.1",
+    "@mantine/dates": "^7.6.1",
+    "@mantine/form": "^7.6.1",
+    "@mantine/hooks": "^7.6.1",
+    "next": "14.1.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "tabler-icons-react": "^1.56.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.1.0",
+    "postcss": "^8",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
+  }
+}
