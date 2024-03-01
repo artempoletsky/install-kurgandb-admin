@@ -52,7 +52,7 @@ function installDependencies() {
 
 
 function editEnvFile() {
-  const filePath = `${CWD}/.env`;
+  const filePath = `${CWD}/.env.local`;
 
   const fileText = fs.existsSync(filePath) ? fs.readFileSync(filePath, { encoding: "utf8" }) : "";
   const lines = fileText.split(/\r?\n|\r|\n/g);
@@ -98,7 +98,7 @@ function main() {
 
   generateTSFile(targetDir);
 
-  editGitignore([`/app/${ADMIN_ROOT}/`, ".env"]);
+  editGitignore([`/app/${ADMIN_ROOT}/`]);
 
   editEnvFile();
 

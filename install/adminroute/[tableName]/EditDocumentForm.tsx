@@ -10,7 +10,7 @@ import FieldLabel from "../comp/FieldLabel";
 import { ActionIcon, Button, Checkbox, CloseButton, Menu, MenuTarget, Modal, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { API_ENDPOINT } from "../generated";
 import { blinkBoolean } from "../utils_client";
-import { $, FieldTag, FieldType, PlainObject, formToDocument } from "@artempoletsky/kurgandb/globals";
+import { $, FieldTag, FieldType, PlainObject } from "@artempoletsky/kurgandb/globals";
 import { ValidationErrorResponse } from "@artempoletsky/easyrpc/client";
 
 import { fieldScripts } from "../../kurgandb_admin/field_scripts";
@@ -82,11 +82,6 @@ export default function EditDocumentForm({
     }
   }
 
-  function getData() {
-    if (!form.current) throw new Error("no form ref");
-    const documentData = formToDocument(form.current, scheme);
-    return documentData;
-  }
   function save() {
 
     if (recordId === undefined) throw new Error("id is undefined");
@@ -100,9 +95,7 @@ export default function EditDocumentForm({
   }
 
   function create() {
-    const data = getData();
-
-    createDocument({ tableName, document: data })
+    createDocument({ tableName, document: record })
       .then(onCreated)
       .catch(onRequestError);
   }
@@ -224,7 +217,7 @@ export default function EditDocumentForm({
             <ActionIcon size={36}><Calendar /></ActionIcon>
           </Menu.Target>
           <Menu.Dropdown >
-            <DatePicker value={record[fieldName]} onChange={onDateChange(fieldName)} />
+            <DatePicker defaultDate={record[fieldName]} value={record[fieldName]} onChange={onDateChange(fieldName)} />
           </Menu.Dropdown>
         </Menu>
         <div className="grow"><TextInput

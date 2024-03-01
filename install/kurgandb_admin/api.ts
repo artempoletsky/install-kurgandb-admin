@@ -1,26 +1,22 @@
+import z from "zod";
 
-import { ValidationRule } from "@artempoletsky/easyrpc";
 
+const ZExapleCustomMethod = z.object({
+  arg: z.string(),
+});
+type AExapleCustomMethod = z.infer<typeof ZExapleCustomMethod>;
 
-type AExapleCustomMethod = {
-  arg: string
-}
-
-const VExapleCustomMethod: ValidationRule<AExapleCustomMethod> = {
-  arg: "stringEmpty",
-}
 
 async function exampleCustomMethod({ arg }: AExapleCustomMethod) {
   return arg.split("").reverse().join("");
 }
 
 export type FExapleCustomMethod = typeof exampleCustomMethod;
-
 //////////////////////////////////////////////////////////////////////////
 
 
 export const customRules = {
-  exampleCustomMethod: VExapleCustomMethod,
+  exampleCustomMethod: ZExapleCustomMethod,
 };
 
 export const customAPI = {
