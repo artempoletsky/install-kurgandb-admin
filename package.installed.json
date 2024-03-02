@@ -5,6 +5,9 @@
   "main": "cli.js",
   "bin": "cli.js",
   "scripts": {
+    "lint": "next lint",
+    "start": "next start",
+    "build": "next build",
     "update": "node ./update.js",
     "next": "next dev -p 3001"
   },
