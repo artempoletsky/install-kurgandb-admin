@@ -47,7 +47,7 @@ function installDependencies() {
   console.log("installing dependencies, please wait...");
   const deps = [
     "@artempoletsky/easyrpc", "@artempoletsky/kurgandb",
-    "@mantine/core", "@mantine/hooks", "@mantine/dates", "@mantine/form",
+    "@mantine/core", "@mantine/hooks", "@mantine/dates", "@mantine/form", "mantine-form-zod-resolver",
     "tabler-icons-react", "zod"
   ];
 
@@ -90,6 +90,20 @@ function editImports(files) {
   }
 }
 
+function modifyGlobalsCSS() {
+  const filePath = `${CWD}/app/globals.css`;
+
+  let fileContents = fs.readFileSync(filePath, { encoding: "utf8" });
+  fileContents = fileContents.replace("@tailwind base;", `@import '@mantine/dates/styles.css';
+  @import '@mantine/core/styles.css';
+
+  @layer tailwind {
+    @tailwind base;
+  }`);
+
+  fs.writeFileSync(filePath, fileContents);
+}
+
 function main() {
   const sourceDir = `${__dirname}/install/adminroute/`;
   const targetDir = `${CWD}/app/${ADMIN_ROOT}/`;
@@ -102,7 +116,7 @@ function main() {
 
   generateTSFile(targetDir);
 
-  editGitignore([`/app/${ADMIN_ROOT}/`]);
+  // editGitignore([`/app/${ADMIN_ROOT}/`]);
 
   editEnvFile();
 
@@ -111,6 +125,7 @@ function main() {
 
   editImports([`${targetDir1}field_scripts.ts`, ...files]);
 
+  modifyGlobalsCSS();
   installDependencies();
 }
 
