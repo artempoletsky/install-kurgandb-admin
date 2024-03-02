@@ -3,12 +3,13 @@
 import { useState } from "react";
 import TextInput from "./TextInput";
 import { Button } from "@mantine/core";
-import { getAPIMethod, useMantineRequestError } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
 import { FAuthorize } from "../api/route";
 import { API_ENDPOINT } from "../generated";
 
-import { zodResolver } from 'mantine-form-zod-resolver';
+
 import z from 'zod';
+import { zodResolver } from 'mantine-form-zod-resolver';
 import { useForm } from '@mantine/form';
 import { AAuthorize, authorize as ZAuthorize } from "../api/schemas";
 
@@ -16,7 +17,7 @@ const authorize = getAPIMethod<FAuthorize>(API_ENDPOINT, "authorize");
 
 
 export default function LoginForm() {
-  const [incorrect, setIncorrect] = useState(false);
+  // const [incorrect, setIncorrect] = useState(false);
 
   const form = useForm<AAuthorize>({
     initialValues: {
@@ -26,15 +27,13 @@ export default function LoginForm() {
     validate: zodResolver(ZAuthorize),
   });
 
-  const setRequestError = useMantineRequestError(form);
+  const [setRequestError, mainErrorMessage] = useErrorResponse(form)
 
   function onAutorize({ userName, password }: AAuthorize) {
-    setIncorrect(false);
     setRequestError();
     authorize({ userName, password })
-      .then((success) => {
-        setIncorrect(!success);
-        if (success) window.location.href += "";
+      .then(() => {
+        window.location.href += "";
       })
       .catch(setRequestError);
   }
@@ -53,9 +52,7 @@ export default function LoginForm() {
         // error={requestError?.invalidFields.password?.userMessage}
         placeholder="password" type="password" />
       <Button type="submit">Login</Button>
-      {incorrect &&
-        <div className="text-red-900">Incorrect username or password</div>
-      }
+      <div className="text-red-900 min-h-[25px]">{mainErrorMessage}</div>
     </form>
   </div>
 }

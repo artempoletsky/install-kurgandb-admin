@@ -61,14 +61,15 @@ export type AGetPage = z.infer<typeof getPage>;
 export const toggleTag = z.object({
   tableName: ZStringNonEmpty,
   fieldName: ZStringNonEmpty,
-  type: z.union(FieldTags.map(t => z.literal(t)) as any),
-  isHeavy: z.boolean(),
+  tagName: z.enum(FieldTags),
 });
-export type AToggleTag = {
-  tableName: string,
-  fieldName: string,
-  tagName: FieldTag,
-}
+export type AToggleTag = z.infer<typeof toggleTag>;
+
+// export type AToggleTag = {
+//   tableName: string,
+//   fieldName: string,
+//   tagName: FieldTag,
+// }
 
 
 export const getFreeId = ZTableOnly;

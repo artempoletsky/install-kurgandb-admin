@@ -236,8 +236,9 @@ export type FRemoveTable = typeof removeTable;
 
 
 const authorize = async ({ userName, password }: schemas.AAuthorize) => {
-
-  return await login(userName, password);
+  const success = await login(userName, password);
+  if (!success) throw new ResponseError("Incorrect username or password.");
+  return success;
 }
 
 export type FAuthorize = typeof authorize;
@@ -299,14 +300,15 @@ export type FExecuteScript = typeof executeScript;
 
 
 import { customAPI, customRules } from "../../kurgandb_admin/api";
-import { ValidationErrorResponse } from "@artempoletsky/easyrpc/client";
+import { JSONErrorResponse } from "@artempoletsky/easyrpc/client";
 
 
 export const POST = async function name(request: NextRequest) {
   const req: APIRequest = await request.json();
   if (!isAdmin() && req.method !== "authorize") {
-    const err: ValidationErrorResponse = {
+    const err: JSONErrorResponse = {
       message: "You must authorize to perform this action",
+      preferredErrorDisplay: "form",
       statusCode: 403,
       args: [],
       invalidFields: {}
