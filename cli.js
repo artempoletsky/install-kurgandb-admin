@@ -126,7 +126,7 @@ function main() {
   editImports([`${targetDir1}field_scripts.ts`, ...files]);
 
   modifyGlobalsCSS();
-  // installDependencies();
+  installDependencies();
 }
 
 if (require.main === module) {
