@@ -47,7 +47,7 @@ function installDependencies() {
   console.log("installing dependencies, please wait...");
   const deps = [
     "@artempoletsky/easyrpc", "@artempoletsky/kurgandb",
-    "@mantine/core", "@mantine/hooks", "@mantine/dates", "@mantine/form", "mantine-form-zod-resolver",
+    "@mantine/core", "@mantine/hooks", "@mantine/dates", "@mantine/form",
     "tabler-icons-react", "zod"
   ];
 
@@ -126,7 +126,7 @@ function main() {
   editImports([`${targetDir1}field_scripts.ts`, ...files]);
 
   modifyGlobalsCSS();
-  installDependencies();
+  // installDependencies();
 }
 
 if (require.main === module) {

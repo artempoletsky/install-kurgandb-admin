@@ -1,7 +1,7 @@
 import { FieldTag, FieldTags, FieldType, FieldTypes, PlainObject } from "@artempoletsky/kurgandb/globals";
 import z from "zod";
 
-const ZStringNonEmpty = z.string().min(1, "Required");
+const ZStringNonEmpty = z.string().trim().min(1, "Required");
 
 const ZTableOnly = z.object({
   tableName: ZStringNonEmpty,

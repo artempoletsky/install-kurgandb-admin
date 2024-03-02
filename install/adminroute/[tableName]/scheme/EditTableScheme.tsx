@@ -1,17 +1,18 @@
 "use client";
 import type { TableScheme } from "@artempoletsky/kurgandb/table";
 import { ReactNode, useState } from "react";
-import { getAPIMethod, ValidationErrorResponce } from "@artempoletsky/easyrpc/client";
-import type { AAddField, FAddField, FChangeFieldIndex, FRemoveField, FRenameField, FToggleTag } from "../../api/route";
+import { getAPIMethod, JSONErrorResponse } from "@artempoletsky/easyrpc/client";
+import type { FAddField, FChangeFieldIndex, FRemoveField, FRenameField, FToggleTag } from "../../api/route";
 import FieldLabel from "../../comp/FieldLabel";
 import { ActionIcon, Button, Select, Tooltip } from "@mantine/core";
-import { FieldTag, FieldType, FieldTypes } from "@artempoletsky/kurgandb/globals";
+import { FieldTag } from "@artempoletsky/kurgandb/globals";
 
 import CreateNewField from "./CreateNewField";
-import { ChevronDown, ChevronUp, Edit, Trash } from 'tabler-icons-react';
+import { ChevronDown, ChevronUp, Trash } from 'tabler-icons-react';
 import RequestError from "../../comp/RequestError";
 import { API_ENDPOINT } from "../../generated";
 import { blinkBoolean } from "../../utils_client";
+import { AAddField } from "../../api/schemas";
 
 const toggleTag = getAPIMethod<FToggleTag>(API_ENDPOINT, "toggleTag");
 const removeField = getAPIMethod<FRemoveField>(API_ENDPOINT, "removeField");
@@ -32,7 +33,7 @@ export default function EditTableScheme({ tableName, scheme: schemeInitial }: Pr
 
   let [scheme, setScheme] = useState(schemeInitial);
 
-  let [requestError, setRequestError] = useState<ValidationErrorResponce | undefined>(undefined);
+  let [requestError, setRequestError] = useState<JSONErrorResponse | undefined>(undefined);
   const [typeCopiedTooltip, setTypeCopiedTooltip] = useState(false);
 
   function toggleHandler(fieldName: string, tagName: FieldTag) {

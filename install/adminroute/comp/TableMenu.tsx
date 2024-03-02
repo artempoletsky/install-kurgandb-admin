@@ -62,7 +62,7 @@ export default function TableMenu({ tableName }: Props) {
       tableName,
     })
       .then(() => {
-        window.location.href = "./";
+        window.location.href = `/${ROOT_PATH}/`;
       })
     // .catch(setRequestError);
   }

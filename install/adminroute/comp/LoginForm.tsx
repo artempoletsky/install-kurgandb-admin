@@ -8,9 +8,7 @@ import { FAuthorize } from "../api/route";
 import { API_ENDPOINT } from "../generated";
 
 
-import z from 'zod';
-import { zodResolver } from 'mantine-form-zod-resolver';
-import { useForm } from '@mantine/form';
+import { useForm, zodResolver } from '@mantine/form';
 import { AAuthorize, authorize as ZAuthorize } from "../api/schemas";
 
 const authorize = getAPIMethod<FAuthorize>(API_ENDPOINT, "authorize");

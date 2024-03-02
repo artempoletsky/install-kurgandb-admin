@@ -1,24 +1,29 @@
-import { Checkbox, Tooltip } from "@mantine/core"
+import { Checkbox, Tooltip, CheckboxProps } from "@mantine/core"
 
-type Props = {
+type Props = CheckboxProps & {
   tooltip: string
-  label: string
-  value: boolean
-  onChange: (newVal: boolean) => void
+  // label: string
+  // onChange: (newVal: boolean) => void
 }
 
-export default function CheckboxTooltip({ tooltip, label, value, onChange }: Props) {
+export default function CheckboxTooltip(props: Props) {
+  const { tooltip } = props;
+  
 
+  const newProps: Omit<Props, "tooltip"> = { ...props };
+  delete (newProps as any).tooltip;
+  
   return <Tooltip label={tooltip}>
     <div className="pt-2 mr-2">
       <Checkbox
-        checked={value}
-        onChange={e => onChange(e.target.checked)}
+        {...newProps}
+        // checked={value}
+        // onChange={e => onChange(e.target.checked)}
         classNames={{
           label: "cursor-help",
           input: "cursor-help",
         }}
-        label={label}
+        // label={label}
       />
     </div>
   </Tooltip>

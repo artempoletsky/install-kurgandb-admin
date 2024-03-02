@@ -2,68 +2,89 @@
 
 import { Button, Checkbox, Select, Tooltip } from "@mantine/core";
 import TextInput from "./TextInput";
-import { ValidationErrorResponce, getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
 import type { FCreateTable } from "../api/route";
 import { useState } from "react";
 import CheckboxTooltip from "./CheckboxTooltip";
 import RequestError from "./RequestError";
 import { API_ENDPOINT } from "../generated";
+import { useForm, zodResolver } from "@mantine/form";
+import { ACreateTable, createTable as ZCreateTable } from "../api/schemas";
 
 const createTable = getAPIMethod<FCreateTable>(API_ENDPOINT, "createTable");
 
 
 export default function CreateNewTable() {
-  let [requestError, setRequestError] = useState<ValidationErrorResponce | undefined>(undefined);
-  let [tableName, setTableName] = useState("");
+
+  const form = useForm<ACreateTable>({
+    initialValues: {
+      tableName: "",
+      keyType: "number",
+      autoIncrement: true,
+    },
+    validate: zodResolver(ZCreateTable)
+  });
+
+  const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse(form);
+
   let [keyType, setKeyType] = useState<"string" | "number">("number");
-  let [autoIncrement, setAutoIncrement] = useState(true);
 
-  function redirectToCreatedTable() {
-    window.location.href += "/" + tableName;
-  }
 
-  function onCreateTable() {
-    setRequestError(undefined);
+  function onCreateTable({ tableName, autoIncrement }: ACreateTable) {
+    setErrorResponse();
     if (keyType == "string") {
       autoIncrement = false;
     }
-
+    
+    tableName = tableName.trim();
     createTable({
       tableName,
       keyType,
       autoIncrement,
     })
-      .then(redirectToCreatedTable)
-      .catch(setRequestError)
+      .then(() => {
+        window.location.href += "/" + tableName + "/scheme";
+      })
+      .catch(setErrorResponse)
   }
 
   return <div className="pl-5 w-[350px]">
     <p className="mb-1">Create a new table:</p>
-    <div className="">
+    <form className="" onSubmit={form.onSubmit(onCreateTable)}>
       <div className="">
         <TextInput
-          error={requestError?.invalidFields.tableName?.userMessage}
-          placeholder="table name" value={tableName}
-          onChange={e => setTableName(e.target.value)}
+          {...form.getInputProps("tableName")}
+          placeholder="table name"
         />
       </div>
       <div className="">
-        <Select label="ID type" value={keyType} data={["string", "number"]} onChange={e => setKeyType(e as any)} />
+        <Select
+          // {...form.getInputProps("keyType")}
+          allowDeselect={false}
+          name="keyType"
+          label="ID type"
+          value={keyType}
+          data={["string", "number"]}
+          onChange={e => setKeyType(e as any)}
+        />
       </div>
       {keyType == "number" &&
         <div className="mb-2">
           <CheckboxTooltip
-            onChange={setAutoIncrement}
-            value={autoIncrement}
+            {...form.getInputProps("autoIncrement", {
+              type: "checkbox"
+            })}
+            // onChange={setAutoIncrement}
+            // value={autoIncrement}
             tooltip="Uncheck if you want to manage ID generation manually"
             label="auto increment"
           />
         </div>}
       <div className="mt-3">
-        <Button onClick={onCreateTable}>Create</Button>
+        <Button type="submit">Create</Button>
       </div>
-      <RequestError requestError={requestError} />
+      <RequestError requestError={errorResponse} />
 
-    </div>
+    </form>
   </div>
 }

@@ -1,14 +1,14 @@
-import { ValidationErrorResponce } from "@artempoletsky/easyrpc/client"
+import { JSONErrorResponse, mainErrorMessage } from "@artempoletsky/easyrpc/client"
 
 type Props = {
-  requestError?: ValidationErrorResponce
+  requestError?: JSONErrorResponse
 }
 
 export default function RequestError({ requestError }: Props) {
 
   return <>
-    {requestError && requestError.message !== "Bad request" && <div className="text-red-800">
-      <p className="">Request failed:</p>
-      <p className="">{requestError.message}</p>
+    {requestError && requestError.preferredErrorDisplay != "field" && <div className="text-red-800">
+      <p className="">Request has failed:</p>
+      <p className="">{mainErrorMessage(requestError)}</p>
     </div>}</>
 }
