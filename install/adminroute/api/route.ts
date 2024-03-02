@@ -2,7 +2,7 @@ import validate, { APIRequest, ResponseError } from "@artempoletsky/easyrpc";
 import { Predicate, CallbackScope } from "@artempoletsky/kurgandb";
 import { Table, TableScheme } from "@artempoletsky/kurgandb/table";
 import { NextRequest, NextResponse } from "next/server";
-import { query } from "../db";
+import { queryUniversal as query } from "@artempoletsky/kurgandb";
 
 import { FieldTag, PlainObject } from "@artempoletsky/kurgandb/globals";
 import { isAdmin, login, logout as userLogout } from "../../kurgandb_admin/auth";

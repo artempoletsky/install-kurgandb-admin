@@ -1,5 +1,5 @@
 
-import { query } from "./db";
+import { queryUniversal as query } from "@artempoletsky/kurgandb";
 import Layout from "./comp/layout";
 import CreateNewTable from "./comp/CreateNewTable";
 import { ROOT_PATH } from "./generated";
@@ -13,7 +13,7 @@ export default async function () {
   const tableNames: string[] = await query(({ }, { }, { db }) => {
     const tables = db.getTables();
     return Object.keys(tables);
-  });
+  }, {});
 
   return (
     <Layout>
