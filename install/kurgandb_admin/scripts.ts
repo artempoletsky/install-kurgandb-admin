@@ -2,6 +2,7 @@ import { FieldType, PlainObject } from "@artempoletsky/kurgandb/globals";
 import fs from "fs";
 import generateDB from "./codegen/db/generate_db";
 import generateCodeFile from "./codegen/generate";
+import { queryUniversal } from "@artempoletsky/kurgandb";
 
 
 
@@ -58,3 +59,17 @@ export const NextRoutes = {
     return "Success!";
   },
 }
+
+
+export async function ThrowError(message: string) {
+  try {
+    await queryUniversal(({ }, { message }, { ResponseError }) => {
+      throw new Error(message);
+    }, {
+      message
+    });
+  } catch (err: any) {
+    return err.message;
+  }
+}
+
