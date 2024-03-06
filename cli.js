@@ -90,18 +90,55 @@ function editImports(files) {
   }
 }
 
+
+function wrapTailwindBase(fileContents) {
+  const iOf = fileContents.indexOf("@tailwind base");
+
+  if (iOf == -1) {
+    console.log("No '@tailwind base;' found. Consider fixing your globals.css manually.");
+    return fileContents;
+  }
+  let wrapped = false;
+
+  for (let i = iOf; i > 0; i--) {
+    const char = fileContents[i];
+    if (char == "}") break; // if we found different wrapping, consider tailwind unwrapped
+
+    if (char == "{") { // probably a wrapping
+
+      const head = fileContents.slice(0, i);
+      wrapped = /^[\s\S]*@layer\s+\w+\s+\{$/
+      break;
+    }
+  }
+  if (wrapped) {
+    console.log("'@tailwind base;' is wrapped already.");
+    return fileContents;
+  }
+
+  console.log("Wrapping '@tailwind base;'...");
+
+  return fileContents.replace("@tailwind base;", `@layer tailwind {
+  @tailwind base;
+}`);
+
+}
+
 function modifyGlobalsCSS() {
   const filePath = `${CWD}/app/globals.css`;
 
   let fileContents = fs.readFileSync(filePath, { encoding: "utf8" });
-  fileContents = fileContents.replace("@tailwind base;", `@import '@mantine/dates/styles.css';
-  @import '@mantine/core/styles.css';
+  // const mantineDatesImport = "@import '@mantine/dates/styles.css'";
+  // const mantineCoreImport = "@import '@mantine/core/styles.css'";
 
-  @layer tailwind {
-    @tailwind base;
-  }`);
+  // if (!fileContents.includes(mantineDatesImport))
+  //   fileContents = mantineDatesImport + ";\r\n" + fileContents;
 
-  fs.writeFileSync(filePath, fileContents);
+  // if (!fileContents.includes(mantineCoreImport))
+  //   fileContents = mantineCoreImport + ";\r\n" + fileContents;
+
+  
+  fs.writeFileSync(filePath, wrapTailwindBase(fileContents));
 }
 
 function main() {
