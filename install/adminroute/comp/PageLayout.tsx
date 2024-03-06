@@ -2,8 +2,8 @@ import { Breadcrumbs, Button, MantineProvider } from "@mantine/core"
 
 import { ReactNode } from "react"
 import { ROOT_PATH } from "../generated";
-// import '@mantine/core/styles.css';
-import '@mantine/dates/styles.css';
+import "@mantine/core/styles.layer.css";
+import "@mantine/dates/styles.layer.css";
 import Link from "./Link";
 import { isAdmin } from "../../kurgandb_admin/auth";
 import LoginForm from "./LoginForm";

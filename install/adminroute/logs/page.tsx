@@ -2,7 +2,7 @@
 import { getLogsList } from "../api/methods";
 import Layout from "../comp/PageLayout";
 import LogsPage from "./LogsPage";
-import { Metadata } from 'next';
+import { Metadata, ResolvingMetadata } from 'next';
 
 
 export const metadata: Metadata = {
