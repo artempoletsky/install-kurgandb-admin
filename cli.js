@@ -57,9 +57,15 @@ function installDependencies() {
 
 function editEnvFile() {
   const filePath = `${CWD}/.env.local`;
+  let fileContents = "";
+  if (fs.existsSync(filePath)) {
+    fileContents = fs.readFileSync(filePath, { encoding: "utf8" });
+    console.log("Adding variables to '.env.local' ...");
+  } else {
+    console.log("No 'env.local' file found, creating...");
+  }
 
-  const fileText = fs.existsSync(filePath) ? fs.readFileSync(filePath, { encoding: "utf8" }) : "";
-  const lines = fileText.split(/\r?\n|\r|\n/g);
+  const lines = fileContents.split(/\r?\n|\r|\n/g);
 
   const linesToAdd = {
     KURGANDB_DATA_DIR: "D:/type/your/address/here",
@@ -127,6 +133,10 @@ function wrapTailwindBase(fileContents) {
 function modifyGlobalsCSS() {
   const filePath = `${CWD}/app/globals.css`;
 
+  if (!fs.existsSync(filePath)) {
+    console.log("No globals.css found.");
+    return;
+  }
   let fileContents = fs.readFileSync(filePath, { encoding: "utf8" });
   // const mantineDatesImport = "@import '@mantine/dates/styles.css'";
   // const mantineCoreImport = "@import '@mantine/core/styles.css'";
@@ -137,13 +147,20 @@ function modifyGlobalsCSS() {
   // if (!fileContents.includes(mantineCoreImport))
   //   fileContents = mantineCoreImport + ";\r\n" + fileContents;
 
-  
+
   fs.writeFileSync(filePath, wrapTailwindBase(fileContents));
 }
+
+const rimraf = require("rimraf");
 
 function main() {
   const sourceDir = `${__dirname}/install/adminroute/`;
   const targetDir = `${CWD}/app/${ADMIN_ROOT}/`;
+  if (fs.existsSync(targetDir)) {
+    console.log(`Removing previous ${targetDir}`);
+    rimraf.sync(targetDir);
+  }
+
   console.log(`installing in '${targetDir}'`);
   fs.cpSync(sourceDir, targetDir, { recursive: true });
 

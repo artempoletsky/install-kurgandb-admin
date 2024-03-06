@@ -118,7 +118,7 @@ export type ARenameField = z.infer<typeof renameField>;
 
 
 export const createTable = z.object({
-  tableName: ZStringNonEmpty,
+  tableName: z.string().regex(/^[a-zA-Z]/, "Must start with a latin letter").trim().min(1, "Required"),
   keyType: z.union([z.literal("string"), z.literal("number")]),
   autoIncrement: z.boolean(),
 });
