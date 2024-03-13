@@ -36,10 +36,7 @@ yarn-error.log*
 next-env.d.ts
 
 /.env
-/app/kurgandb_admin/
 
-
-/app/kurgandb/
 .env
 /next.config.mjs
 /postcss.config.js
@@ -53,6 +50,5 @@ next-env.d.ts
 /app/layout.tsx
 /app/page.tsx
 
-/app/adminroute/
 /install/adminroute/generated.ts
 /kurgandb_log/

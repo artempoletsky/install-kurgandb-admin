@@ -46,11 +46,19 @@ function installDependencies() {
   const jsonData = JSON.parse(fs.readFileSync(packageFilePath));
   console.log("installing dependencies, please wait...");
   const deps = [
-    "@artempoletsky/easyrpc", "@artempoletsky/kurgandb",
     "@mantine/core", "@mantine/hooks", "@mantine/dates", "@mantine/form",
     "tabler-icons-react", "zod"
   ];
 
+  // skip locally installed packages. It means that we are in the dev mode.
+  const rpcName = "@artempoletsky/easyrpc";
+  if (jsonData.dependencies[rpcName] || !jsonData.dependencies[rpcName].startsWith("file:")) {
+    deps.push(rpcName);
+  }
+  const dbName = "@artempoletsky/kurgandb";
+  if (jsonData.dependencies[dbName] || !jsonData.dependencies[dbName].startsWith("file:")) {
+    deps.push(dbName);
+  }
   exec(`npm install --save ${deps.join(" ")}`);
 }
 

@@ -3,10 +3,10 @@ import type { EventTableOpen } from "@artempoletsky/kurgandb/globals";
 
 type TableEventsDeclaration = Record<string, (event: any, scope: CallbackScope) => void>
 
-
-const exampleTable1: TableEventsDeclaration = {
-  "tableOpen": (event: EventTableOpen<any, any, any, any, any, any>, scope) => {
-
+// users - a table name
+const users: TableEventsDeclaration = {
+  "tableOpen": ({ $ }: EventTableOpen<any, any, any, any, any, any>) => {
+    
   }
 }
 

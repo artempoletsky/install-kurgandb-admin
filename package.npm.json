@@ -19,5 +19,7 @@
     "/cli.js"
   ],
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "rimraf": "^5.0.5"
+  }
 }

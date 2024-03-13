@@ -1,4 +1,5 @@
-
+const rimraf = require("rimraf");
+rimraf.sync(`${__dirname}/install/`);
 
 const sourceDir = `${__dirname}/install/adminroute/`;
 const targetDir = `${__dirname}/app/adminroute/`;
