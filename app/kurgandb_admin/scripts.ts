@@ -63,7 +63,7 @@ export const NextRoutes = {
 
 export async function ThrowError(message: string) {
   try {
-    await queryUniversal(({ }, { message }, { ResponseError }) => {
+    await queryUniversal(({ }, { message }, { }) => {
       throw new Error(message);
     }, {
       message
