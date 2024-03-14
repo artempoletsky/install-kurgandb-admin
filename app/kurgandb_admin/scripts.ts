@@ -55,6 +55,7 @@ export const NextRoutes = {
 
     generateCodeFile(sourcePath + "/codegen/newpage/api/route.ts.txt", dirPath + "/route.ts", {});
     generateCodeFile(sourcePath + "/codegen/newpage/api/schemas.ts.txt", dirPath + "/schemas.ts", {});
+    generateCodeFile(sourcePath + "/codegen/newpage/api/methods.ts.txt", dirPath + "/methods.ts", {});
 
     return "Success!";
   },

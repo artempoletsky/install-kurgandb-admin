@@ -7,6 +7,8 @@ const ZTableOnly = z.object({
   tableName: ZStringNonEmpty,
 });
 
+export type ATableOnly = z.infer<typeof ZTableOnly>;
+
 const ZEmpty = z.object({});
 
 
@@ -154,3 +156,13 @@ export const getLog = z.object({
   fileName: ZStringNonEmpty,
 });
 export type AGetLog = z.infer<typeof getLog>;
+
+
+export const getTableEvents = ZTableOnly;
+
+
+export const toggleAdminEvent = z.object({
+  tableName: ZStringNonEmpty,
+  eventName: ZStringNonEmpty,
+});
+export type AToggleAdminEvent = z.infer<typeof toggleAdminEvent>;

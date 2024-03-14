@@ -1,12 +1,17 @@
-import type { CallbackScope } from "@artempoletsky/kurgandb";
-import type { EventTableOpen } from "@artempoletsky/kurgandb/globals";
 
-type TableEventsDeclaration = Record<string, (event: any, scope: CallbackScope) => void>
+import type { EventTableOpen, EventRecordChange } from "@artempoletsky/kurgandb/globals";
 
+import { User, UserFull, UserLight, UsersMeta } from "@/globals";
+type TableEventsDeclaration = Record<string, (event: any) => void>
 
-const exampleTable1: TableEventsDeclaration = {
-  "tableOpen": (event: EventTableOpen<any, any, any, any, any, any>, scope) => {
-
-  }
+// EventTableOpen<UserFull, string, UsersMeta, UserFull, UserLight, User>
+export const users: TableEventsDeclaration = {
+  "tableOpen": ({ $ }: EventTableOpen<UserFull, string, UsersMeta, UserFull, UserLight, User>) => {
+    const tableName = "users";
+    $.log(`Table '${tableName}' has been opened.`, "", "info");
+  },
+  "recordChange:password": ({ $, newValue, oldValue, record, table }: EventRecordChange<UserFull, string, UsersMeta, UserFull, UserLight, User, string>) => {
+    $.log(`User '${record.username}' has changed his password from '${oldValue}' to '${newValue}'`, "", "info");
+  },
 }
 

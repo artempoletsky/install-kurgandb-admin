@@ -1,5 +1,5 @@
 import { Predicate } from "@artempoletsky/kurgandb";
-import { Table, TableScheme } from "@artempoletsky/kurgandb/table";
+import { Table, TableScheme } from "@artempoletsky/kurgandb/globals";
 import { queryUniversal as query } from "@artempoletsky/kurgandb";
 
 import { FieldTag, PlainObject } from "@artempoletsky/kurgandb/globals";
@@ -21,6 +21,8 @@ import type {
   ARemoveField,
   ARemoveTable,
   ARenameField,
+  ATableOnly,
+  AToggleAdminEvent,
   AToggleTag,
   AUpdateDocument
 } from "./schemas";
@@ -28,18 +30,19 @@ import type {
 
 
 type Tables = Record<string, Table<any, any, any>>;
-function methodFactory<PayloadType extends PlainObject, ReturnType>(predicate: Predicate<Tables, PayloadType, ReturnType>) {
-  return async function (payload: PayloadType): Promise<ReturnType> {
-    let result: ReturnType;
+
+export function methodFactory<Payload extends PlainObject, PredicateReturnType, ReturnType = PredicateReturnType>(predicate: Predicate<Tables, Payload, PredicateReturnType>, then?: (dbResult: PredicateReturnType, payload: Payload) => ReturnType) {
+  return async function (payload: Payload) {
+    let dbResult: PredicateReturnType;
     try {
-      result = await query(predicate, payload);
+      dbResult = await query(predicate, payload);
     } catch (err: any) {
       throw new ResponseError(err);
     }
-    return result;
+    if (!then) return dbResult as unknown as ReturnType;
+    return then(dbResult, payload);
   }
 }
-
 
 export const createDocument = methodFactory<ACreateDocument, string | number>((T, { tableName, document }, { db }) => {
   let t = db.getTable(tableName);
@@ -67,7 +70,7 @@ export const updateDocument = methodFactory(({ }, { tableName, document, id }: A
 
   t.where(<any>t.primaryKey, id).update(doc => {
     for (const key in document) {
-      doc.set(key, document[key]);
+      doc.$set(key as any, document[key]);
     }
   });
 });
@@ -110,7 +113,7 @@ export type RGetPage = {
 }
 
 
-export const getPage = methodFactory<AGetPage, RGetPage>(({ }, { tableName, queryString, page }, { db, $, ResponseError }) => {
+export const getPage = methodFactory<AGetPage, RGetPage>(({ }, { tableName, queryString, page }, { db, $ }) => {
   let t = db.getTable(tableName);
   let table = t;
   let tq: any;
@@ -169,7 +172,7 @@ export type FGetFreeId = typeof getFreeId;
 
 export const getDraft = methodFactory<AGetDraft, any>(({ }, { tableName }, { db }) => {
   let t = db.getTable(tableName);
-  return t.getDocumentDraft();
+  return t.getRecordDraft();
 });
 
 export type FGetDraft = typeof getDraft;
@@ -179,14 +182,14 @@ export type FGetDraft = typeof getDraft;
 ///////////////////////////////////////////
 
 
-export const addField = methodFactory<AAddField, TableScheme>(({ }, { tableName, fieldName, type, isHeavy }, { db, ResponseError }) => {
+export const addField = methodFactory<AAddField, TableScheme>(({ }, { tableName, fieldName, type, isHeavy }, { db, $ }) => {
   let t = db.getTable(tableName);
   try {
     t.addField(fieldName, type, isHeavy);
   } catch (err) {
     // throw err;
 
-    throw new ResponseError({
+    throw new $.ResponseError({
       invalidFields: {
         fieldName: {
           message: "Already taken {...} ({...})",
@@ -350,3 +353,49 @@ export const getLog = methodFactory(({ }, { fileName }: AGetLog, { db }) => {
   return db.getLog(fileName);
 });
 export type FGetLog = typeof getLog;
+
+import * as AdminEvents from "../../kurgandb_admin/events";
+import { ParsedFunction, parseFunction } from "@artempoletsky/kurgandb/function";
+
+
+export const getTableEvents = methodFactory(({ }, { tableName }: ATableOnly, { db }) => {
+  const t = db.getTable(tableName);
+  return t.getRegisteredEventListeners();
+}, (registeredEvents, { tableName }) => {
+  const evs = (AdminEvents as any)[tableName] || {};
+  return {
+    adminEvents: Object.keys(evs),
+    registeredEvents,
+  }
+});
+
+export type FGetTableEvents = typeof getTableEvents;
+
+export async function toggleAdminEvent({ eventName, tableName }: AToggleAdminEvent) {
+
+  type Payload = AToggleAdminEvent & {
+    fun: ParsedFunction
+  }
+  const evs = (AdminEvents as any)[tableName];
+  if (!evs) throw new ResponseError("Can't find events for table {...}", [tableName]);
+  const funRaw: Function = evs[eventName];
+  if (!funRaw) throw new ResponseError("Can't find event {...} for table {...}", [eventName, tableName]);
+
+  const fun = parseFunction(funRaw);
+  return await query(({ }, { tableName, eventName, fun }: Payload, { db }) => {
+    const t = db.getTable(tableName);
+    const result = !t.hasEventListener(eventName, "admin");
+    if (result) {
+      t.registerEventListenerParsed("admin", eventName, fun);
+    } else {
+      t.unregisterEventListener("admin", eventName);
+    }
+    
+    return t.getRegisteredEventListeners();
+  }, {
+    eventName,
+    tableName,
+    fun,
+  });
+}
+export type FToggleAdminEvent = typeof toggleAdminEvent;

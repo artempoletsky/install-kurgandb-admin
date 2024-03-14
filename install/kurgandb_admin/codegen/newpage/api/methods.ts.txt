@@ -14,7 +14,7 @@ export type FSayHello = typeof sayHello;
 
 
 export const register = methodFactory(({ users }, { username, password }: ARegister, { $ }) => {
-  const draft = users.getDocumentDraft();
+  const draft = users.getRecordDraft();
   users.insert({
     ...draft,
     username,

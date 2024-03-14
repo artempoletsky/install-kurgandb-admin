@@ -104,7 +104,7 @@ function getTypeNames(tableName: string, scheme: TableScheme) {
   const visible = tags.has("hidden") ? basic : "";
   const full = visible ? `${basic}Full` : basic;
   const light = tags.has("heavy") ? `${basic}Light` : (visible ? basic : "");
-  const insert = tags.has("autoinc") ? `${basic}Insert` : (light ? basic : "");
+  const insert = tags.has("autoinc") ? `${basic}Insert` : (light ? full : "");
   const meta = `${basic}sMeta`;
 
   return {
