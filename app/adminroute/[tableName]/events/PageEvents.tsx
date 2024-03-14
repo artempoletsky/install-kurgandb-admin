@@ -3,11 +3,13 @@
 import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
 import { ReactNode, useState } from "react";
 import { RegisteredEvents } from "@artempoletsky/kurgandb/globals";
-import { Button } from "@mantine/core";
-import { FToggleAdminEvent } from "../../api/methods";
+import { ActionIcon, Button } from "@mantine/core";
+import { FToggleAdminEvent, FUnregisterEvent } from "../../api/methods";
 import { API_ENDPOINT } from "../../generated";
+import { Trash } from "tabler-icons-react";
 
 const toggleAdminEvent = getAPIMethod<FToggleAdminEvent>(API_ENDPOINT, "toggleAdminEvent");
+const unregisterEvent = getAPIMethod<FUnregisterEvent>(API_ENDPOINT, "unregisterEvent");
 
 
 type Props = {
@@ -33,6 +35,19 @@ export default function TestComponent({ adminEvents, registeredEvents: initialRe
     .then(setRegisteredEvents)
     .catch(setErrorResponse);
 
+  const fcUnregister = fetchCatch(unregisterEvent)
+    .before((eventName, namespaceId) => {
+      if (!confirm("Are you sure you want to unregister this event?")) return;
+
+      return {
+        tableName,
+        eventName,
+        namespaceId,
+      }
+    })
+    .then(setRegisteredEvents)
+    .catch(setErrorResponse)
+
   const registeredGroups: ReactNode[] = [];
   for (const namespaceId in registeredEvents) {
     const events: ReactNode[] = [];
@@ -40,7 +55,7 @@ export default function TestComponent({ adminEvents, registeredEvents: initialRe
       const fun = registeredEvents[namespaceId][eventName];
 
       events.push(<details key={namespaceId + eventName} className="">
-        <summary>{eventName}</summary>
+        <summary>{eventName}  <ActionIcon className="relative top-[3px]" size="xs" onClick={fcUnregister.action(eventName, namespaceId)}><Trash /></ActionIcon></summary>
         {fun.args}<br />
         <p className="whitespace-pre">
           {fun.body}

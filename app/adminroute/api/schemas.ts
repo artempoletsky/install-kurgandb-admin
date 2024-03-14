@@ -166,3 +166,11 @@ export const toggleAdminEvent = z.object({
   eventName: ZStringNonEmpty,
 });
 export type AToggleAdminEvent = z.infer<typeof toggleAdminEvent>;
+
+
+export const unregisterEvent = z.object({
+  tableName: ZStringNonEmpty,
+  eventName: ZStringNonEmpty,
+  namespaceId: ZStringNonEmpty,
+});
+export type AUnregisterEvent = z.infer<typeof unregisterEvent>;

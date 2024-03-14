@@ -24,6 +24,7 @@ import type {
   ATableOnly,
   AToggleAdminEvent,
   AToggleTag,
+  AUnregisterEvent,
   AUpdateDocument
 } from "./schemas";
 
@@ -390,7 +391,7 @@ export async function toggleAdminEvent({ eventName, tableName }: AToggleAdminEve
     } else {
       t.unregisterEventListener("admin", eventName);
     }
-    
+
     return t.getRegisteredEventListeners();
   }, {
     eventName,
@@ -399,3 +400,11 @@ export async function toggleAdminEvent({ eventName, tableName }: AToggleAdminEve
   });
 }
 export type FToggleAdminEvent = typeof toggleAdminEvent;
+
+export const unregisterEvent = methodFactory(({ }, { tableName, namespaceId, eventName }: AUnregisterEvent, { db }) => {
+  const t = db.getTable(tableName);
+  t.unregisterEventListener(namespaceId, eventName);
+  return t.getRegisteredEventListeners();
+});
+
+export type FUnregisterEvent = typeof unregisterEvent;

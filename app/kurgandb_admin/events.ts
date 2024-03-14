@@ -1,5 +1,5 @@
 
-import type { EventTableOpen, EventRecordChange, EventRecordsInsert } from "@artempoletsky/kurgandb/globals";
+import type { EventTableOpen, EventRecordChange, EventRecordsInsert, EventRecordsRemoveLight, EventRecordsRemove } from "@artempoletsky/kurgandb/globals";
 
 import { User, UserFull, UserLight, UsersMeta } from "@/globals";
 type TableEventsDeclaration = Record<string, (event: any) => void>
@@ -14,7 +14,13 @@ export const users: TableEventsDeclaration = {
     $.log(`User '${record.username}' has changed his password from '${oldValue}' to '${newValue}'`, "", "info");
   },
   "recordsInsert": ({ $, records }: EventRecordsInsert<UserFull, string, UsersMeta, UserFull, UserLight, User>) => {
-    $.log(`Added '${records.length}' records`, records.map(r=> r.username).join(", "), "info");
+    $.log(`Added '${records.length}' records`, records.map(r => r.username).join(", "), "info");
+  },
+  "recordsRemoveLight": ({ $, records }: EventRecordsRemoveLight<UserFull, string, UsersMeta, UserFull, UserLight, User>) => {
+    $.log(`Removed '${records.length}' records`, records.map(r => r.username).join(", "), "info");
+  },
+  "recordsRemove": ({ $, records }: EventRecordsRemove<UserFull, string, UsersMeta, UserFull, UserLight, User>) => {
+    $.log(`Removed '${records.length}' records`, records.map(r => r.username).join(", "), "info");
   },
 }
 

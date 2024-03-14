@@ -28,12 +28,12 @@ export default function TableMenu({ tableName }: Props) {
   const Items: Item[] = [
     {
       label: "Edit documents",
-      icon: <Edit />,
+      icon: <FileDatabase />,
       href: `/${ROOT_PATH}/${tableName}`,
     },
     {
       label: "Edit scheme",
-      icon: <FileDatabase />,
+      icon: <Edit />,
       href: `/${ROOT_PATH}/${tableName}/scheme`,
     },
     {
