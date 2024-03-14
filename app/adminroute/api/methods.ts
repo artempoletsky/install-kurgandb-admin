@@ -336,7 +336,10 @@ export type FExecuteScript = typeof executeScript;
 
 export const getAllTables = methodFactory(({ }, { }, { db }) => {
   const tables = db.getTables();
-  return Object.keys(tables);
+  return {
+    version: db.versionString,
+    tableNames: Object.keys(tables),
+  };
 });
 
 export type FGetAllTables = () => Promise<ReturnType<typeof getAllTables>>;

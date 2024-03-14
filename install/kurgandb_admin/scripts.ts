@@ -2,21 +2,8 @@ import { FieldType, PlainObject } from "@artempoletsky/kurgandb/globals";
 import fs from "fs";
 import generateDB from "./codegen/db/generate_db";
 import generateCodeFile from "./codegen/generate";
-import { queryUniversal } from "@artempoletsky/kurgandb";
+import { queryUniversal as query } from "@artempoletsky/kurgandb";
 
-
-
-export const codeGeneration = {
-  async generateGlobalsAndDB_Files() {
-    return await generateDB();
-  },
-}
-
-export async function exampleScript(argument1: string, argument2: string) {
-  // You can add a descrition with the comment
-
-  return `Hello world! ${argument1} ${argument2} `;
-}
 
 
 export const NextRoutes = {
@@ -60,17 +47,59 @@ export const NextRoutes = {
     return "Success!";
   },
 }
+export const projectSetup = {
+  async generateGlobalsAndDB_Files() {
+    // Generate globals.ts and db.ts according to your database structure
 
+    return await generateDB();
+  },
+  async createUsersTable() {
+    // Create an example table named `users` with predefined fields
 
-export async function ThrowError(message: string) {
-  try {
-    await queryUniversal(({ }, { message }, { }) => {
-      throw new Error(message);
-    }, {
-      message
-    });
-  } catch (err: any) {
-    return err.message;
-  }
+    const tableName = "users";
+    
+    const result = await query(({ }, { tableName }, { db }) => {
+      if (db.doesTableExist(tableName)) {
+        return "Table already exists";
+      }
+      db.createTable({
+        name: tableName,
+        fields: {
+          username: "string",
+          password: "string",
+          isAdmin: "boolean",
+          about: "string",
+        },
+        tags: {
+          username: ["primary"],
+          password: ["hidden"],
+          about: ["hidden", "heavy", "textarea"],
+          isAdmin: [],
+        }
+      });
+      return "created";
+    }, { tableName });
+    return result;
+  },
 }
 
+export const misc = {
+
+  async ThrowError(message: string) {
+    // Throw an error in the database with your message, you will see the error in the logs
+    try {
+      await query(({ }, { message }, { }) => {
+        throw new Error(message);
+      }, {
+        message
+      });
+    } catch (err: any) {
+      return err.message;
+    }
+  },
+  async printHelloWithYourArguments(argument1: string, argument2: string) {
+    // You can add a descrition with the comment
+
+    return `Hello world! ${argument1} ${argument2} `;
+  },
+}
