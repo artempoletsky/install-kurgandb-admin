@@ -17,7 +17,6 @@ type Props = {
 };
 export default function TestComponent({ logsList }: Props) {
 
-  const [greeting, setGreeting] = useState("");
   const [pageEntries, setPageEntries] = useState<string[]>([])
   const [page, setPage] = useState(1);
 

@@ -5,7 +5,7 @@ import EditDocumentForm from "./EditDocumentForm";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { FGetDraft, FGetFreeId, FGetPage, FReadDocument, RGetPage } from "../api/methods";
 import { getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
-import type { TableScheme } from "@artempoletsky/kurgandb/table";
+import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 import { Button, Textarea } from "@mantine/core";
 import RequestError from "../comp/RequestError";
 import { API_ENDPOINT } from "../generated";

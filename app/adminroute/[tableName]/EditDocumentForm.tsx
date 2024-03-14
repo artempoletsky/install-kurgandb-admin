@@ -1,5 +1,5 @@
 "use client";
-import type { TableScheme } from "@artempoletsky/kurgandb/table";
+import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 
 // import Button from "./Button";
 import { ReactNode, useEffect, useRef, useState } from "react";
@@ -10,7 +10,7 @@ import FieldLabel from "../comp/FieldLabel";
 import { ActionIcon, Button, Checkbox, CloseButton, Menu, MenuTarget, Modal, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { API_ENDPOINT } from "../generated";
 import { blinkBoolean } from "../utils_client";
-import { $, FieldTag, FieldType, PlainObject } from "@artempoletsky/kurgandb/globals";
+import { FieldTag, FieldType, PlainObject } from "@artempoletsky/kurgandb/globals";
 import { JSONErrorResponse } from "@artempoletsky/easyrpc/client";
 
 import { fieldScripts } from "../../kurgandb_admin/field_scripts";

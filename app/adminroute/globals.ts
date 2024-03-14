@@ -1,6 +1,6 @@
 import { JSONErrorResponse } from "@artempoletsky/easyrpc/client";
 import { PlainObject } from "@artempoletsky/kurgandb/globals";
-import type { TableScheme } from "@artempoletsky/kurgandb/table";
+import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 
 
 

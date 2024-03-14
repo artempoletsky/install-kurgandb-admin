@@ -1,5 +1,5 @@
 "use client";
-import type { TableScheme } from "@artempoletsky/kurgandb/table";
+import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 import { ReactNode, useState } from "react";
 import { getAPIMethod, JSONErrorResponse } from "@artempoletsky/easyrpc/client";
 import type { FAddField, FChangeFieldIndex, FRemoveField, FRenameField, FToggleTag } from "../../api/methods";

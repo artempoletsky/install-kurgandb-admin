@@ -4,7 +4,7 @@ import Layout, { BreadrumbsArray } from "../../comp/PageLayout";
 
 // import type { FGetScheme, FReadDocument } from "../api/route";
 
-import { TableScheme } from "@artempoletsky/kurgandb/table";
+import { TableScheme } from "@artempoletsky/kurgandb/globals";
 
 
 

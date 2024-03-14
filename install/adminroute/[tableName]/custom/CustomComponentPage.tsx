@@ -1,6 +1,6 @@
 "use client";
 import { useErrorResponse } from "@artempoletsky/easyrpc/client";
-import type { TableScheme } from "@artempoletsky/kurgandb/table";
+import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 
 import CustomComponentTable from "../../../kurgandb_admin/components/CustomComponentTable";
 import RequestError from "../../comp/RequestError";
