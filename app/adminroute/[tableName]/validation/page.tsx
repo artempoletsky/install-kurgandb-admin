@@ -1,12 +1,8 @@
 
-import { getScheme } from "../../api/methods";
+import PageValidation from "./PageValidation";
+import { Metadata } from "next";
 import Layout, { BreadrumbsArray } from "../../comp/PageLayout";
-
-// import type { FGetScheme, FReadDocument } from "../api/route";
-
-import { TableScheme } from "@artempoletsky/kurgandb/globals";
-
-
+import { getTableValidation } from "../../api/methods";
 
 
 type Payload = {
@@ -16,20 +12,14 @@ type Props = {
   params: Payload
 }
 
+export const metadata: Metadata = {
+  title: "",
+};
 
 export const dynamic = "force-dynamic";
 
-
 export default async function page({ params }: Props) {
   const { tableName } = params;
-  let scheme: TableScheme | undefined;
-  try {
-    scheme = await getScheme({
-      tableName
-    });
-  } catch (error) {
-    console.log(error);
-  }
 
   const crumbs: BreadrumbsArray = [
     { href: "/", title: "Tables" },
@@ -37,9 +27,12 @@ export default async function page({ params }: Props) {
     { href: "", title: "Validation rules" },
   ];
 
+  metadata.title = `${tableName} events`;
+  const validation = await getTableValidation({ tableName });
+
   return (
     <Layout breadcrumbs={crumbs} tableName={tableName}>
-      not implemented yet
+      <PageValidation {...validation} tableName={tableName}></PageValidation>
     </Layout>
   );
 }

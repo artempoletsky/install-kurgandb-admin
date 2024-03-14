@@ -71,7 +71,10 @@ export const updateDocument = methodFactory(({ }, { tableName, document, id }: A
 
   t.where(<any>t.primaryKey, id).update(doc => {
     for (const key in document) {
-      doc.$set(key as any, document[key]);
+      const newValue = document[key];
+      if (doc.$get("key") != newValue) {
+        doc.$set(key as any, newValue);
+      }
     }
   });
 });
@@ -411,3 +414,74 @@ export const unregisterEvent = methodFactory(({ }, { tableName, namespaceId, eve
 });
 
 export type FUnregisterEvent = typeof unregisterEvent;
+
+
+export const getTableCustomPageData = methodFactory(({ }, { tableName }: ATableOnly, { db }) => {
+  const t = db.getTable(tableName);
+  return {
+    scheme: t.scheme,
+    meta: t.meta as any,
+  }
+});
+export type FGetTableCustomPageData = typeof getTableCustomPageData;
+
+
+import * as AdminValidators from "../../kurgandb_admin/validation";
+export const getTableValidation = methodFactory(({ }, { tableName }: ATableOnly, { db }) => {
+  const t = db.getTable(tableName);
+  return {
+    currentValidator: t.getSavedValidator(),
+    primaryKey: t.primaryKey,
+  }
+}, ({ currentValidator, primaryKey }, { tableName }) => {
+  // const evs = (AdminEvents as any)[tableName] || {};
+  let adminValidator: undefined | ParsedFunction;
+  const fn = (AdminValidators as any)[tableName];
+  if (fn) {
+    adminValidator = parseFunction(fn);
+  }
+  return {
+    adminValidator,
+    currentValidator,
+    primaryKey,
+  }
+});
+
+export type FGetTableValidation = typeof getTableValidation;
+
+
+export const setCurrentTableValidator = async ({ tableName }: ATableOnly) => {
+  const fn = (AdminValidators as any)[tableName];
+  if (!fn) {
+    throw new ResponseError("Validator for table {...} doesn't exist", [tableName]);
+  }
+
+  return await query(({ }, { tableName, fun }, { db }) => {
+    const t = db.getTable(tableName);
+    t.setValidator(fun);
+    return t.getSavedValidator();
+  }, {
+    tableName,
+    fun: parseFunction(fn),
+  });
+}
+
+export type FSetCurrentTableValidator = typeof setCurrentTableValidator;
+
+
+export const unsetCurrentTableValidator = methodFactory(({ }, { tableName }: ATableOnly, { db }) => {
+  const t = db.getTable(tableName);
+  t.setValidator();
+  return t.getSavedValidator();
+});
+
+export type FUnsetCurrentTableValidator = typeof unsetCurrentTableValidator;
+
+
+export const getInvalidRecords = methodFactory(({ }, { tableName }: ATableOnly, { db }) => {
+  const t = db.getTable(tableName);
+  const zObject = t.getZObject();
+  return t.filter(rec => !zObject.safeParse(rec).success).limit(20).select(rec => rec.$light()) as PlainObject[]
+});
+
+export type FGetInvalidRecords = typeof getInvalidRecords;

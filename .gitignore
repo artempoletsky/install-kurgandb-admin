@@ -52,3 +52,4 @@ next-env.d.ts
 
 /install/adminroute/generated.ts
 /kurgandb_log/
+/kurgandb_data/

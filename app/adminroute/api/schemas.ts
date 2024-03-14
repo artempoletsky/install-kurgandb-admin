@@ -174,3 +174,11 @@ export const unregisterEvent = z.object({
   namespaceId: ZStringNonEmpty,
 });
 export type AUnregisterEvent = z.infer<typeof unregisterEvent>;
+
+export const getTableCustomPageData = ZTableOnly;
+
+export const getTableValidation = ZTableOnly;
+
+export const setCurrentTableValidator = ZTableOnly;
+export const unsetCurrentTableValidator = ZTableOnly;
+export const getInvalidRecords = ZTableOnly;

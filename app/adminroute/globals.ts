@@ -1,4 +1,4 @@
-import { JSONErrorResponse } from "@artempoletsky/easyrpc/client";
+import { JSONErrorResponse, RequestErrorSetter } from "@artempoletsky/easyrpc/client";
 import { PlainObject } from "@artempoletsky/kurgandb/globals";
 import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 
@@ -42,9 +42,10 @@ export function formatCamelCase(str: string) {
 
 
 export type TableComponentProps = {
-  onRequestError: (e: JSONErrorResponse) => void
-  tableName: string
-  scheme: TableScheme
+  onRequestError: RequestErrorSetter;
+  tableName: string;
+  scheme: TableScheme;
+  meta: any;
 }
 
 export type DocumentComponentProps = {
