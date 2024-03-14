@@ -1,5 +1,5 @@
 
-import type { EventTableOpen, EventRecordChange } from "@artempoletsky/kurgandb/globals";
+import type { EventTableOpen, EventRecordChange, EventRecordsInsert } from "@artempoletsky/kurgandb/globals";
 
 import { User, UserFull, UserLight, UsersMeta } from "@/globals";
 type TableEventsDeclaration = Record<string, (event: any) => void>
@@ -12,6 +12,9 @@ export const users: TableEventsDeclaration = {
   },
   "recordChange:password": ({ $, newValue, oldValue, record, table }: EventRecordChange<UserFull, string, UsersMeta, UserFull, UserLight, User, string>) => {
     $.log(`User '${record.username}' has changed his password from '${oldValue}' to '${newValue}'`, "", "info");
+  },
+  "recordsInsert": ({ $, records }: EventRecordsInsert<UserFull, string, UsersMeta, UserFull, UserLight, User>) => {
+    $.log(`Added '${records.length}' records`, records.map(r=> r.username).join(", "), "info");
   },
 }
 
