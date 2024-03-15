@@ -2,7 +2,8 @@ import { FieldType, PlainObject } from "@artempoletsky/kurgandb/globals";
 import fs from "fs";
 import generateDB from "./codegen/db/generate_db";
 import generateCodeFile from "./codegen/generate";
-import { queryUniversal as query } from "@artempoletsky/kurgandb";
+import { query } from "@/db";
+// import { queryUniversal as query } from "@artempoletsky/kurgandb";
 
 
 
@@ -47,6 +48,7 @@ export const NextRoutes = {
     return "Success!";
   },
 }
+
 export const projectSetup = {
   async generateGlobalsAndDB_Files() {
     // Generate globals.ts and db.ts according to your database structure
@@ -57,7 +59,7 @@ export const projectSetup = {
     // Create an example table named `users` with predefined fields
 
     const tableName = "users";
-    
+
     const result = await query(({ }, { tableName }, { db }) => {
       if (db.doesTableExist(tableName)) {
         return "Table already exists";
@@ -80,6 +82,17 @@ export const projectSetup = {
       return "created";
     }, { tableName });
     return result;
+  },
+
+  async polluteUsersMetadata() {
+    // store example metadata in the `users` table
+    return await query(({ users }) => {
+      users.meta.foo = {
+        bar: "baz",
+        num: 3,
+      }
+      return JSON.stringify(users.meta);
+    });
   },
 }
 

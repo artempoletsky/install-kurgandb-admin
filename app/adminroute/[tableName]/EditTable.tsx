@@ -9,7 +9,7 @@ import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 import { Button, Textarea } from "@mantine/core";
 import RequestError from "../comp/RequestError";
 import { API_ENDPOINT } from "../generated";
-import cssSide from "../comp/SidebarList.module.css";
+import css from "../admin.module.css";
 
 import { PlainObject } from "@artempoletsky/kurgandb/globals";
 
@@ -139,8 +139,8 @@ export default function EditTable({ tableName, scheme }: Props) {
         <Button className="align-top" onClick={insert}>New record</Button>
       </div>
       <div className="flex">
-        <ul className={cssSide.sidebar}>
-          {pageData.documents.map(id => <li className={cssSide.item} key={id} onClick={e => openRecord(id)}>{id}</li>)}
+        <ul className={css.sidebar}>
+          {pageData.documents.map(id => <li className={css.item} key={id} onClick={e => openRecord(id)}>{id}</li>)}
         </ul>
         {scheme && record && <EditDocumentForm
           onClose={onClose}

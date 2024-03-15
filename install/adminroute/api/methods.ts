@@ -71,7 +71,10 @@ export const updateDocument = methodFactory(({ }, { tableName, document, id }: A
 
   t.where(<any>t.primaryKey, id).update(doc => {
     for (const key in document) {
-      doc.$set(key as any, document[key]);
+      const newValue = document[key];
+      if (doc.$get("key") != newValue) {
+        doc.$set(key as any, newValue);
+      }
     }
   });
 });
@@ -411,3 +414,95 @@ export const unregisterEvent = methodFactory(({ }, { tableName, namespaceId, eve
 });
 
 export type FUnregisterEvent = typeof unregisterEvent;
+
+
+export const getTableCustomPageData = methodFactory(({ }, { tableName }: ATableOnly, { db }) => {
+  const t = db.getTable(tableName);
+  return {
+    scheme: t.scheme,
+    meta: t.meta as any,
+  }
+});
+export type FGetTableCustomPageData = typeof getTableCustomPageData;
+
+
+import * as AdminValidators from "../../kurgandb_admin/validation";
+
+export type RUpdateValidationPage = {
+  invalidRecords: PlainObject[];
+  currentValidator: ParsedFunction;
+}
+
+export type RGetTableValidation = RUpdateValidationPage & {
+  adminValidator?: ParsedFunction;
+  primaryKey: string;
+}
+
+export const getTableValidation = methodFactory(({ }, { tableName }: ATableOnly, { db, $ }) => {
+  const t = db.getTable(tableName);
+  return {
+    currentValidator: t.getSavedValidator(),
+    primaryKey: t.primaryKey,
+    invalidRecords: t.filter($.invalid).limit(20).select($.light) as PlainObject[],
+  }
+}, ({ currentValidator, primaryKey, invalidRecords }, { tableName }) => {
+  // const evs = (AdminEvents as any)[tableName] || {};
+  let adminValidator: undefined | ParsedFunction;
+  const fn = (AdminValidators as any)[tableName];
+  if (fn) {
+    adminValidator = parseFunction(fn);
+  }
+
+  const result: RGetTableValidation = {
+    invalidRecords,
+    adminValidator,
+    currentValidator,
+    primaryKey,
+  }
+  return result;
+});
+
+export type FGetTableValidation = typeof getTableValidation;
+
+
+export const setCurrentTableValidator = async ({ tableName }: ATableOnly): Promise<RUpdateValidationPage> => {
+  const fn = (AdminValidators as any)[tableName];
+  if (!fn) {
+    throw new ResponseError("Validator for table {...} doesn't exist", [tableName]);
+  }
+
+  return await query(({ }, { tableName, fun }, { db, $ }) => {
+    const t = db.getTable(tableName);
+    t.setValidator(fun);
+    // return t.getSavedValidator();
+    return {
+      currentValidator: t.getSavedValidator(),
+      invalidRecords: t.filter($.invalid).limit(20).select($.light) as PlainObject[],
+    }
+  }, {
+    tableName,
+    fun: parseFunction(fn),
+  });
+}
+
+export type FSetCurrentTableValidator = typeof setCurrentTableValidator;
+
+
+export const unsetCurrentTableValidator = methodFactory(({ }, { tableName }: ATableOnly, { db, $ }): RUpdateValidationPage => {
+  const t = db.getTable(tableName);
+  t.setValidator();
+  return {
+    currentValidator: t.getSavedValidator(),
+    invalidRecords: t.filter($.invalid).limit(20).select($.light) as PlainObject[],
+  }
+});
+
+export type FUnsetCurrentTableValidator = typeof unsetCurrentTableValidator;
+
+
+export const getInvalidRecords = methodFactory(({ }, { tableName }: ATableOnly, { db, $ }) => {
+  const t = db.getTable(tableName);
+  return t.filter($.invalid).limit(20).select($.light) as PlainObject[]
+});
+
+export type FGetInvalidRecords = typeof getInvalidRecords;

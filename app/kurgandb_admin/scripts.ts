@@ -85,6 +85,7 @@ export const projectSetup = {
   },
 
   async polluteUsersMetadata() {
+    // store example metadata in the `users` table
     return await query(({ users }) => {
       users.meta.foo = {
         bar: "baz",

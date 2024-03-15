@@ -6,16 +6,15 @@ import CustomComponentTable from "../../../kurgandb_admin/components/CustomCompo
 import RequestError from "../../comp/RequestError";
 
 
-export default function CustomComponentPage(props: { tableName: string, scheme: TableScheme }) {
+export default function CustomComponentPage(props: { tableName: string, scheme: TableScheme, meta: any }) {
 
   const [setRequestError, , requestError] = useErrorResponse();
 
   return (
     <div className="">
       <CustomComponentTable
-        tableName={props.tableName}
+        {...props}
         onRequestError={setRequestError}
-        scheme={props.scheme}
       />
       <RequestError requestError={requestError} />
     </div>

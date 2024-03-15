@@ -427,39 +427,58 @@ export type FGetTableCustomPageData = typeof getTableCustomPageData;
 
 
 import * as AdminValidators from "../../kurgandb_admin/validation";
-export const getTableValidation = methodFactory(({ }, { tableName }: ATableOnly, { db }) => {
+
+export type RUpdateValidationPage = {
+  invalidRecords: PlainObject[];
+  currentValidator: ParsedFunction;
+}
+
+export type RGetTableValidation = RUpdateValidationPage & {
+  adminValidator?: ParsedFunction;
+  primaryKey: string;
+}
+
+export const getTableValidation = methodFactory(({ }, { tableName }: ATableOnly, { db, $ }) => {
   const t = db.getTable(tableName);
   return {
     currentValidator: t.getSavedValidator(),
     primaryKey: t.primaryKey,
+    invalidRecords: t.filter($.invalid).limit(20).select($.light) as PlainObject[],
   }
-}, ({ currentValidator, primaryKey }, { tableName }) => {
+}, ({ currentValidator, primaryKey, invalidRecords }, { tableName }) => {
   // const evs = (AdminEvents as any)[tableName] || {};
   let adminValidator: undefined | ParsedFunction;
   const fn = (AdminValidators as any)[tableName];
   if (fn) {
     adminValidator = parseFunction(fn);
   }
-  return {
+
+  const result: RGetTableValidation = {
+    invalidRecords,
     adminValidator,
     currentValidator,
     primaryKey,
   }
+  return result;
 });
 
 export type FGetTableValidation = typeof getTableValidation;
 
 
-export const setCurrentTableValidator = async ({ tableName }: ATableOnly) => {
+export const setCurrentTableValidator = async ({ tableName }: ATableOnly): Promise<RUpdateValidationPage> => {
   const fn = (AdminValidators as any)[tableName];
   if (!fn) {
     throw new ResponseError("Validator for table {...} doesn't exist", [tableName]);
   }
 
-  return await query(({ }, { tableName, fun }, { db }) => {
+  return await query(({ }, { tableName, fun }, { db, $ }) => {
     const t = db.getTable(tableName);
     t.setValidator(fun);
-    return t.getSavedValidator();
+    // return t.getSavedValidator();
+    return {
+      currentValidator: t.getSavedValidator(),
+      invalidRecords: t.filter($.invalid).limit(20).select($.light) as PlainObject[],
+    }
   }, {
     tableName,
     fun: parseFunction(fn),
@@ -469,19 +488,21 @@ export const setCurrentTableValidator = async ({ tableName }: ATableOnly) => {
 export type FSetCurrentTableValidator = typeof setCurrentTableValidator;
 
 
-export const unsetCurrentTableValidator = methodFactory(({ }, { tableName }: ATableOnly, { db }) => {
+export const unsetCurrentTableValidator = methodFactory(({ }, { tableName }: ATableOnly, { db, $ }): RUpdateValidationPage => {
   const t = db.getTable(tableName);
   t.setValidator();
-  return t.getSavedValidator();
+  return {
+    currentValidator: t.getSavedValidator(),
+    invalidRecords: t.filter($.invalid).limit(20).select($.light) as PlainObject[],
+  }
 });
 
 export type FUnsetCurrentTableValidator = typeof unsetCurrentTableValidator;
 
 
-export const getInvalidRecords = methodFactory(({ }, { tableName }: ATableOnly, { db }) => {
+export const getInvalidRecords = methodFactory(({ }, { tableName }: ATableOnly, { db, $ }) => {
   const t = db.getTable(tableName);
-  const zObject = t.getZObject();
-  return t.filter(rec => !zObject.safeParse(rec).success).limit(20).select(rec => rec.$light()) as PlainObject[]
+  return t.filter($.invalid).limit(20).select($.light) as PlainObject[]
 });
 
 export type FGetInvalidRecords = typeof getInvalidRecords;

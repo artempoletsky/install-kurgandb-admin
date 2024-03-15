@@ -1,6 +1,6 @@
 "use client";
 
-import cssSide from "../comp/SidebarList.module.css";
+import css from "../admin.module.css";
 import { getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
 
 import { useEffect, useState } from "react";
@@ -54,8 +54,8 @@ export default function TestComponent({ logsList }: Props) {
   return (
     <div className="">
       <div className="flex gap-3">
-        <ul className={cssSide.sidebar}>
-          {pageEntries.map(id => <li className={cssSide.item} key={id} onClick={e => openLog(id)}>{id}</li>)}
+        <ul className={css.sidebar}>
+          {pageEntries.map(id => <li className={css.item} key={id} onClick={e => openLog(id)}>{id}</li>)}
         </ul>
         <ul className="overflow-y-scroll h-[675px] w-[750px]">
           {logEntries.map((e, i) =>
