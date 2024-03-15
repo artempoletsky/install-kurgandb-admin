@@ -37,7 +37,7 @@ export default async function Layout({ children, breadcrumbs, tableName }: Props
       </div>
     }
     {authorised || setupRequired
-      ? <div className="relative p-3 bg-stone-200 min-h-screen">
+      ? <div className="relative p-3 bg-stone-300 min-h-screen">
 
         <Header>{tableName && <TableMenu tableName={tableName} />}</Header>
         <div className="">

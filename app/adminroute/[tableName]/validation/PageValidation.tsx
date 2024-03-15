@@ -4,7 +4,7 @@ import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyr
 import { ReactNode, useState } from "react";
 import { ActionIcon, Button } from "@mantine/core";
 import { FGetInvalidRecords, FSetCurrentTableValidator, FUnsetCurrentTableValidator, RUpdateValidationPage } from "../../api/methods";
-import { API_ENDPOINT } from "../../generated";
+import { API_ENDPOINT, ROOT_PATH } from "../../generated";
 import { Trash } from "tabler-icons-react";
 import { ParsedFunction } from "@artempoletsky/kurgandb/function";
 import { ParsedFunctionComponent } from "../../comp/ParsedFunctionComponent";
@@ -12,6 +12,7 @@ import type { PlainObject } from "@artempoletsky/kurgandb/globals";
 import type { ATableOnly } from "../../api/schemas";
 import { LightRecordDetails } from "./LigthRecordDetails";
 import css from "../../admin.module.css";
+import Link from "../../comp/Link";
 
 const setCurrentTableValidator = getAPIMethod<FSetCurrentTableValidator>(API_ENDPOINT, "setCurrentTableValidator");
 const unsetCurrentTableValidator = getAPIMethod<FUnsetCurrentTableValidator>(API_ENDPOINT, "unsetCurrentTableValidator");
@@ -93,6 +94,7 @@ export default function TestComponent({
       {invalidRecords.length
         ? <div className="">
           <div className={css.h3}>The table has invalid records:</div>
+          <div className="mb-1 mt-2"><Link href={`/${ROOT_PATH}/${tableName}#q=t.filter($.invalid)`}>Edit records</Link></div>
           {invalidRecords.map(rec => <LightRecordDetails key={rec[primaryKey]} record={rec} primaryKey={primaryKey} />)}
         </div>
         : <div className={css.h3}>All records are valid</div>}
