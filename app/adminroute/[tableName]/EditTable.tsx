@@ -13,7 +13,6 @@ import css from "../admin.module.css";
 
 import { PlainObject } from "@artempoletsky/kurgandb/globals";
 
-import { encode, decode } from "@hugov/shorter-string";
 
 
 const readDocument = getAPIMethod<FReadDocument>(API_ENDPOINT, "readDocument");

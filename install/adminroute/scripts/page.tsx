@@ -7,7 +7,7 @@ import * as scriptsRaw from "../../kurgandb_admin/scripts";
 import ScriptsPage, { Group, ParsedFunction } from "./ScriptsPage";
 import { PlainObject } from "@artempoletsky/kurgandb/globals";
 
-
+export const dynamic = "force-static";
 
 function parseFunction(f: Function): ParsedFunction | false {
   const str = f.toString();

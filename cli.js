@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 'use strict';
 const fs = require("fs");
+const pkg = require("./package.json");
 const args = process.argv.slice(2);
 
 const ADMIN_ROOT = args[0] || "kurgandb";
@@ -36,6 +37,8 @@ function generateTSFile(targetDir) {
   fs.writeFileSync(generatedFilePath, `export const ROOT_PATH = "${ADMIN_ROOT}";
 
 export const API_ENDPOINT = "/" + ROOT_PATH + "/api/";
+
+export const ADMIN_VERSION = "${pkg.version}";
 `);
 }
 

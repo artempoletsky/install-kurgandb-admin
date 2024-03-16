@@ -23,7 +23,10 @@ export default async function Layout({ children, breadcrumbs, tableName }: Props
 
   let items: ReactNode[] = [];
   if (breadcrumbs) {
-    items = breadcrumbs.map((e, i) => e.href ? <Link key={i} href={`/${ROOT_PATH}/${e.href}`}>{e.title}</Link> : <b key={i}>{e.title}</b>)
+    items = breadcrumbs.map((e, i) => {
+      if (!e.href) return <b key={i}>{e.title}</b>;
+      return <Link key={i} href={`/${ROOT_PATH}${e.href}`}>{e.title}</Link>;
+    })
   }
 
   const authorised = await isAdmin();
@@ -37,7 +40,7 @@ export default async function Layout({ children, breadcrumbs, tableName }: Props
       </div>
     }
     {authorised || setupRequired
-      ? <div className="relative p-3 bg-stone-200 min-h-screen">
+      ? <div className="relative p-3 bg-stone-300 min-h-screen">
 
         <Header>{tableName && <TableMenu tableName={tableName} />}</Header>
         <div className="">

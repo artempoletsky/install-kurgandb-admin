@@ -337,15 +337,23 @@ export const executeScript = async ({ args, path }: AExecuteScript): Promise<Scr
 export type FExecuteScript = typeof executeScript;
 
 
-export const getAllTables = methodFactory(({ }, { }, { db }) => {
-  const tables = db.getTables();
+export const getDBVersion = methodFactory(({ }, { }: {}, { db }) => {
+  return db.versionString;
+}, dbVersion => {
   return {
-    version: db.versionString,
-    tableNames: Object.keys(tables),
+    adminVersion: `KurganDB admin v${ADMIN_VERSION}`,
+    dbVersion,
   };
 });
 
-export type FGetAllTables = () => Promise<ReturnType<typeof getAllTables>>;
+export type FGetDBVersion = typeof getDBVersion;
+
+export const getAllTables = methodFactory(({ }, { }: {}, { db }) => {
+  const tables = db.getTables();
+  return Object.keys(tables)
+});
+
+export type FGetAllTables = typeof getAllTables;
 
 
 
@@ -427,6 +435,7 @@ export type FGetTableCustomPageData = typeof getTableCustomPageData;
 
 
 import * as AdminValidators from "../../kurgandb_admin/validation";
+import { ADMIN_VERSION } from "../generated";
 
 export type RUpdateValidationPage = {
   invalidRecords: PlainObject[];

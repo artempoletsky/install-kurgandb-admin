@@ -71,12 +71,13 @@ export const projectSetup = {
           password: "string",
           isAdmin: "boolean",
           about: "string",
+          birthDate: "date",
         },
         tags: {
           username: ["primary"],
           password: ["hidden"],
+          birthDate: ["hidden"],
           about: ["hidden", "heavy", "textarea"],
-          isAdmin: [],
         }
       });
       return "created";
