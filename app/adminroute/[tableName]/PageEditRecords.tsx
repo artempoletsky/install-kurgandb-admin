@@ -3,7 +3,7 @@
 import Paginator from "../comp/paginator";
 import EditDocumentForm from "./EditDocumentForm";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { FGetDraft, FGetFreeId, FGetPage, FReadDocument, RGetPage } from "../api/methods";
+import type { FGetDraft, FGetFreeId, FGetPage, FGetScheme, FReadDocument, RGetPage } from "../api/methods";
 import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
 import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 import { Button, Textarea } from "@mantine/core";
@@ -19,23 +19,44 @@ const readDocument = getAPIMethod<FReadDocument>(API_ENDPOINT, "readDocument");
 const getPage = getAPIMethod<FGetPage>(API_ENDPOINT, "getPage");
 const getDraft = getAPIMethod<FGetDraft>(API_ENDPOINT, "getDraft");
 const getFreeId = getAPIMethod<FGetFreeId>(API_ENDPOINT, "getFreeId");
+const getScheme = getAPIMethod<FGetScheme>(API_ENDPOINT, "getScheme");
 
 
 type Props = {
-  tableName: string
-  page?: number
-  scheme: TableScheme
+  tableName: string;
 }
 
+function getSchemeProps(scheme?: TableScheme) {
+  if (!scheme) {
+    return {
+      primaryKey: "",
+      autoincId: "",
+    }
+  }
+  let primaryKey = Object.keys(scheme.tags).find(id => {
+    return scheme.tags[id]?.includes("primary") || false;
+  }) || "";
+  if (!primaryKey) throw new Error("primary key is undefined");
+  let autoincId = scheme.tags[primaryKey].includes("autoinc");
 
-export default function EditTable({ tableName, scheme }: Props) {
+  return {
+    primaryKey,
+    autoincId,
+  };
+}
+
+export default function PageEditRecords({ tableName }: Props) {
 
 
-  let [record, setRecord] = useState<PlainObject | undefined>(undefined);
-  let [currentId, setCurrentId] = useState<string | number | undefined>(undefined);
-  let [pageData, setPageData] = useState<RGetPage | undefined>(undefined);
-  let [page, setPage] = useState<number>(1);
+  const [record, setRecord] = useState<PlainObject | undefined>(undefined);
+  const [currentId, setCurrentId] = useState<string | number | undefined>(undefined);
+  const [pageData, setPageData] = useState<RGetPage | undefined>(undefined);
+  const [page, setPage] = useState<number>(1);
+  const [scheme, setScheme] = useState<TableScheme>();
   const queryDefault = "table.all()";
+
+  const { autoincId, primaryKey } = getSchemeProps(scheme);
+
   // let [queryString, setQueryString] = useState<string>(queryDefault);
 
   const queryInput = useRef<HTMLTextAreaElement>(null);
@@ -44,6 +65,7 @@ export default function EditTable({ tableName, scheme }: Props) {
   const [setRequestError, , requestError] = useErrorResponse();
 
   const fc = fetchCatch({
+    before: () => ({ tableName }),
     errorCatcher: setRequestError,
   });
 
@@ -60,11 +82,7 @@ export default function EditTable({ tableName, scheme }: Props) {
       setRecord(rec);
     });
 
-  let primaryKey = Object.keys(scheme.tags).find(id => {
-    return scheme.tags[id]?.includes("primary") || false;
-  }) || "";
-  if (!primaryKey) throw new Error("primary key is undefined");
-  let autoincId = scheme.tags[primaryKey].includes("autoinc");
+
 
 
   const loadPage = useCallback((page: number) => {
@@ -75,7 +93,7 @@ export default function EditTable({ tableName, scheme }: Props) {
     const queryString = !queryInput.current ? queryDefault : queryInput.current.value;
     if (queryString != queryDefault) {
       window.location.hash = "#q=" + queryString;
-    }else {
+    } else {
       window.location.hash = "";
     }
 
@@ -89,43 +107,34 @@ export default function EditTable({ tableName, scheme }: Props) {
   // function loadPage() {
 
   // }
-
-  function insert() {
-    // setInsertMode(true);
-    setRequestError();
-    getDraft({ tableName })
-      .then((draft) => {
-        setRecord(draft);
-        setInsertMode(true);
-      })
-      .catch(setRequestError);
-  }
+  const fcInsert = fc.method(getDraft)
+    .then(draft => {
+      setRecord(draft);
+      setInsertMode(true);
+    });
 
   function onDocCreated() {
     loadPage(page);
     setRecord(undefined);
   }
 
-  function onDuplicate() {
-    if (autoincId) {
+  const fcOnDuplicate = fc.method(getFreeId)
+    .confirm(async () => {
+      if (!autoincId) return true;
+
       const newDoc = { ...record };
       delete newDoc[primaryKey];
       setRecord(newDoc);
       setInsertMode(true);
-      return;
-    }
-    setRequestError();
-    getFreeId({ tableName })
-      .then(newId => {
-        setRecord({
-          ...record,
-          [primaryKey]: newId
-        });
-        setInsertMode(true);
-      })
-      .catch(setRequestError);
-  }
-
+      return false;
+    })
+    .then(newId => {
+      setRecord({
+        ...record,
+        [primaryKey]: newId
+      });
+      setInsertMode(true);
+    });
 
   useEffect(() => {
 
@@ -148,7 +157,11 @@ export default function EditTable({ tableName, scheme }: Props) {
       console.log(err);
     }
 
-    loadPage(1);
+    getScheme({ tableName }).then(scheme => {
+      setScheme(scheme);
+      loadPage(1);
+    });
+
   }, [loadPage]);
 
 
@@ -183,7 +196,7 @@ export default function EditTable({ tableName, scheme }: Props) {
         </div>
         <Button className="align-top" onClick={e => loadPage(1)}>Select</Button>
         <div className="border-l border-gray-500 mx-3 h-[34px]"></div>
-        <Button className="align-top" onClick={insert}>New record</Button>
+        <Button className="align-top" onClick={fcInsert.action()}>New record</Button>
       </div>
       <RequestError requestError={requestError} />
       {pageData
@@ -201,7 +214,7 @@ export default function EditTable({ tableName, scheme }: Props) {
               record={record}
               onDeleted={onDocCreated}
               onCreated={onDocCreated}
-              onDuplicate={onDuplicate}
+              onDuplicate={fcOnDuplicate.action()}
               onRequestError={setRequestError}
             />}
           </div>

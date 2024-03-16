@@ -8,7 +8,7 @@ import Link from "./Link";
 import { isAdmin } from "../../kurgandb_admin/auth";
 import LoginForm from "./LoginForm";
 import Header from "./Header";
-import TableMenu from "./TableMenu";
+import TableHeader from "./TableHeader";
 
 export type BreadrumbsArray = { title: string, href: string }[];
 
@@ -42,7 +42,7 @@ export default async function Layout({ children, breadcrumbs, tableName }: Props
     {authorised || setupRequired
       ? <div className="relative p-3 bg-stone-300 min-h-screen">
 
-        <Header>{tableName && <TableMenu tableName={tableName} />}</Header>
+        <Header>{tableName && <TableHeader tableName={tableName} />}</Header>
         <div className="">
           <div className="">
             {breadcrumbs && <Breadcrumbs className="mb-3">{items}</Breadcrumbs>}

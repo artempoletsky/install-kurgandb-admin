@@ -23,12 +23,12 @@ type Item = {
 }
 
 
-export default function TableMenu({ tableName }: Props) {
+export default function TableHeader({ tableName }: Props) {
 
 
   const Items: Item[] = [
     {
-      label: "Edit documents",
+      label: "Edit records",
       icon: <FileDatabase />,
       href: `/${ROOT_PATH}/${tableName}`,
     },
