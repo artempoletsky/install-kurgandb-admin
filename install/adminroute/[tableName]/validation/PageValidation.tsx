@@ -3,7 +3,7 @@
 import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
 import { ReactNode, useState } from "react";
 import { ActionIcon, Button } from "@mantine/core";
-import { FGetInvalidRecords, FSetCurrentTableValidator, FUnsetCurrentTableValidator, RUpdateValidationPage } from "../../api/methods";
+import type { FGetInvalidRecords, FSetCurrentTableValidator, FUnsetCurrentTableValidator, RGetTableValidation, RUpdateValidationPage } from "../../api/methods";
 import { API_ENDPOINT, ROOT_PATH } from "../../generated";
 import { Trash } from "tabler-icons-react";
 import { ParsedFunction } from "@artempoletsky/kurgandb/function";
@@ -20,13 +20,7 @@ const getInvalidRecords = getAPIMethod<FGetInvalidRecords>(API_ENDPOINT, "getInv
 
 
 
-type Props = {
-  adminValidator?: ParsedFunction;
-  currentValidator: ParsedFunction;
-  tableName: string;
-  primaryKey: string;
-  invalidRecords: PlainObject[];
-};
+type Props = RGetTableValidation & ATableOnly;
 
 export default function TestComponent({
   adminValidator,

@@ -1,10 +1,10 @@
 
-import { getSchemeSafe, getTableCustomPageData } from "../../api/methods";
+import { Metadata } from "next";
 import Layout, { BreadrumbsArray } from "../../comp/PageLayout";
 
-import CustomComponentPage from "./CustomComponentPage";
-import TableNotFound from "../TableNotFound";
-import { ResponseError } from "@artempoletsky/easyrpc";
+import PageCustomComponent from "./PageCustomComponent";
+import { FGetTableCustomPageData } from "../../api/methods";
+import ComponentLoader from "../../comp/ComponentLoader";
 
 type Payload = {
   tableName: string,
@@ -13,7 +13,9 @@ type Props = {
   params: Payload
 }
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+
+export const metadata: Metadata = {};
 
 export default async function page({ params }: Props) {
   const { tableName } = params;
@@ -23,21 +25,15 @@ export default async function page({ params }: Props) {
     { href: "", title: "Custom" },
   ];
 
+  metadata.title = `${tableName} custom page`;
 
-  try {
-    const result = await getTableCustomPageData({ tableName })
-    return (
-      <Layout breadcrumbs={crumbs} tableName={tableName}>
-        <CustomComponentPage {...result} tableName={tableName} />
-      </Layout>
-    );
-  } catch (err: any) {
-    if (err instanceof ResponseError) {
-      return <Layout breadcrumbs={crumbs} tableName={tableName}>
-        <TableNotFound tableName={tableName} />
-      </Layout>
-    }
-    throw err;
-  }
+  const getTableCustomPageData: FGetTableCustomPageData = "getTableCustomPageData" as any;
+  return <Layout breadcrumbs={crumbs} tableName={tableName}>
+    <ComponentLoader
+      method={getTableCustomPageData}
+      Component={PageCustomComponent}
+      args={{ tableName }}
+    />
+  </Layout>
 
 }

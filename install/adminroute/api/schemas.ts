@@ -49,15 +49,16 @@ export type ADeleteDocument = z.infer<typeof deleteDocument>;
 
 
 export const getScheme = ZTableOnly;
+export const getSchemePage = ZTableOnly;
 export type AGetScheme = z.infer<typeof getScheme>;
 
 
-export const getPage = z.object({
+export const queryRecords = z.object({
   tableName: ZStringNonEmpty,
-  queryString: ZStringNonEmpty,
+  queryString: z.string(),
   page: z.number(),
 });
-export type AGetPage = z.infer<typeof getPage>;
+export type AQueryRecords = z.infer<typeof queryRecords>;
 
 
 export const toggleTag = z.object({

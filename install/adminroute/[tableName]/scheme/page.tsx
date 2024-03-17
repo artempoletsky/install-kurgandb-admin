@@ -1,7 +1,8 @@
 
 import PageTableScheme from "./PageTableScheme"
-import { getScheme } from "../../api/methods"
+import type { FGetSchemePage } from "../../api/methods"
 import Layout, { BreadrumbsArray } from "../../comp/PageLayout"
+import ComponentLoader from "../../comp/ComponentLoader"
 
 
 type Payload = {
@@ -21,7 +22,13 @@ export default async function page({ params }: Props) {
     { href: "", title: "Edit scheme" },
   ];
 
+  const getSchemePage: FGetSchemePage = "getSchemePage" as any;
   return <Layout breadcrumbs={crumbs} tableName={tableName}>
-    <PageTableScheme tableName={tableName}></PageTableScheme>
+    <ComponentLoader
+      method={getSchemePage}
+      Component={PageTableScheme}
+      args={{ tableName }}
+    />
+    {/* <PageTableScheme tableName={tableName}></PageTableScheme> */}
   </Layout>
 }

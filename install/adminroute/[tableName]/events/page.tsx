@@ -2,7 +2,9 @@
 import PageEvents from "./PageEvents";
 import { Metadata } from "next";
 import Layout, { BreadrumbsArray } from "../../comp/PageLayout";
-import { getTableEvents } from "../../api/methods";
+// import { getTableEvents } from "../../api/methods";
+import ComponentLoader from "../../comp/ComponentLoader";
+import { FGetTableEvents } from "../../api/methods";
 
 
 type Payload = {
@@ -16,7 +18,7 @@ export const metadata: Metadata = {
   title: "",
 };
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
 export default async function page({ params }: Props) {
   const { tableName } = params;
@@ -28,11 +30,15 @@ export default async function page({ params }: Props) {
   ];
 
   metadata.title = `${tableName} events`;
-  const events = await getTableEvents({ tableName });
 
+  const getTableEvents: FGetTableEvents = "getTableEvents" as any;
   return (
     <Layout breadcrumbs={crumbs} tableName={tableName}>
-      <PageEvents {...events} tableName={tableName}></PageEvents>
+      <ComponentLoader
+        method={getTableEvents}
+        Component={PageEvents}
+        args={{ tableName }}
+      />
     </Layout>
   );
 }

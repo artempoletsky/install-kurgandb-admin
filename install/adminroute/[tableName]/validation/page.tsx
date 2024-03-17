@@ -2,7 +2,8 @@
 import PageValidation from "./PageValidation";
 import { Metadata } from "next";
 import Layout, { BreadrumbsArray } from "../../comp/PageLayout";
-import { getTableValidation } from "../../api/methods";
+import { FGetTableValidation, getTableValidation } from "../../api/methods";
+import ComponentLoader from "../../comp/ComponentLoader";
 
 
 type Payload = {
@@ -28,11 +29,15 @@ export default async function page({ params }: Props) {
   ];
 
   metadata.title = `${tableName} events`;
-  const validation = await getTableValidation({ tableName });
 
+  const getTableValidation: FGetTableValidation = "getTableValidation" as any;
   return (
     <Layout breadcrumbs={crumbs} tableName={tableName}>
-      <PageValidation {...validation} tableName={tableName}></PageValidation>
+      <ComponentLoader
+        method={getTableValidation}
+        Component={PageValidation}
+        args={{ tableName }}
+      />
     </Layout>
   );
 }

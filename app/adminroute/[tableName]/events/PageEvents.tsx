@@ -1,10 +1,10 @@
 "use client";
 
 import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { RegisteredEvents } from "@artempoletsky/kurgandb/globals";
 import { ActionIcon, Button } from "@mantine/core";
-import { FToggleAdminEvent, FUnregisterEvent } from "../../api/methods";
+import { FGetTableEvents, FToggleAdminEvent, FUnregisterEvent } from "../../api/methods";
 import { API_ENDPOINT } from "../../generated";
 import { Trash } from "tabler-icons-react";
 
@@ -13,14 +13,13 @@ const unregisterEvent = getAPIMethod<FUnregisterEvent>(API_ENDPOINT, "unregister
 
 
 type Props = {
-  adminEvents: string[];
-  registeredEvents: RegisteredEvents;
   tableName: string;
+  registeredEvents: RegisteredEvents;
+  adminEvents: string[];
 };
 
-export default function TestComponent({ adminEvents, registeredEvents: initialRegisteredEvents, tableName }: Props) {
-  const [greeting, setGreeting] = useState("");
-  const [name, setName] = useState("");
+export default function TestComponent({ tableName, registeredEvents: initialRegisteredEvents, adminEvents }: Props) {
+  
   const [registeredEvents, setRegisteredEvents] = useState(initialRegisteredEvents);
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();
 

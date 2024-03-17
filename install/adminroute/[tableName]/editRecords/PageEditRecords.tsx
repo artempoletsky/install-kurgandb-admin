@@ -1,30 +1,31 @@
 "use client";
 
-import Paginator from "../comp/paginator";
+import Paginator from "../../comp/paginator";
 import EditDocumentForm from "./EditDocumentForm";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { FGetDraft, FGetFreeId, FGetPage, FGetScheme, FReadDocument, RGetPage } from "../api/methods";
+import type { FGetDraft, FGetFreeId, FQueryRecords, FGetScheme, FReadDocument, RQueryRecords, RGetSchemePage } from "../../api/methods";
 import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
 import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 import { Button, Textarea } from "@mantine/core";
-import RequestError from "../comp/RequestError";
-import { API_ENDPOINT } from "../generated";
-import css from "../admin.module.css";
+import RequestError from "../../comp/RequestError";
+import { API_ENDPOINT } from "../../generated";
+import css from "../../admin.module.css";
 
 import { PlainObject } from "@artempoletsky/kurgandb/globals";
+import type { AQueryRecords, ATableOnly } from "../../api/schemas";
+import ComponentLoader from "../../comp/ComponentLoader";
+import RecordsList from "./RecordsList";
 
 
 
 const readDocument = getAPIMethod<FReadDocument>(API_ENDPOINT, "readDocument");
-const getPage = getAPIMethod<FGetPage>(API_ENDPOINT, "getPage");
+const queryRecords = "queryRecords" as unknown as FQueryRecords;
+// getAPIMethod<FQueryRecords>(API_ENDPOINT, "queryRecords");
 const getDraft = getAPIMethod<FGetDraft>(API_ENDPOINT, "getDraft");
 const getFreeId = getAPIMethod<FGetFreeId>(API_ENDPOINT, "getFreeId");
-const getScheme = getAPIMethod<FGetScheme>(API_ENDPOINT, "getScheme");
 
 
-type Props = {
-  tableName: string;
-}
+type Props = ATableOnly & RGetSchemePage;
 
 function getSchemeProps(scheme?: TableScheme) {
   if (!scheme) {
@@ -45,14 +46,14 @@ function getSchemeProps(scheme?: TableScheme) {
   };
 }
 
-export default function PageEditRecords({ tableName }: Props) {
+export default function PageEditRecords({ tableName, scheme }: Props) {
 
 
   const [record, setRecord] = useState<PlainObject | undefined>(undefined);
   const [currentId, setCurrentId] = useState<string | number | undefined>(undefined);
-  const [pageData, setPageData] = useState<RGetPage | undefined>(undefined);
-  const [page, setPage] = useState<number>(1);
-  const [scheme, setScheme] = useState<TableScheme>();
+  const [pageData, setPageData] = useState<RQueryRecords | undefined>(undefined);
+  // const [page, setPage] = useState<number>(1);
+
   const queryDefault = "table.all()";
 
   const { autoincId, primaryKey } = getSchemeProps(scheme);
@@ -83,12 +84,14 @@ export default function PageEditRecords({ tableName }: Props) {
     });
 
 
-
+  function openDocument(id: string | number) {
+    fcOpenRecord.action(id)();
+  }
 
   const loadPage = useCallback((page: number) => {
     setRequestError();
     setRecord(undefined);
-    setPage(page);
+    // setPage(page);
 
     const queryString = !queryInput.current ? queryDefault : queryInput.current.value;
     if (queryString != queryDefault) {
@@ -97,12 +100,17 @@ export default function PageEditRecords({ tableName }: Props) {
       window.location.hash = "";
     }
 
-    getPage({
+    setQueryArgs({
       page,
       queryString,
-      tableName
-    }).then(setPageData)
-      .catch(setRequestError);
+      tableName,
+    });
+    // queryRecords({
+    //   page,
+    //   queryString,
+    //   tableName
+    // }).then(setPageData)
+    //   .catch(setRequestError);
   }, [tableName, setRequestError])
   // function loadPage() {
 
@@ -114,7 +122,7 @@ export default function PageEditRecords({ tableName }: Props) {
     });
 
   function onDocCreated() {
-    loadPage(page);
+    loadPage(queryArgs.page);
     setRecord(undefined);
   }
 
@@ -157,10 +165,7 @@ export default function PageEditRecords({ tableName }: Props) {
       console.log(err);
     }
 
-    getScheme({ tableName }).then(scheme => {
-      setScheme(scheme);
-      loadPage(1);
-    });
+    loadPage(1);
 
   }, [loadPage]);
 
@@ -178,6 +183,12 @@ export default function PageEditRecords({ tableName }: Props) {
 
     queryInput.current.value = string;
   }
+
+  const [queryArgs, setQueryArgs] = useState<AQueryRecords>({
+    page: 1,
+    tableName,
+    queryString: queryDefault,
+  });
   return (
     <div>
       <div className="mt-3 mb-1 flex gap-1">
@@ -199,29 +210,37 @@ export default function PageEditRecords({ tableName }: Props) {
         <Button className="align-top" onClick={fcInsert.action()}>New record</Button>
       </div>
       <RequestError requestError={requestError} />
-      {pageData
-        ? <div className="">
-          <div className="flex">
-            <ul className={css.sidebar}>
+      <div className="">
+        <div className="flex">
+          <ComponentLoader
+            Component={RecordsList}
+            method={queryRecords}
+            args={queryArgs}
+            onData={setPageData}
+            props={{
+              onRecordSelect: openDocument
+            }}
+          />
+          {/* <ul className={css.sidebar}>
               {pageData.documents.map(id => <li className={css.item} key={id} onClick={fcOpenRecord.action(id)}>{id}</li>)}
-            </ul>
-            {scheme && record && <EditDocumentForm
-              onClose={onClose}
-              insertMode={insertMode}
-              recordId={currentId}
-              tableName={tableName}
-              scheme={scheme}
-              record={record}
-              onDeleted={onDocCreated}
-              onCreated={onDocCreated}
-              onDuplicate={fcOnDuplicate.action()}
-              onRequestError={setRequestError}
-            />}
-          </div>
-          <Paginator page={page} pagesCount={pageData.pagesCount} onSetPage={loadPage}></Paginator>
+            </ul> */}
+          {scheme && record && <EditDocumentForm
+            onClose={onClose}
+            insertMode={insertMode}
+            recordId={currentId}
+            tableName={tableName}
+            scheme={scheme}
+            record={record}
+            onDeleted={onDocCreated}
+            onCreated={onDocCreated}
+            onDuplicate={fcOnDuplicate.action()}
+            onRequestError={setRequestError}
+          />}
         </div>
-        : <div className="">Loading...</div>
-      }
+        {pageData && <Paginator page={queryArgs.page} pagesCount={pageData.pagesCount} onSetPage={loadPage}></Paginator>}
+      </div>
+
+
 
 
     </div>

@@ -2,7 +2,7 @@
 import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 import { ReactNode, useEffect, useState } from "react";
 import { fetchCatch, getAPIMethod, JSONErrorResponse, useErrorResponse } from "@artempoletsky/easyrpc/client";
-import type { FAddField, FChangeFieldIndex, FGetScheme, FRemoveField, FRenameField, FToggleTag } from "../../api/methods";
+import type { FAddField, FChangeFieldIndex, FGetScheme, FRemoveField, FRenameField, FToggleTag, RGetSchemePage } from "../../api/methods";
 import FieldLabel from "../../comp/FieldLabel";
 import { ActionIcon, Button, Select, Tooltip } from "@mantine/core";
 import { FieldTag } from "@artempoletsky/kurgandb/globals";
@@ -12,7 +12,7 @@ import { ChevronDown, ChevronUp, Trash } from 'tabler-icons-react';
 import RequestError from "../../comp/RequestError";
 import { API_ENDPOINT } from "../../generated";
 import { blinkBoolean } from "../../utils_client";
-import { AAddField } from "../../api/schemas";
+import { AAddField, ATableOnly } from "../../api/schemas";
 
 const toggleTag = getAPIMethod<FToggleTag>(API_ENDPOINT, "toggleTag");
 const removeField = getAPIMethod<FRemoveField>(API_ENDPOINT, "removeField");
@@ -22,22 +22,18 @@ const renameField = getAPIMethod<FRenameField>(API_ENDPOINT, "renameField");
 const getScheme = getAPIMethod<FGetScheme>(API_ENDPOINT, "getScheme");
 
 
-type Props = {
-  tableName: string;
-}
+type Props = ATableOnly & RGetSchemePage;
 
 const TAGS_AVAILABLE: FieldTag[] = ["index", "unique", "textarea", "heavy", "hidden"];
 
 
-export default function PageTableScheme({ tableName }: Props) {
+export default function PageTableScheme({ tableName, scheme: schemeInitial }: Props) {
   const fields: ReactNode[] = [];
 
-  let [scheme, setScheme] = useState<TableScheme>();
+  let [scheme, setScheme] = useState<TableScheme>(schemeInitial);
 
   const [setRequestError, , requestError] = useErrorResponse();
   const [typeCopiedTooltip, setTypeCopiedTooltip] = useState(false);
-
-  useEffect(() => { getScheme({ tableName }).then(setScheme).catch(setRequestError); }, []);
 
   const fc = fetchCatch({
     errorCatcher: setRequestError,
@@ -128,54 +124,53 @@ export default function PageTableScheme({ tableName }: Props) {
     return sel.value as FieldTag;
   }
 
-  if (scheme) {
-    let i = 0;
-    for (const fieldName of scheme.fieldsOrderUser) {
-      const tags = scheme.tags[fieldName] || [];
-      const type = scheme.fields[fieldName];
 
-      const tagsType: string[] = tags.slice(0);
-      tagsType.unshift(type);
+  let i = 0;
+  for (const fieldName of scheme.fieldsOrderUser) {
+    const tags = scheme.tags[fieldName] || [];
+    const type = scheme.fields[fieldName];
 
-      fields.push(<li className="mb-3" key={fieldName}>
-        <FieldLabel fieldName={fieldName} scheme={scheme} onRename={fcRenameField.action()} />
-        <div className="flex gap-3">
-          <Button onClick={fcToggle.action(fieldName)}>Toggle tag:</Button>
-          <Select
-            allowDeselect={false}
-            name={`tag_select_${fieldName}`}
-            defaultValue={TAGS_AVAILABLE[0]} data={TAGS_AVAILABLE.map(k => ({ label: k, value: k }))} />
-          <div className="border-l border-stone-800"></div>
+    const tagsType: string[] = tags.slice(0);
+    tagsType.unshift(type);
+
+    fields.push(<li className="mb-3" key={fieldName}>
+      <FieldLabel fieldName={fieldName} scheme={scheme} onRename={fcRenameField.action()} />
+      <div className="flex gap-3">
+        <Button onClick={fcToggle.action(fieldName)}>Toggle tag:</Button>
+        <Select
+          allowDeselect={false}
+          name={`tag_select_${fieldName}`}
+          defaultValue={TAGS_AVAILABLE[0]} data={TAGS_AVAILABLE.map(k => ({ label: k, value: k }))} />
+        <div className="border-l border-stone-800"></div>
+        <ActionIcon
+          className="p-1.5"
+          size={36}
+          onClick={fcRemoveField.action(fieldName)}>
+          <Trash />
+        </ActionIcon>
+
+        <div className="border-l border-stone-800 w-[40px] flex flex-col pl-3">
           <ActionIcon
-            className="p-1.5"
-            size={36}
-            onClick={fcRemoveField.action(fieldName)}>
-            <Trash />
+            disabled={i == 0}
+            // className="absolute left-3 top-0"
+            size={18}
+            onClick={fcMoveField.action(fieldName, -1)}>
+            <ChevronUp />
           </ActionIcon>
-
-          <div className="border-l border-stone-800 w-[40px] flex flex-col pl-3">
-            <ActionIcon
-              disabled={i == 0}
-              // className="absolute left-3 top-0"
-              size={18}
-              onClick={fcMoveField.action(fieldName, -1)}>
-              <ChevronUp />
-            </ActionIcon>
-            <ActionIcon
-              disabled={i == scheme.fieldsOrderUser.length - 1}
-              // className="absolute left-3 bottom-0"
-              size={18}
-              onClick={fcMoveField.action(fieldName, 1)}>
-              <ChevronDown />
-            </ActionIcon>
-          </div>
-
-
-
+          <ActionIcon
+            disabled={i == scheme.fieldsOrderUser.length - 1}
+            // className="absolute left-3 bottom-0"
+            size={18}
+            onClick={fcMoveField.action(fieldName, 1)}>
+            <ChevronDown />
+          </ActionIcon>
         </div>
-      </li>)
-      i++;
-    }
+
+
+
+      </div>
+    </li>)
+    i++;
   }
 
 

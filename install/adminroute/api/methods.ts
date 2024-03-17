@@ -15,7 +15,7 @@ import type {
   AGetDraft,
   AGetFreeId,
   AGetLog,
-  AGetPage,
+  AQueryRecords as AQueryRecords,
   AGetScheme,
   AReadDocument,
   ARemoveField,
@@ -29,6 +29,7 @@ import type {
 } from "./schemas";
 
 
+export type CompType<Type extends (arg: any) => Promise<any>> = Awaited<ReturnType<Type>> & Parameters<Type>[0];
 
 type Tables = Record<string, Table<any, any, any>>;
 
@@ -107,17 +108,28 @@ export const getScheme = methodFactory(({ }, { tableName }: AGetScheme, { db }) 
 
 export type FGetScheme = typeof getScheme;
 
+export async function getSchemePage(args: AGetScheme) {
+  const scheme = await getScheme(args);
+  return {
+    scheme,
+  }
+}
+
+export type FGetSchemePage = typeof getSchemePage;
+export type RGetSchemePage = Awaited<ReturnType<FGetSchemePage>>;
+
+
 /////////////////////////////////////////////////////
 
 
 
-export type RGetPage = {
-  documents: any[]
-  pagesCount: number
+export type RQueryRecords = {
+  documents: any[];
+  pagesCount: number;
 }
 
 
-export const getPage = methodFactory<AGetPage, RGetPage>(({ }, { tableName, queryString, page }, { db, $ }) => {
+export const queryRecords = methodFactory<AQueryRecords, RQueryRecords>(({ }, { tableName, queryString, page }, { db, $ }) => {
   let t = db.getTable(tableName);
   let table = t;
   let tq: any;
@@ -127,7 +139,7 @@ export const getPage = methodFactory<AGetPage, RGetPage>(({ }, { tableName, quer
     try {
       tq = eval(queryString).limit(0);
     } catch (err) {
-      throw new ResponseError(`Query string contains errors: {...}`, [err + ""]);
+      throw new $.ResponseError(`Query string contains errors: {...}`, [err + ""]);
     }
 
   }
@@ -143,7 +155,7 @@ export const getPage = methodFactory<AGetPage, RGetPage>(({ }, { tableName, quer
   return paginage(tq.select($.primary), page, 20);
 });
 
-export type FGetPage = typeof getPage;
+export type FQueryRecords = typeof queryRecords;
 
 /////////////////////////////////////////////////////
 
@@ -432,6 +444,7 @@ export const getTableCustomPageData = methodFactory(({ }, { tableName }: ATableO
   }
 });
 export type FGetTableCustomPageData = typeof getTableCustomPageData;
+export type RGetTableCustomPageData = Awaited<ReturnType<FGetTableCustomPageData>>;
 
 
 import * as AdminValidators from "../../kurgandb_admin/validation";
