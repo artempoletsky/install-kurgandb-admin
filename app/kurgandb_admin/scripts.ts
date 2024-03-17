@@ -7,34 +7,34 @@ import { query } from "@/db";
 
 
 
-export const NextRoutes = {
-  async createNewPage(path: string, mainComponentName: string) {
-    if (!path) {
+export const Next_routes = {
+  async Create_new_page(Path: string, Main_component_name: string) {
+    if (!Path) {
       return "Specify a path for the Next router!"
     }
-    if (!mainComponentName) {
-      mainComponentName = "UnnamedPage";
+    if (!Main_component_name) {
+      Main_component_name = "UnnamedPage";
     }
 
-    const dirPath = process.cwd() + "/app/" + path;
+    const dirPath = process.cwd() + "/app/" + Path;
     if (fs.existsSync(dirPath)) return "Already exists!";
 
 
     fs.mkdirSync(dirPath, { recursive: true });
     const variables = {
-      $$PATH$$: path,
-      $$COMP$$: mainComponentName,
+      $$PATH$$: Path,
+      $$COMP$$: Main_component_name,
     }
 
     const sourcePath = `${process.cwd()}/app/kurgandb_admin`;
     generateCodeFile(sourcePath + "/codegen/newpage/page.tsx.txt", dirPath + "/page.tsx", variables);
-    generateCodeFile(sourcePath + "/codegen/newpage/UnnamedPage.tsx.txt", dirPath + `/${mainComponentName}.tsx`, variables);
+    generateCodeFile(sourcePath + "/codegen/newpage/UnnamedPage.tsx.txt", dirPath + `/${Main_component_name}.tsx`, variables);
 
-    this.createNewAPI(path + "/api");
+    this.Create_new_API(Path + "/api");
   },
 
-  async createNewAPI(path: string) {
-    const dirPath = process.cwd() + "/app/" + path;
+  async Create_new_API(Path: string) {
+    const dirPath = process.cwd() + "/app/" + Path;
     if (fs.existsSync(dirPath)) return "Already exists!";
 
     fs.mkdirSync(dirPath, { recursive: true });
@@ -49,13 +49,13 @@ export const NextRoutes = {
   },
 }
 
-export const projectSetup = {
-  async generateGlobalsAndDB_Files() {
+export const Project_setup = {
+  async Generate_globals_and_db_files() {
     // Generate globals.ts and db.ts according to your database structure
 
     return await generateDB();
   },
-  async createUsersTable() {
+  async Create_users_table() {
     // Create an example table named `users` with predefined fields
 
     const tableName = "users";
@@ -85,8 +85,9 @@ export const projectSetup = {
     return result;
   },
 
-  async polluteUsersMetadata() {
-    // store example metadata in the `users` table
+  async Pollute_users_metadata() {
+    // Store example metadata in the `users` table
+
     return await query(({ users }) => {
       users.meta.foo = {
         bar: "baz",
@@ -97,10 +98,11 @@ export const projectSetup = {
   },
 }
 
-export const misc = {
+export const Miscellaneous = {
 
-  async ThrowError(message: string) {
+  async Throw_error(message: string) {
     // Throw an error in the database with your message, you will see the error in the logs
+    if (!message) return "Specify a message first";
     try {
       await query(({ }, { message }, { }) => {
         throw new Error(message);
@@ -111,9 +113,11 @@ export const misc = {
       return err.message;
     }
   },
-  async printHelloWithYourArguments(argument1: string, argument2: string) {
-    // You can add a descrition with the comment
+  async Print_hello_with_your_arguments(First_argument: string, Second_argument: string) {
+    // You can add a descrition to the script with the comment
 
-    return `Hello world! ${argument1} ${argument2} `;
+    if (!First_argument) First_argument = "Cow";
+    if (!Second_argument) Second_argument = "Hello";
+    return `${First_argument} says ${Second_argument}!`;
   },
 }

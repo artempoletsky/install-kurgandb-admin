@@ -8,6 +8,7 @@ import { useRef } from "react";
 import { invalidate } from "../comp/Link";
 import { useRouter } from "next/navigation";
 import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
+import { formatName } from "./ScriptsPage";
 
 const executeScript = getAPIMethod<FExecuteScript>(API_ENDPOINT, "executeScript");
 
@@ -43,7 +44,7 @@ export default function FunctionComponent({ className, description, args, path, 
   }).action();
 
   function printArguments(args: string[], path: string) {
-    return <div className="inline-flex gap-3">{args.map(key => <TextInput autoComplete="off" name={key} key={key} placeholder={key} />)}</div>;
+    return <div className="inline-flex gap-3">{args.map(key => <TextInput autoComplete="off" name={key} key={key} placeholder={formatName(key)} />)}</div>;
   }
 
   return (

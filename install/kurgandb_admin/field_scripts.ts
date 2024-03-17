@@ -12,19 +12,19 @@ type UserFull = { username: string, password: string };
 export const fieldScripts: FieldScriptsObject = {
   users: { // the name of the table
     username: { // the name of the field
-      reverse(record: UserFull) {
+      Reverse(record: UserFull) {
         exampleCustomMethod({
           arg: record.username
         }).then(reversed => {
           record.username = reversed;
         })
       },
-      script() {
+      Script() {
 
       },
     },
     password: {
-      encode(record: UserFull) {
+      Encode(record: UserFull) {
         record.password = encodePassword(record.password);
       }
     }

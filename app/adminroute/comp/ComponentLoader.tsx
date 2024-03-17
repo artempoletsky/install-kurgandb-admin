@@ -30,18 +30,24 @@ export default function ComponentLoader
 
   const [data, setData] = useState<RT>();
   useEffect(() => {
+    setData(undefined);
+    setErrorResponse();
     method(args).then(res => {
       setData(res);
       if (onData) onData(res);
-    }).catch(setErrorResponse);
+    }).catch(errorResponse => {
+      setData(undefined);
+      setErrorResponse(errorResponse);
+    });
   }, [args]);
+
 
   if (!data && !errorResponse) {
     if (children) return children;
     return <Loader type="dots" />
   }
   if (data) return <Component {...data} {...args} {..._props} ></Component>;
-  
+
   if (error) return error;
   return <RequestError requestError={errorResponse}></RequestError>;
 }

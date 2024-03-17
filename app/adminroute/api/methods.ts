@@ -36,11 +36,7 @@ type Tables = Record<string, Table<any, any, any>>;
 function methodFactory<Payload extends PlainObject, PredicateReturnType, ReturnType = PredicateReturnType>(predicate: Predicate<Tables, Payload, PredicateReturnType>, then?: (dbResult: PredicateReturnType, payload: Payload) => ReturnType) {
   return async function (payload: Payload) {
     let dbResult: PredicateReturnType;
-    try {
-      dbResult = await query(predicate, payload);
-    } catch (err: any) {
-      throw new ResponseError(err);
-    }
+    dbResult = await query(predicate, payload);
     if (!then) return dbResult as unknown as ReturnType;
     return then(dbResult, payload);
   }
@@ -141,7 +137,12 @@ export const queryRecords = methodFactory<AQueryRecords, RQueryRecords>(({ }, { 
     } catch (err) {
       throw new $.ResponseError(`Query string contains errors: {...}`, [err + ""]);
     }
-
+  }
+  let ids: any[];
+  try {
+    ids = tq.select($.primary);
+  } catch (err) {
+    throw new $.ResponseError("Query has failed with error {...}", [err + ""]);
   }
 
   function paginage<Type>(array: Type[], page: number, pageSize: number) {
@@ -152,7 +153,7 @@ export const queryRecords = methodFactory<AQueryRecords, RQueryRecords>(({ }, { 
     }
   }
 
-  return paginage(tq.select($.primary), page, 20);
+  return paginage(ids, page, 20);
 });
 
 export type FQueryRecords = typeof queryRecords;

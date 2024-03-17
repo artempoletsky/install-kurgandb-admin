@@ -14,7 +14,7 @@ import { FieldTag, FieldType, PlainObject } from "@artempoletsky/kurgandb/global
 import { JSONErrorResponse } from "@artempoletsky/easyrpc/client";
 
 import { fieldScripts } from "../../../kurgandb_admin/field_scripts";
-import { ScriptsRecord, formatCamelCase } from "../../globals";
+import { ScriptsRecord } from "../../globals";
 import CustomComponentRecord from "../../../kurgandb_admin/components/CustomComponentRecord";
 import { Calendar, Dots, Edit } from "tabler-icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -154,7 +154,7 @@ export default function EditDocumentForm({
 
     const scriptNames: Record<string, string> = {};
     for (const key in scripts) {
-      scriptNames[key] = formatCamelCase(key);
+      scriptNames[key] = key.replaceAll("_", " ");
     }
     const scriptKeys = Object.keys(scriptNames);
 
