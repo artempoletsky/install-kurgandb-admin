@@ -1,13 +1,14 @@
 "use client";
 
 import css from "../admin.module.css";
-import { getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
+import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
 
 import { useEffect, useState } from "react";
 import { API_ENDPOINT } from "../generated";
 import type { FGetLog } from "../api/methods";
 import Paginator from "../comp/paginator";
 import type { LogEntry } from "@artempoletsky/kurgandb/globals";
+import { before } from "node:test";
 
 const getLog = getAPIMethod<FGetLog>(API_ENDPOINT, "getLog");
 
@@ -26,20 +27,12 @@ export default function TestComponent({ logsList }: Props) {
 
   const [setErrorResponse, mainErrorMessage] = useErrorResponse();
 
-
-  function openLog(fileName: string) {
-    setErrorResponse();
-
-    getLog({
-      fileName
-    })
-      .then((logs) => {
-        setLogEntries(logs);
-        // console.log(logs);
-      })
-      .catch(setErrorResponse);
-
-  }
+  const fcOpenLog = fetchCatch(getLog)
+    .before(fileName => ({
+      fileName,
+    }))
+    .catch(setErrorResponse)
+    .then(setLogEntries);
 
   function showPage(num: number) {
     setPage(num);
@@ -55,7 +48,7 @@ export default function TestComponent({ logsList }: Props) {
     <div className="">
       <div className="flex gap-3">
         <ul className={css.sidebar}>
-          {pageEntries.map(id => <li className={css.item} key={id} onClick={e => openLog(id)}>{id}</li>)}
+          {pageEntries.map(id => <li className={css.sidebar_li} key={id} onClick={fcOpenLog.action(id)}>{id}</li>)}
         </ul>
         <ul className="overflow-y-scroll h-[675px] w-[750px]">
           {logEntries.map((e, i) =>

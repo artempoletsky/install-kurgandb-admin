@@ -5,6 +5,7 @@ import Layout, { BreadrumbsArray } from "../../comp/PageLayout";
 import PageCustomComponent from "./PageCustomComponent";
 import { FGetTableCustomPageData } from "../../api/methods";
 import ComponentLoader from "../../comp/ComponentLoader";
+import TableNotFound from "../TableNotFound";
 
 type Payload = {
   tableName: string,
@@ -33,6 +34,7 @@ export default async function page({ params }: Props) {
       method={getTableCustomPageData}
       Component={PageCustomComponent}
       args={{ tableName }}
+      error={<TableNotFound tableName={tableName} />}
     />
   </Layout>
 

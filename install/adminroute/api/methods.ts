@@ -367,13 +367,25 @@ export const getAllTables = methodFactory(({ }, { }: {}, { db }) => {
 
 export type FGetAllTables = typeof getAllTables;
 
-
+export async function getAllTablesPage() {
+  return {
+    tables: await getAllTables({}),
+  }
+}
+export type FGetAllTablesPage = typeof getAllTablesPage;
 
 
 export const getLogsList = methodFactory(({ }, { }, { db }) => {
   return db.getLogsList();
 });
 export type FGetLogsList = () => Promise<ReturnType<typeof getLogsList>>;
+
+export async function getLogsListPage() {
+  return {
+    logsList: await getLogsList({}),
+  }
+}
+export type FGetLogsListPage = typeof getLogsListPage;
 
 
 export const getLog = methodFactory(({ }, { fileName }: AGetLog, { db }) => {

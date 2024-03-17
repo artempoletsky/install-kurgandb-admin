@@ -5,6 +5,7 @@ import Layout, { BreadrumbsArray } from "../../comp/PageLayout";
 // import { getTableEvents } from "../../api/methods";
 import ComponentLoader from "../../comp/ComponentLoader";
 import { FGetTableEvents } from "../../api/methods";
+import TableNotFound from "../TableNotFound";
 
 
 type Payload = {
@@ -38,6 +39,7 @@ export default async function page({ params }: Props) {
         method={getTableEvents}
         Component={PageEvents}
         args={{ tableName }}
+        error={<TableNotFound tableName={tableName} />}
       />
     </Layout>
   );

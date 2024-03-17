@@ -16,11 +16,12 @@ type Props<AT, RT, PT> = {
   props?: PT;
   children?: ReactNode;
   onData?: (res: RT) => void;
+  error?: ReactNode;
 }
 
 export default function ComponentLoader
   <AT, RT, PT>
-  ({ Component, children, args, method: methodHack, props, onData }: Props<AT, RT, PT>) {
+  ({ Component, children, args, method: methodHack, props, onData, error }: Props<AT, RT, PT>) {
   const methodName = methodHack as unknown as string;
 
   const _props: PT = props || {} as PT;
@@ -40,7 +41,8 @@ export default function ComponentLoader
     return <Loader type="dots" />
   }
   if (data) return <Component {...data} {...args} {..._props} ></Component>;
-
+  
+  if (error) return error;
   return <RequestError requestError={errorResponse}></RequestError>;
 }
 

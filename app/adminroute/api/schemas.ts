@@ -150,8 +150,10 @@ export type AExecuteScript = z.infer<typeof executeScript>;
 
 
 export const getAllTables = ZEmpty;
+export const getAllTablesPage = ZEmpty;
 
 export const getLogsList = ZEmpty;
+export const getLogsListPage = ZEmpty;
 
 export const getLog = z.object({
   fileName: ZStringNonEmpty,

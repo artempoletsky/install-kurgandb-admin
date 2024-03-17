@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import Layout, { BreadrumbsArray } from "../../comp/PageLayout";
 import { FGetTableValidation, getTableValidation } from "../../api/methods";
 import ComponentLoader from "../../comp/ComponentLoader";
+import TableNotFound from "../TableNotFound";
 
 
 type Payload = {
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
   title: "",
 };
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
 export default async function page({ params }: Props) {
   const { tableName } = params;
@@ -37,6 +38,7 @@ export default async function page({ params }: Props) {
         method={getTableValidation}
         Component={PageValidation}
         args={{ tableName }}
+        error={<TableNotFound tableName={tableName} />}
       />
     </Layout>
   );
