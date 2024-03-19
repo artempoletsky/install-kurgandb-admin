@@ -201,22 +201,7 @@ export type FGetDraft = typeof getDraft;
 
 export const addField = methodFactory<AAddField, TableScheme>(({ }, { tableName, fieldName, type, isHeavy }, { db, $ }) => {
   let t = db.getTable(tableName);
-  try {
-    t.addField(fieldName, type, isHeavy);
-  } catch (err) {
-    // throw err;
-
-    throw new $.ResponseError({
-      invalidFields: {
-        fieldName: {
-          message: "Already taken {...} ({...})",
-          args: [t.scheme.fields[fieldName], t.scheme.tags[fieldName].join(", ")],
-        }
-      }
-    });
-
-  }
-
+  t.addField(fieldName, type, isHeavy);
   return t.scheme;
 });
 
