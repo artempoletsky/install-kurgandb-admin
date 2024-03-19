@@ -42,27 +42,36 @@ export const ADMIN_VERSION = "${pkg.version}";
 `);
 }
 
-const { exec } = require("child_process");
+// const { exec } = require("child_process");
 
-function installDependencies() {
+const util = require('node:util');
+const exec = util.promisify(require('node:child_process').exec);
+
+async function installDependencies() {
   const packageFilePath = `${__dirname}/package.json`;
   const jsonData = JSON.parse(fs.readFileSync(packageFilePath));
   console.log("installing dependencies, please wait...");
   const deps = [
-    "@mantine/core", "@mantine/hooks", "@mantine/dates", "@mantine/form",
+    "@mantine/hooks", "@mantine/dates", "@mantine/form", "@mantine/core",
     "tabler-icons-react", "zod"
   ];
 
   // skip locally installed packages. It means that we are in the dev mode.
   const rpcName = "@artempoletsky/easyrpc";
-  if (jsonData.dependencies[rpcName] || !jsonData.dependencies[rpcName].startsWith("file:")) {
+  if (!jsonData.dependencies[rpcName] || !jsonData.dependencies[rpcName].startsWith("file:")) {
     deps.push(rpcName);
   }
   const dbName = "@artempoletsky/kurgandb";
-  if (jsonData.dependencies[dbName] || !jsonData.dependencies[dbName].startsWith("file:")) {
+  if (!jsonData.dependencies[dbName] || !jsonData.dependencies[dbName].startsWith("file:")) {
     deps.push(dbName);
   }
-  exec(`npm install --save ${deps.join(" ")}`);
+  // console.log(deps.join(" "));
+
+  for (const pkg of deps) {
+    console.log(pkg);
+    await exec(`npm install --save ${pkg}@latest`);
+  }
+
 }
 
 
