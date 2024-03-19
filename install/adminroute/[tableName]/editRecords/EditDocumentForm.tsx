@@ -27,16 +27,18 @@ const deleteDocument = getAPIMethod<FDeleteDocument>(API_ENDPOINT, "deleteDocume
 
 
 type Props = {
-  record: PlainObject
-  scheme: TableScheme
-  insertMode?: boolean
-  tableName: string
-  recordId: string | number | undefined
-  onCreated: (id: string | number) => void
-  onDeleted: () => void
-  onDuplicate: () => void
-  onRequestError: (e: JSONErrorResponse) => void
-  onClose: () => void
+  record: PlainObject;
+  scheme: TableScheme;
+  insertMode?: boolean;
+  tableName: string;
+  recordId: string | number | undefined;
+  onCreated: (id: string | number) => void;
+  onDeleted: () => void;
+  onDuplicate: () => void;
+  onRequestError: (e: JSONErrorResponse) => void;
+  onClose: () => void;
+  onUpdateId: (oldId: string | number, newId: string | number) => void;
+  primaryKey: string;
 };
 
 function createProxy<T>(record: T, setRecord: (newRecord: T) => void): T {
@@ -66,7 +68,9 @@ export default function EditDocumentForm({
   onCreated,
   onDuplicate,
   onRequestError,
-  onClose
+  onClose,
+  onUpdateId,
+  primaryKey,
 }: Props) {
 
   const form = useRef<HTMLFormElement>(null);
@@ -85,12 +89,19 @@ export default function EditDocumentForm({
   function save() {
 
     if (recordId === undefined) throw new Error("id is undefined");
-
+    const oldRecordId = recordId;
     updateDocument({
-      id: recordId,
+      id: oldRecordId,
       tableName,
       document: record
-    }).then(() => blinkBoolean(setSavedTooltip))
+    }).then(() => {
+      blinkBoolean(setSavedTooltip);
+      if (recordId != record[primaryKey]) {
+        console.log(recordId, record[primaryKey]);
+
+        onUpdateId(recordId, record[primaryKey]);
+      }
+    })
       .catch(onRequestError);
   }
 
@@ -290,7 +301,6 @@ export default function EditDocumentForm({
     <div className="min-w-[500px] relative pt-5">
       <div className="absolute right-0 top-0">
         <CloseButton onClick={onClose} />
-        {/* <ActionIcon className="" size="md"></ActionIcon> */}
       </div>
       <form className="mb-5" ref={form}>{fields}</form>
       {insertMode

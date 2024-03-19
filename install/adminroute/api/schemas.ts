@@ -13,7 +13,7 @@ const ZEmpty = z.object({});
 
 
 
-const ZKeyType = z.union([ZStringNonEmpty, z.number()]);
+const ZKeyType = z.union([z.string(), z.number()]);
 
 
 export const createDocument = z.object({

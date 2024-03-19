@@ -69,7 +69,7 @@ export const updateDocument = methodFactory(({ }, { tableName, document, id }: A
   t.where(<any>t.primaryKey, id).update(doc => {
     for (const key in document) {
       const newValue = document[key];
-      if (doc.$get("key") != newValue) {
+      if (doc.$get(key) != newValue) {
         doc.$set(key as any, newValue);
       }
     }

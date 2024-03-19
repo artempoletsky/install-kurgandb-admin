@@ -25,6 +25,8 @@
 
   .sidebar_li {
     @apply cursor-pointer py-1 border-b border-gray-500;
+    min-height: 34px;
+    white-space: pre;
   }
 
   .pseudo {

@@ -13,7 +13,7 @@ import css from "../../admin.module.css";
 
 import { PlainObject } from "@artempoletsky/kurgandb/globals";
 import type { AQueryRecords, ATableOnly } from "../../api/schemas";
-import ComponentLoader from "../../comp/ComponentLoader";
+import ComponentLoader, { Mutator } from "../../comp/ComponentLoader";
 import RecordsList from "./RecordsList";
 
 
@@ -71,6 +71,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
   });
 
   const fcOpenRecord = fc.method(readDocument)
+    .catch(setRequestError)
     .before((id: string | number) => {
       setCurrentId(id);
       return {
@@ -189,6 +190,20 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
     tableName,
     queryString: queryDefault,
   });
+  const mutator = new Mutator<RQueryRecords>();
+  function onUpdateId(oldId: string | number, newId: string | number) {
+    if (!pageData) throw new Error("no page data");
+
+    const iOf = pageData.documents.indexOf(oldId);
+    pageData.documents.splice(iOf, 1, newId);
+    setCurrentId(newId);
+    setRecord({
+      ...record,
+      [primaryKey]: newId,
+    });
+    mutator.trigger(pageData);
+  }
+
   return (
     <div>
       <div className="mt-3 mb-1 flex gap-1">
@@ -208,8 +223,10 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
         <Button className="align-top" onClick={e => loadPage(1)}>Select</Button>
         <div className="border-l border-gray-500 mx-3 h-[34px]"></div>
         <Button className="align-top" onClick={fcInsert.action()}>New record</Button>
+        <div className="grow ml-3">
+          <RequestError requestError={requestError} />
+        </div>
       </div>
-      <RequestError requestError={requestError} />
       <div className="">
         <div className="flex">
           <ComponentLoader
@@ -220,11 +237,14 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
             props={{
               onRecordSelect: openDocument
             }}
+            mutator={mutator}
           />
           {/* <ul className={css.sidebar}>
               {pageData.documents.map(id => <li className={css.item} key={id} onClick={fcOpenRecord.action(id)}>{id}</li>)}
             </ul> */}
           {scheme && record && <EditDocumentForm
+            primaryKey={primaryKey}
+            onUpdateId={onUpdateId}
             onClose={onClose}
             insertMode={insertMode}
             recordId={currentId}
@@ -239,9 +259,6 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
         </div>
         {pageData && <Paginator page={queryArgs.page} pagesCount={pageData.pagesCount} onSetPage={loadPage}></Paginator>}
       </div>
-
-
-
 
     </div>
 

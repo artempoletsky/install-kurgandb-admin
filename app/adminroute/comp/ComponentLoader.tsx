@@ -8,6 +8,14 @@ import RequestError from "./RequestError";
 import { Loader } from "@mantine/core";
 
 
+export class Mutator<RT>  {
+  setter: ((res: RT) => void) | undefined
+  trigger(res: RT) {
+    console.log(res);
+    if (this.setter) this.setter(res);
+  }
+}
+
 
 type Props<AT, RT, PT> = {
   method: (arg: AT) => Promise<RT>;
@@ -17,11 +25,12 @@ type Props<AT, RT, PT> = {
   children?: ReactNode;
   onData?: (res: RT) => void;
   error?: ReactNode;
+  mutator?: Mutator<RT>;
 }
 
 export default function ComponentLoader
   <AT, RT, PT>
-  ({ Component, children, args, method: methodHack, props, onData, error }: Props<AT, RT, PT>) {
+  ({ Component, children, args, method: methodHack, props, onData, error, mutator }: Props<AT, RT, PT>) {
   const methodName = methodHack as unknown as string;
 
   const _props: PT = props || {} as PT;
@@ -39,6 +48,9 @@ export default function ComponentLoader
       setData(undefined);
       setErrorResponse(errorResponse);
     });
+    if (mutator) {
+      mutator.setter = setData;
+    }
   }, [args]);
 
 
