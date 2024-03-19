@@ -13,6 +13,8 @@ import RequestError from "../../comp/RequestError";
 import { API_ENDPOINT } from "../../generated";
 import { blinkBoolean } from "../../utils_client";
 import { AAddField, ATableOnly } from "../../api/schemas";
+import { generateRecordTypesFromScheme } from "./generateType";
+import Code from "../../comp/Code";
 
 const toggleTag = getAPIMethod<FToggleTag>(API_ENDPOINT, "toggleTag");
 const removeField = getAPIMethod<FRemoveField>(API_ENDPOINT, "removeField");
@@ -71,31 +73,7 @@ export default function PageTableScheme({ tableName, scheme: schemeInitial }: Pr
       })
     });
 
-
-
-  function copyDocumentType() {
-    if (!scheme) return;
-    let res = `type ${tableName} = {\n`;
-    for (const field of scheme.fieldsOrderUser) {
-      const type = scheme.fields[field];
-      let tsType: string = type;
-      switch (type) {
-        case "date":
-          tsType = "Date";
-          break;
-
-        case "json":
-          tsType = "null | {}";
-          break;
-      }
-
-      res += `  ${field}: ${tsType}\n`;
-    }
-    res += `}`;
-
-    navigator.clipboard.writeText(res);
-    blinkBoolean(setTypeCopiedTooltip);
-  }
+  const declarationCode = generateRecordTypesFromScheme(scheme, tableName);
 
   const fcAddField = fc.method(addField)
     .before((args: AAddField) => args);
@@ -174,14 +152,20 @@ export default function PageTableScheme({ tableName, scheme: schemeInitial }: Pr
   }
 
 
-  return <div><ul>
-    {fields}
-  </ul>
-    <CreateNewField requestError={requestError} onAddField={onAddField} tableName={tableName} />
+  return <div>
+    <div className="flex">
+      <ul>
+        {fields}
+      </ul>
+      <div className="">
+        <CreateNewField requestError={requestError} onAddField={onAddField} tableName={tableName} />
+        <RequestError requestError={requestError} />
+      </div>
+      <div className="">
+        <p className="mb-1">Record types declaration:</p>
+        <Code size="sm" code={declarationCode} />
+      </div>
+    </div>
 
-    <RequestError requestError={requestError} />
-    <Tooltip opened={typeCopiedTooltip} label="Copied!">
-      <Button onClick={copyDocumentType}>Copy document type</Button>
-    </Tooltip>
   </div>
 }
