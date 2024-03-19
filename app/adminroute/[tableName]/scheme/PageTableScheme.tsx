@@ -13,6 +13,7 @@ import RequestError from "../../comp/RequestError";
 import { API_ENDPOINT } from "../../generated";
 import { blinkBoolean } from "../../utils_client";
 import { AAddField, ATableOnly } from "../../api/schemas";
+import { generateRecordTypesFromScheme } from "./generateType";
 
 const toggleTag = getAPIMethod<FToggleTag>(API_ENDPOINT, "toggleTag");
 const removeField = getAPIMethod<FRemoveField>(API_ENDPOINT, "removeField");
@@ -75,24 +76,7 @@ export default function PageTableScheme({ tableName, scheme: schemeInitial }: Pr
 
   function copyDocumentType() {
     if (!scheme) return;
-    let res = `type ${tableName} = {\n`;
-    for (const field of scheme.fieldsOrderUser) {
-      const type = scheme.fields[field];
-      let tsType: string = type;
-      switch (type) {
-        case "date":
-          tsType = "Date";
-          break;
-
-        case "json":
-          tsType = "null | {}";
-          break;
-      }
-
-      res += `  ${field}: ${tsType}\n`;
-    }
-    res += `}`;
-
+    const res = generateRecordTypesFromScheme(scheme, tableName);
     navigator.clipboard.writeText(res);
     blinkBoolean(setTypeCopiedTooltip);
   }

@@ -197,7 +197,9 @@ function main() {
   const compDir = `${targetDir1}components/`;
   const files = fs.readdirSync(compDir).map(f => compDir + f);
 
-  editImports([`${targetDir1}field_scripts.ts`, ...files]);
+  files.push(`${targetDir1}field_scripts.ts`);
+  files.push(`${targetDir1}codegen/db/generate_db.ts`);
+  editImports(files);
 
   modifyGlobalsCSS();
   installDependencies();
