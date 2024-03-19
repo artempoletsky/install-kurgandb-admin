@@ -7,7 +7,7 @@ import * as scriptsRaw from "../../kurgandb_admin/scripts";
 import ScriptsPage, { Group, ParsedFunction as ParsedFunctionClient } from "./ScriptsPage";
 import { PlainObject } from "@artempoletsky/kurgandb/globals";
 import { parseFunction, ParsedFunction } from "@artempoletsky/kurgandb/function";
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 function prepareFunction(f: Function): ParsedFunctionClient | false {
   const { body, args, isAsync } = parseFunction(f);

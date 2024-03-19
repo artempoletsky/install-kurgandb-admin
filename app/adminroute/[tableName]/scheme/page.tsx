@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title: "",
 };
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export default async function page({ params }: Props) {
   const { tableName } = params;

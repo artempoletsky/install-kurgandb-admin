@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "",
 };
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 type Props = {};
 export default async function page(props: Props) {
