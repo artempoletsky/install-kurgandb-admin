@@ -2,7 +2,7 @@
 import PageEvents from "./PageEvents";
 import { Metadata } from "next";
 import Layout, { BreadrumbsArray } from "../../comp/PageLayout";
-// import { getTableEvents } from "../../api/methods";
+
 import ComponentLoader from "../../comp/ComponentLoader";
 import { FGetTableEvents } from "../../api/methods";
 import TableNotFound from "../TableNotFound";

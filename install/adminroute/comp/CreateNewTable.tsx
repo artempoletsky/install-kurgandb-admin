@@ -2,7 +2,8 @@
 
 import { Button, Checkbox, Select, Tooltip } from "@mantine/core";
 import TextInput from "./TextInput";
-import { getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { useErrorResponse } from "@artempoletsky/easyrpc/react";
 import type { FCreateTable } from "../api/methods";
 import { useState } from "react";
 import CheckboxTooltip from "./CheckboxTooltip";

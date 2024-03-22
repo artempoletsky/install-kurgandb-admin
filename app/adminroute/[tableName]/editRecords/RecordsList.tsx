@@ -1,4 +1,4 @@
-import { CompType, FQueryRecords } from "../../api/methods";
+
 import css from "../../admin.module.css";
 
 

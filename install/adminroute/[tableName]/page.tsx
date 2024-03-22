@@ -1,7 +1,6 @@
 
 import Layout, { BreadrumbsArray } from "../comp/PageLayout";
 
-// import type { FGetScheme, FReadDocument } from "../api/route";
 import { FGetSchemePage, getScheme } from "../api/methods";
 import { TableScheme } from "@artempoletsky/kurgandb/globals";
 import PageEditRecords from "./editRecords/PageEditRecords";

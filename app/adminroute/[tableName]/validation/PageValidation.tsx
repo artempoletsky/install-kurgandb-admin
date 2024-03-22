@@ -1,6 +1,7 @@
 "use client";
 
-import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { ReactNode, useState } from "react";
 import { ActionIcon, Button } from "@mantine/core";
 import type { FGetInvalidRecords, FSetCurrentTableValidator, FUnsetCurrentTableValidator, RGetTableValidation, RUpdateValidationPage } from "../../api/methods";

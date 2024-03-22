@@ -1,7 +1,8 @@
 "use client";
 import type { TableScheme } from "@artempoletsky/kurgandb/globals";
-import { ReactNode, useEffect, useState } from "react";
-import { fetchCatch, getAPIMethod, JSONErrorResponse, useErrorResponse } from "@artempoletsky/easyrpc/client";
+import { ReactNode, useState } from "react";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { useErrorResponse, fetchCatch } from "@artempoletsky/easyrpc/react";
 import type { FAddField, FChangeFieldIndex, FGetScheme, FRemoveField, FRenameField, FToggleTag, RGetSchemePage } from "../../api/methods";
 import FieldLabel from "../../comp/FieldLabel";
 import { ActionIcon, Button, Select, Tooltip } from "@mantine/core";

@@ -2,7 +2,8 @@
 
 import { Button, TextInput } from "@mantine/core";
 import { API_ENDPOINT, ROOT_PATH } from "../generated";
-import { fetchCatch, getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { fetchCatch } from "@artempoletsky/easyrpc/react";
 import type { FExecuteScript, ScriptsLogRecord } from "../api/methods";
 import { useRef } from "react";
 import { invalidate } from "../comp/Link";

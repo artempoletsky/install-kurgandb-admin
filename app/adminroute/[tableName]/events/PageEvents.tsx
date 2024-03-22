@@ -1,6 +1,7 @@
 "use client";
 
-import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
+import {  getAPIMethod } from "@artempoletsky/easyrpc/client";
+import {  useErrorResponse, fetchCatch } from "@artempoletsky/easyrpc/react";
 import { ReactNode, useEffect, useState } from "react";
 import { RegisteredEvents } from "@artempoletsky/kurgandb/globals";
 import { ActionIcon, Button } from "@mantine/core";

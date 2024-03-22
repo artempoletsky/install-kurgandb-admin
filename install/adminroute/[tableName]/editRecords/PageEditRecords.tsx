@@ -4,7 +4,8 @@ import Paginator from "../../comp/paginator";
 import EditDocumentForm from "./EditDocumentForm";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { FGetDraft, FGetFreeId, FQueryRecords, FGetScheme, FReadDocument, RQueryRecords, RGetSchemePage } from "../../api/methods";
-import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+
 import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 import { Button, Textarea } from "@mantine/core";
 import RequestError from "../../comp/RequestError";
@@ -15,6 +16,7 @@ import { PlainObject } from "@artempoletsky/kurgandb/globals";
 import type { AQueryRecords, ATableOnly } from "../../api/schemas";
 import ComponentLoader, { Mutator } from "../../comp/ComponentLoader";
 import RecordsList from "./RecordsList";
+import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 
 
 

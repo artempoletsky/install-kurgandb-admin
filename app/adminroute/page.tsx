@@ -1,8 +1,7 @@
 
 import Layout from "./comp/PageLayout";
 import CreateNewTable from "./comp/CreateNewTable";
-import { API_ENDPOINT, ROOT_PATH } from "./generated";
-import Link from "./comp/Link";
+
 import { getDBVersion, type FGetAllTablesPage } from "./api/methods";
 import { Metadata } from "next";
 import AllTables from "./comp/AllTables";

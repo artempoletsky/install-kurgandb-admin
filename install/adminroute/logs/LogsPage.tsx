@@ -1,7 +1,8 @@
 "use client";
 
 import css from "../admin.module.css";
-import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 
 import { useEffect, useState } from "react";
 import { API_ENDPOINT } from "../generated";
