@@ -2,9 +2,24 @@
 'use strict';
 const fs = require("fs");
 const pkg = require("./package.json");
-const args = process.argv.slice(2);
+let args = process.argv.slice(2);
 
-const ADMIN_ROOT = args[0] || "kurgandb";
+const ENUM_OPTIONS = {
+  fast: "--fast",
+};
+
+
+let ADMIN_ROOT;
+if (!args[0] || args[0].startsWith("--")) {
+  ADMIN_ROOT = "kurgandb";
+} else {
+  ADMIN_ROOT = args[0];
+  args = args.slice(1);
+}
+
+const argsSet = new Set(args);
+
+console.log(argsSet);
 
 const CWD = process.cwd();
 
@@ -202,7 +217,11 @@ function main() {
   editImports(files);
 
   modifyGlobalsCSS();
-  installDependencies();
+  if (!argsSet.has(ENUM_OPTIONS.fast)) {
+    installDependencies();
+  } else {
+    console.log("skipping installing dependencies");
+  }
 }
 
 if (require.main === module) {

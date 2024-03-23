@@ -113,7 +113,7 @@ export default function PageTableScheme({ tableName, scheme: schemeInitial }: Pr
     tagsType.unshift(type);
 
     fields.push(<li className="mb-3" key={fieldName}>
-      <FieldLabel fieldName={fieldName} scheme={scheme} onRename={fcRenameField.action()} />
+      <FieldLabel fieldName={fieldName} scheme={scheme} onRename={fcRenameField.action(fieldName)} />
       <div className="flex gap-3">
         <Button onClick={fcToggle.action(fieldName)}>Toggle tag:</Button>
         <Select

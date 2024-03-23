@@ -5,7 +5,8 @@
   "main": "cli.js",
   "bin": "cli.js",
   "scripts": {
-    "i": "npx ./ adminroute",
+    "install": "node ./cli.js adminroute",
+    "i": "node ./cli.js adminroute --fast",
     "lint": "next lint",
     "start": "next start -p 3001",
     "build": "next build",

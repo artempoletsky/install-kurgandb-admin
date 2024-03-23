@@ -6,7 +6,8 @@
   "bin": "cli.js",
   "scripts": {
     "update": "node ./update.js",
-    "next": "next dev -p 3001"
+    "inst": "node ./cli.js adminroute",
+    "li": "node ./cli.js adminroute --fast"
   },
   "keywords": [
     "admin-panel",
