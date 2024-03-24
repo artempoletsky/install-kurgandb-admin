@@ -29,7 +29,7 @@ export default function Code(props: Props) {
         {/* <Button onClick={copyDocumentType}>Copy document type to clipboard</Button> */}
       </Tooltip>
     </div>
-    <p className={`whitespace-pre text-${size}`}>
+    <p className={`whitespace-pre text-${size} overflow-auto`}>
       {props.code}
     </p>
   </div >

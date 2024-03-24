@@ -1,13 +1,14 @@
 "use client";
 
-import {  getAPIMethod } from "@artempoletsky/easyrpc/client";
-import {  useErrorResponse, fetchCatch } from "@artempoletsky/easyrpc/react";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { useErrorResponse, fetchCatch } from "@artempoletsky/easyrpc/react";
 import { ReactNode, useEffect, useState } from "react";
 import { RegisteredEvents } from "@artempoletsky/kurgandb/globals";
 import { ActionIcon, Button } from "@mantine/core";
 import { FGetTableEvents, FToggleAdminEvent, FUnregisterEvent } from "../../api/methods";
 import { API_ENDPOINT } from "../../generated";
 import { Trash } from "tabler-icons-react";
+import { ParsedFunctionComponent } from "../../comp/ParsedFunctionComponent";
 
 const toggleAdminEvent = getAPIMethod<FToggleAdminEvent>(API_ENDPOINT, "toggleAdminEvent");
 const unregisterEvent = getAPIMethod<FUnregisterEvent>(API_ENDPOINT, "unregisterEvent");
@@ -20,7 +21,7 @@ type Props = {
 };
 
 export default function TestComponent({ tableName, registeredEvents: initialRegisteredEvents, adminEvents }: Props) {
-  
+
   const [registeredEvents, setRegisteredEvents] = useState(initialRegisteredEvents);
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();
 
@@ -52,15 +53,13 @@ export default function TestComponent({ tableName, registeredEvents: initialRegi
   for (const namespaceId in registeredEvents) {
     const events: ReactNode[] = [];
     for (const eventName in registeredEvents[namespaceId]) {
-      const fun = registeredEvents[namespaceId][eventName];
+      const fn = registeredEvents[namespaceId][eventName];
 
-      events.push(<details key={namespaceId + eventName} className="">
-        <summary>{eventName}  <ActionIcon className="relative top-[3px]" size="xs" onClick={fcUnregister.action(eventName, namespaceId)}><Trash /></ActionIcon></summary>
-        {fun.args}<br />
-        <p className="whitespace-pre">
-          {fun.body}
-        </p>
-      </details>)
+      events.push(<ParsedFunctionComponent
+        name={eventName}
+        {...fn}
+        onRemoveClick={fcUnregister.action(eventName, namespaceId)}
+      />)
     }
     registeredGroups.push(<div className="pl-3 border-l border-stone-500" key={namespaceId}>
       <p className="">{namespaceId}</p>

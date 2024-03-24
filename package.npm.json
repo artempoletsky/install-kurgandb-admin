@@ -6,8 +6,8 @@
   "bin": "cli.js",
   "scripts": {
     "update": "node ./update.js",
-    "install": "node ./cli.js adminroute",
-    "i": "node ./cli.js adminroute --fast"
+    "inst": "node ./cli.js adminroute",
+    "fast": "node ./cli.js adminroute --fast"
   },
   "keywords": [
     "admin-panel",

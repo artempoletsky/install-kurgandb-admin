@@ -7,7 +7,7 @@
   "scripts": {
     "update": "node ./update.js",
     "inst": "node ./cli.js adminroute",
-    "li": "node ./cli.js adminroute --fast"
+    "fast": "node ./cli.js adminroute --fast"
   },
   "keywords": [
     "admin-panel",

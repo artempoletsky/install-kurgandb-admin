@@ -5,12 +5,12 @@
   "main": "cli.js",
   "bin": "cli.js",
   "scripts": {
-    "install": "node ./cli.js adminroute",
-    "i": "node ./cli.js adminroute --fast",
+    "update": "node ./update.js",
+    "inst": "node ./cli.js adminroute",
+    "fast": "node ./cli.js adminroute --fast",
     "lint": "next lint",
     "start": "next start -p 3001",
     "build": "next build",
-    "update": "node ./update.js",
     "next": "next dev -p 3001"
   },
   "keywords": [

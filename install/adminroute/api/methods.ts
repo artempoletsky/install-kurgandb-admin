@@ -1,5 +1,5 @@
 import { Predicate } from "@artempoletsky/kurgandb";
-import { Table, TableScheme } from "@artempoletsky/kurgandb/globals";
+import { PluginFactory, Table, TableScheme } from "@artempoletsky/kurgandb/globals";
 import { queryUniversal as query } from "@artempoletsky/kurgandb";
 
 import { FieldTag, PlainObject } from "@artempoletsky/kurgandb/globals";
@@ -25,7 +25,8 @@ import type {
   AToggleAdminEvent,
   AToggleTag,
   AUnregisterEvent,
-  AUpdateDocument
+  AUpdateDocument,
+  ATogglePlugin
 } from "./schemas";
 
 
@@ -33,7 +34,7 @@ export type CompType<Type extends (arg: any) => Promise<any>> = Awaited<ReturnTy
 
 type Tables = Record<string, Table<any, any, any>>;
 
-function methodFactory<Payload extends PlainObject, PredicateReturnType, ReturnType = PredicateReturnType>(predicate: Predicate<Tables, Payload, PredicateReturnType>, then?: (dbResult: PredicateReturnType, payload: Payload) => ReturnType) {
+function methodFactory<Payload extends PlainObject, PredicateReturnType, ReturnType = PredicateReturnType>(predicate: Predicate<Tables, Payload, PredicateReturnType, {}>, then?: (dbResult: PredicateReturnType, payload: Payload) => ReturnType) {
   return async function (payload: Payload) {
     let dbResult: PredicateReturnType;
     dbResult = await query(predicate, payload);
@@ -526,3 +527,39 @@ export const getInvalidRecords = methodFactory(({ }, { tableName }: ATableOnly, 
 });
 
 export type FGetInvalidRecords = typeof getInvalidRecords;
+
+
+export type RGetPlugins = {
+  registeredPlugins: Record<string, ParsedFunction>;
+  adminPlugins: string[];
+}
+import * as Plugins from "../../kurgandb_admin/plugins";
+export const getPlugins = methodFactory<{}, Record<string, ParsedFunction>, RGetPlugins>(({ }, { }, { db }) => {
+  return db.getPlugins();
+}, (registeredPlugins) => {
+  return {
+    registeredPlugins,
+    adminPlugins: Object.keys(Plugins),
+  }
+});
+export type FGetPlugins = () => Promise<RGetPlugins>
+
+
+export async function togglePlugin({ pluginName }: ATogglePlugin) {
+  let pluginFactory: undefined | ParsedFunction;
+  let pluginFn: PluginFactory | undefined = (Plugins as any)[pluginName];
+  if (pluginFn) {
+    pluginFactory = parseFunction(pluginFn);
+  }
+  return await query(({ }, { pluginName, pluginFactory }, { db }) => {
+    const registered = db.getPlugins()[pluginName];
+    if (registered) {
+      db.unregisterPlugin(pluginName);
+    } else if (pluginFactory) {
+      db.registerPlugin(pluginName, pluginFactory);
+    }
+    return db.getPlugins();
+  }, { pluginName, pluginFactory });
+}
+
+export type FTogglePlugin = typeof togglePlugin;

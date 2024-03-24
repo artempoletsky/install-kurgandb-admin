@@ -13,6 +13,7 @@ export default function Header(props: { children?: ReactNode }) {
     <div className="grow">
       {props.children}
     </div>
+    <Link href={`/${ROOT_PATH}/plugins`}><Button>Plugins</Button></Link>
     <Link href={`/${ROOT_PATH}/scripts`}><Button>Scripts</Button></Link>
     <Link href={`/${ROOT_PATH}/logs`}><Button>Logs</Button></Link>
     <LogoutButton />
