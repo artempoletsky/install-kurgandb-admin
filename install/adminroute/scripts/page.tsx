@@ -1,6 +1,5 @@
 
 
-import Layout, { BreadrumbsArray } from "../comp/PageLayout";
 
 import * as scriptsRaw from "../../kurgandb_admin/scripts";
 
@@ -19,7 +18,7 @@ function prepareFunction(f: Function): ParsedFunctionClient | false {
       description = descMatched[1];
     }
   }
-  
+
   return {
     args: args,
     description,
@@ -47,15 +46,7 @@ const scripts: Group = createGroup(scriptsRaw);
 
 export default async function page() {
 
-  const crumbs: BreadrumbsArray = [
-    { href: "/", title: "Tables" },
-    { href: "", title: "Scripts" },
-  ];
-
-
   return (
-    <Layout breadcrumbs={crumbs}>
-      <ScriptsPage scripts={scripts} />
-    </Layout>
+    <ScriptsPage scripts={scripts} />
   );
 }

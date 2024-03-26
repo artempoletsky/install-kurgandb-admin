@@ -9,6 +9,7 @@ import { FGetTableEvents, FToggleAdminEvent, FUnregisterEvent } from "../../api/
 import { API_ENDPOINT } from "../../generated";
 import { Trash } from "tabler-icons-react";
 import { ParsedFunctionComponent } from "../../comp/ParsedFunctionComponent";
+import { Store } from "../../StoreProvider";
 
 const toggleAdminEvent = getAPIMethod<FToggleAdminEvent>(API_ENDPOINT, "toggleAdminEvent");
 const unregisterEvent = getAPIMethod<FUnregisterEvent>(API_ENDPOINT, "unregisterEvent");
@@ -21,7 +22,11 @@ type Props = {
 };
 
 export default function TestComponent({ tableName, registeredEvents: initialRegisteredEvents, adminEvents }: Props) {
-
+  Store.setBreadcrumbs([
+    { href: "/", title: "Tables" },
+    { href: `/${tableName}/`, title: tableName },
+    { href: "", title: "Events" },
+  ]);
   const [registeredEvents, setRegisteredEvents] = useState(initialRegisteredEvents);
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();
 

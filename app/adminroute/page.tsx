@@ -1,5 +1,5 @@
 
-import Layout from "./comp/PageLayout";
+
 import CreateNewTable from "./comp/CreateNewTable";
 
 import { getDBVersion, type FGetAllTablesPage } from "./api/methods";
@@ -22,7 +22,7 @@ export default async function page() {
   const getAllTablesPage = "getAllTablesPage" as unknown as FGetAllTablesPage;
 
   return (
-    <Layout>
+    <>
       <div>{adminVersion} / {dbVersion}</div>
       <div className="flex">
         <div className="mt-3 w-[350px]">
@@ -34,6 +34,6 @@ export default async function page() {
         </div>
         <CreateNewTable />
       </div>
-    </Layout>
+    </>
   );
 }

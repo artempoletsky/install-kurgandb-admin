@@ -1,6 +1,6 @@
 "use client";
 import type { TableScheme } from "@artempoletsky/kurgandb/globals";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { useErrorResponse, fetchCatch } from "@artempoletsky/easyrpc/react";
 import type { FAddField, FChangeFieldIndex, FGetScheme, FRemoveField, FRenameField, FToggleTag, RGetSchemePage } from "../../api/methods";
@@ -16,6 +16,7 @@ import { blinkBoolean } from "../../utils_client";
 import { AAddField, ATableOnly } from "../../api/schemas";
 import { generateRecordTypesFromScheme } from "./generateType";
 import Code from "../../comp/Code";
+import { Store } from "../../StoreProvider";
 
 const toggleTag = getAPIMethod<FToggleTag>(API_ENDPOINT, "toggleTag");
 const removeField = getAPIMethod<FRemoveField>(API_ENDPOINT, "removeField");
@@ -34,6 +35,13 @@ export default function PageTableScheme({ tableName, scheme: schemeInitial }: Pr
   const fields: ReactNode[] = [];
 
   let [scheme, setScheme] = useState<TableScheme>(schemeInitial);
+
+
+  Store.setBreadcrumbs([
+    { href: "/", title: "Tables" },
+    { href: `/${tableName}/`, title: tableName },
+    { href: "", title: "Edit scheme" },
+  ]);
 
   const [setRequestError, , requestError] = useErrorResponse();
   const [typeCopiedTooltip, setTypeCopiedTooltip] = useState(false);

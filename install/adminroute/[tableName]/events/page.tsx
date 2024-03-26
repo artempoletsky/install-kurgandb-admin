@@ -1,7 +1,6 @@
 
 import PageEvents from "./PageEvents";
 import { Metadata } from "next";
-import Layout, { BreadrumbsArray } from "../../comp/PageLayout";
 
 import ComponentLoader from "../../comp/ComponentLoader";
 import { FGetTableEvents } from "../../api/methods";
@@ -24,23 +23,16 @@ export const dynamic = "force-dynamic";
 export default async function page({ params }: Props) {
   const { tableName } = params;
 
-  const crumbs: BreadrumbsArray = [
-    { href: "/", title: "Tables" },
-    { href: `/${tableName}/`, title: tableName },
-    { href: "", title: "Events" },
-  ];
 
   metadata.title = `${tableName} events`;
 
   const getTableEvents: FGetTableEvents = "getTableEvents" as any;
   return (
-    <Layout breadcrumbs={crumbs} tableName={tableName}>
-      <ComponentLoader
-        method={getTableEvents}
-        Component={PageEvents}
-        args={{ tableName }}
-        error={<TableNotFound tableName={tableName} />}
-      />
-    </Layout>
+    <ComponentLoader
+      method={getTableEvents}
+      Component={PageEvents}
+      args={{ tableName }}
+      error={<TableNotFound tableName={tableName} />}
+    />
   );
 }

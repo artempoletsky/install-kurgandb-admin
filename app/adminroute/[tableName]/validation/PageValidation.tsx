@@ -14,6 +14,7 @@ import type { ATableOnly } from "../../api/schemas";
 import { LightRecordDetails } from "./LigthRecordDetails";
 import css from "../../admin.module.css";
 import Link from "../../comp/Link";
+import { Store } from "../../StoreProvider";
 
 const setCurrentTableValidator = getAPIMethod<FSetCurrentTableValidator>(API_ENDPOINT, "setCurrentTableValidator");
 const unsetCurrentTableValidator = getAPIMethod<FUnsetCurrentTableValidator>(API_ENDPOINT, "unsetCurrentTableValidator");
@@ -31,6 +32,11 @@ export default function TestComponent({
   invalidRecords: invalidRecordsInitial
 }: Props) {
 
+  Store.setBreadcrumbs([
+    { href: "/", title: "Tables" },
+    { href: `/${tableName}/`, title: tableName },
+    { href: "", title: "Validation rules" },
+  ]);
   const [currentValidator, setCurrentValidator] = useState(initialCurrentValidator);
   const [invalidRecords, setInvalidRecords] = useState<PlainObject[]>(invalidRecordsInitial);
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();
