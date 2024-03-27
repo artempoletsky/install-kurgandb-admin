@@ -3,7 +3,7 @@
 
 import * as scriptsRaw from "../../kurgandb_admin/scripts";
 
-import ScriptsPage, { Group, ParsedFunction as ParsedFunctionClient } from "./ScriptsPage";
+import PageScripts, { Group, ParsedFunction as ParsedFunctionClient } from "./PageScripts";
 import { PlainObject } from "@artempoletsky/kurgandb/globals";
 import { parseFunction, ParsedFunction } from "@artempoletsky/kurgandb/function";
 export const dynamic = "force-dynamic";
@@ -47,6 +47,6 @@ const scripts: Group = createGroup(scriptsRaw);
 export default async function page() {
 
   return (
-    <ScriptsPage scripts={scripts} />
+    <PageScripts scripts={scripts} />
   );
 }

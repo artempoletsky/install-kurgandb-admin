@@ -10,7 +10,7 @@ import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 import { Button, Textarea } from "@mantine/core";
 import RequestError from "../../comp/RequestError";
 import { API_ENDPOINT } from "../../generated";
-import css from "../../admin.module.css";
+
 
 import { PlainObject } from "@artempoletsky/kurgandb/globals";
 import type { AQueryRecords, ATableOnly } from "../../api/schemas";
@@ -217,13 +217,13 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
           <Textarea defaultValue={queryDefault} className="min-w-[500px]" resize="vertical" ref={queryInput} />
           <div className="flex gap-3 mt-2">
             <i onClick={e => setQuery(queryDefault)}
-              className={css.pseudo}>All</i>
+              className="pseudo">All</i>
             <i onClick={e => setQuery(whereRequest)}
-              className={css.pseudo}>Where</i>
+              className="pseudo">Where</i>
             <i onClick={e => setQuery(startsWith)}
-              className={css.pseudo}>Stars with</i>
+              className="pseudo">Stars with</i>
             <i onClick={e => setQuery(getInvalidRecordsRequest)}
-              className={css.pseudo}>Invalid</i>
+              className="pseudo">Invalid</i>
           </div>
         </div>
         <Button className="align-top" onClick={e => loadPage(1)}>Select</Button>

@@ -9,7 +9,7 @@ import { useRef } from "react";
 import { invalidate } from "../comp/Link";
 import { useRouter } from "next/navigation";
 import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
-import { formatName } from "./ScriptsPage";
+import { formatName } from "./PageScripts";
 
 const executeScript = getAPIMethod<FExecuteScript>(API_ENDPOINT, "executeScript");
 

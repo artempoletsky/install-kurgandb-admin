@@ -4,6 +4,7 @@ import { ReactNode, useState } from "react";
 import FunctionComponent from "./FunctionComponent";
 import Log from "./Log";
 import type { ScriptsLogRecord } from "../api/methods";
+import { Store } from "../StoreProvider";
 
 
 
@@ -27,8 +28,8 @@ export function formatName(key: string) {
   return key.replaceAll("_", " ");
 }
 
-export default function ScriptsPage({ scripts }: Props) {
-
+export default function PageScripts({ scripts }: Props) {
+  Store.setTableName("");
   const [log, setLog] = useState<ScriptsLogRecord[]>([]);
   function onLog(record: ScriptsLogRecord) {
     setLog(log => log.concat(record));

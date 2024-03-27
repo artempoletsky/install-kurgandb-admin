@@ -1,5 +1,5 @@
 "use client";
-import { Dispatch, ReactNode, SetStateAction, createContext, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useState } from "react";
 import { BreadcrumbsArray } from "./comp/Breadcrumbs";
 // import { BreadcrumbsArray } from "./layout";
 
@@ -8,10 +8,11 @@ export class Store {
   static setTableName: Dispatch<SetStateAction<string>>;
 }
 
-//  const BreadcrumbsContext = createContext<BreadcrumbsArray | null>(null);
-//  const TableNameContext = createContext<string>("");
+export function useStore() {
+  return useContext(StoreContext);
+}
 
-function useStore() {
+function createStore() {
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbsArray | null>(null)
   const [tableName, setTableName] = useState("")
   Store.setBreadcrumbs = setBreadcrumbs;
@@ -19,7 +20,7 @@ function useStore() {
   return { breadcrumbs, tableName };
 }
 
-export const StoreContext = createContext<ReturnType<typeof useStore>>({
+const StoreContext = createContext<ReturnType<typeof createStore>>({
   breadcrumbs: null,
   tableName: "",
 });
@@ -30,7 +31,7 @@ export type ChildrenProps = {
 
 
 export default function StoreProvider({ children }: ChildrenProps) {
-  const store = useStore();
+  const store = createStore();
   return (<StoreContext.Provider value={store}>
     {children}
   </StoreContext.Provider>);

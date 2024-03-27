@@ -31,7 +31,7 @@ export default function TableHeader({ tableName }: Props) {
     {
       label: "Edit records",
       icon: <FileDatabase />,
-      href: `/${ROOT_PATH}/${tableName}`,
+      href: `/${ROOT_PATH}/${tableName}/records`,
     },
     {
       label: "Edit scheme",

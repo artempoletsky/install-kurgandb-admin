@@ -1,11 +1,11 @@
 
 
-import CreateNewTable from "./comp/CreateNewTable";
+import CreateNewTable from "../comp/CreateNewTable";
 
-import { getDBVersion, type FGetAllTablesPage } from "./api/methods";
+import { getDBVersion, type FGetAllTablesPage } from "../api/methods";
 import { Metadata } from "next";
-import AllTables from "./comp/AllTables";
-import ComponentLoader from "./comp/ComponentLoader";
+import PageTables from "./PageTables";
+import ComponentLoader from "../comp/ComponentLoader";
 
 
 export const metadata: Metadata = {
@@ -27,7 +27,7 @@ export default async function page() {
       <div className="flex">
         <div className="mt-3 w-[350px]">
           <ComponentLoader
-            Component={AllTables}
+            Component={PageTables}
             method={getAllTablesPage}
             args={{}}
           />

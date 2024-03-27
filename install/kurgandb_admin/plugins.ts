@@ -1,6 +1,6 @@
-import { PluginFactory } from "@artempoletsky/kurgandb/globals";
+import { CallbackScope } from "@artempoletsky/kurgandb";
 
-export const myPlugin: PluginFactory = function name(scope) {
+export const myPlugin = function name(scope: CallbackScope) {
 
   return {
     myMethod() {

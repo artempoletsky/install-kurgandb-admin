@@ -216,7 +216,7 @@ function main() {
   files.push(`${targetDir1}codegen/db/generate_db.ts`);
   editImports(files);
 
-  modifyGlobalsCSS();
+  // modifyGlobalsCSS();
   if (!argsSet.has(ENUM_OPTIONS.fast)) {
     installDependencies();
   } else {
