@@ -90,7 +90,7 @@ export function generateRecordTypesFromScheme(tScheme: TableScheme, tableName: s
   const tags = getTableTags(tScheme);
 
   result += `export const Z${names.basic} = z.object({\r\n`;
-  for (const fieldName in tScheme.fields) {
+  for (const fieldName of tScheme.fieldsOrderUser) {
     const type = tScheme.fields[fieldName];
     const zodType = fieldTypeToZod(type);
     result += `  ${fieldName}: ${zodType},\r\n`;
@@ -108,5 +108,27 @@ export function generateRecordTypesFromScheme(tScheme: TableScheme, tableName: s
   if (tags.has("hidden")) {
     result += `export type ${names.visible} = Omit<${names.full}, ${printFieldsWithTag(tScheme, "hidden")}>;\r\n\r\n`;
   }
+  return result;
+}
+
+
+export function generateCreateTable(tScheme: TableScheme, tableName: string) {
+  let fields = "";
+  let tags = "";
+  for (const fieldName of tScheme.fieldsOrderUser) {
+    const type = tScheme.fields[fieldName];
+    fields += `    ${fieldName}: "${type}", \r\n`;
+
+    const value = tScheme.tags[fieldName];
+    tags += `    ${fieldName}: [${value.map(v => `"${v}"`).join(", ")}], \r\n`;
+  }
+
+  let result = `db.createTable({
+  name: "${tableName}",
+  fields: {
+${fields}  },
+  tags: {
+${tags}  }
+});`;
   return result;
 }
