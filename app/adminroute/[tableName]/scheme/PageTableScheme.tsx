@@ -14,7 +14,7 @@ import RequestError from "../../comp/RequestError";
 import { API_ENDPOINT } from "../../generated";
 import { blinkBoolean } from "../../utils_client";
 import { AAddField, ATableOnly } from "../../api/schemas";
-import { generateRecordTypesFromScheme } from "./generateType";
+import { generateCreateTable, generateRecordTypesFromScheme } from "./generateType";
 import Code from "../../comp/Code";
 import { Store } from "../../StoreProvider";
 
@@ -83,6 +83,7 @@ export default function PageTableScheme({ tableName, scheme: schemeInitial }: Pr
     });
 
   const declarationCode = generateRecordTypesFromScheme(scheme, tableName);
+  const createTableCode = generateCreateTable(scheme, tableName);
 
   const fcAddField = fc.method(addField)
     .before((args: AAddField) => args);
@@ -173,6 +174,8 @@ export default function PageTableScheme({ tableName, scheme: schemeInitial }: Pr
       <div className="">
         <p className="mb-1">Record types declaration:</p>
         <Code size="sm" code={declarationCode} />
+        <p className="mb-1">Create table:</p>
+        <Code size="sm" code={createTableCode} />
       </div>
     </div>
 
