@@ -94,7 +94,7 @@ export default function TestComponent({
       {invalidRecords.length
         ? <div className="">
           <div className="h3">The table has invalid records:</div>
-          <div className="mb-1 mt-2"><Link href={`/${ROOT_PATH}/${tableName}#q=t.filter($.invalid)`}>Edit records</Link></div>
+          <div className="mb-1 mt-2"><Link href={`/${ROOT_PATH}/${tableName}/records#q=t.filter($.invalid)`}>Edit records</Link></div>
           {invalidRecords.map(rec => <LightRecordDetails key={rec[primaryKey]} record={rec} primaryKey={primaryKey} />)}
         </div>
         : <div className="h3">All records are valid</div>}

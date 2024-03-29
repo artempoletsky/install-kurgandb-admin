@@ -120,4 +120,16 @@ export const Miscellaneous = {
     if (!Second_argument) Second_argument = "Hello";
     return `${First_argument} says ${Second_argument}!`;
   },
+
+  async Install_NPM_package(Package_name: string) {
+    return await query(async ({ }, { name }, { db }) => {
+      return await db.npmInstall(name);
+    }, { name: Package_name });
+  },
+
+  async Uninstall_NPM_package(Package_name: string) {
+    return await query(({ }, { name }, { db }) => {
+      return db.npmUninstall(name);
+    }, { name: Package_name });
+  },
 }

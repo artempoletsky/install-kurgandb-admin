@@ -544,22 +544,34 @@ export const getPlugins = methodFactory<{}, Record<string, ParsedFunction>, RGet
 });
 export type FGetPlugins = () => Promise<RGetPlugins>
 
+export type PluginDef = {
+  npm: string[],
+  install: PluginFactory;
+};
 
 export async function togglePlugin({ pluginName }: ATogglePlugin) {
   let pluginFactory: undefined | ParsedFunction;
-  let pluginFn: PluginFactory | undefined = (Plugins as any)[pluginName];
-  if (pluginFn) {
-    pluginFactory = parseFunction(pluginFn);
+  let pluginDef: PluginDef | undefined = (Plugins as any)[pluginName];
+  let dependencies: string[] = [];
+  if (pluginDef) {
+    dependencies = pluginDef.npm;
+    pluginFactory = parseFunction(pluginDef.install);
   }
-  return await query(({ }, { pluginName, pluginFactory }, { db }) => {
+  return await query(async ({ }, { pluginName, pluginFactory, dependencies }, { db }) => {
     const registered = db.getPlugins()[pluginName];
     if (registered) {
       db.unregisterPlugin(pluginName);
+      if (dependencies.length) {
+        await db.npmUninstall(dependencies.join(" "));
+      }
     } else if (pluginFactory) {
-      db.registerPlugin(pluginName, pluginFactory);
+      if (dependencies.length) {
+        await db.npmInstall(dependencies.join(" "));
+      }
+      await db.registerPlugin(pluginName, pluginFactory);
     }
     return db.getPlugins();
-  }, { pluginName, pluginFactory });
+  }, { pluginName, pluginFactory, dependencies });
 }
 
 export type FTogglePlugin = typeof togglePlugin;

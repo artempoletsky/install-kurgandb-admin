@@ -1,14 +1,20 @@
-import { CallbackScope } from "@artempoletsky/kurgandb";
+import { GlobalScope } from "@artempoletsky/kurgandb";
 
-export const myPlugin = function name(scope: CallbackScope) {
-
-  return {
-    myMethod() {
-      return scope.db.versionString;
+export const myPlugin = {
+  npm: ["is-odd"],
+  install: async function (scope: GlobalScope) {
+    const isOdd = scope.$.require("is-odd");
+    return {
+      isOdd(number: number): boolean {
+        return isOdd(number);
+      },
+      myMethod() {
+        return scope.db.versionString;
+      }
     }
   }
 }
 
 export type Plugins = {
-  myPlugin: ReturnType<typeof myPlugin>;
+  myPlugin: Awaited<ReturnType<typeof myPlugin.install>>;
 }
