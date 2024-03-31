@@ -21,7 +21,10 @@ type Props = {
   plugins: string[];
 };
 export default function PagePlugins({ registeredPlugins: pluginsInitial, adminPlugins }: RGetPlugins) {
-  Store.setTableName("");
+  useEffect(() => {
+    Store.setTableName("");
+  }, []);
+
   const [plugins, setPlugins] = useState(pluginsInitial);
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();
   const fc = fetchCatch({
@@ -46,6 +49,7 @@ export default function PagePlugins({ registeredPlugins: pluginsInitial, adminPl
   const activePlugins: ReactNode[] = [];
   for (const name in plugins) {
     activePlugins.push(<ParsedFunctionComponent
+      key={name}
       name={name}
       {...plugins[name]}
       onRemoveClick={confirmRemove.action(name)}

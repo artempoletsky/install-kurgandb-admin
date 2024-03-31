@@ -17,7 +17,7 @@ import type { AQueryRecords, ATableOnly } from "../../api/schemas";
 import ComponentLoader, { Mutator } from "../../comp/ComponentLoader";
 import RecordsList from "./RecordsList";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
-import { Store } from "../../StoreProvider";
+// import { Store } from "../../StoreProvider";
 
 
 
@@ -51,10 +51,10 @@ function getSchemeProps(scheme?: TableScheme) {
 }
 
 export default function PageEditRecords({ tableName, scheme }: Props) {
-  Store.setBreadcrumbs([
-    { href: "/", title: "Tables" },
-    { href: "", title: tableName },
-  ]);
+  // Store.setBreadcrumbs([
+  //   { href: "/", title: "Tables" },
+  //   { href: "", title: tableName },
+  // ]);
 
   const [record, setRecord] = useState<PlainObject | undefined>(undefined);
   const [currentId, setCurrentId] = useState<string | number | undefined>(undefined);

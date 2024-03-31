@@ -18,7 +18,10 @@ type Props = {
   logsList: string[];
 };
 export default function PageLogs({ logsList }: Props) {
-  Store.setTableName("");
+  useEffect(() => {
+    Store.setTableName("");
+  }, []);
+
   const [pageEntries, setPageEntries] = useState<string[]>([])
   const [page, setPage] = useState(1);
 

@@ -37,12 +37,6 @@ export default function PageTableScheme({ tableName, scheme: schemeInitial }: Pr
   let [scheme, setScheme] = useState<TableScheme>(schemeInitial);
 
 
-  Store.setBreadcrumbs([
-    { href: "/", title: "Tables" },
-    { href: `/${tableName}/`, title: tableName },
-    { href: "", title: "Edit scheme" },
-  ]);
-
   const [setRequestError, , requestError] = useErrorResponse();
   const [typeCopiedTooltip, setTypeCopiedTooltip] = useState(false);
 

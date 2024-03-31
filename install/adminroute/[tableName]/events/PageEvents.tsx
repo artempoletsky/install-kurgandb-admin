@@ -22,11 +22,7 @@ type Props = {
 };
 
 export default function TestComponent({ tableName, registeredEvents: initialRegisteredEvents, adminEvents }: Props) {
-  Store.setBreadcrumbs([
-    { href: "/", title: "Tables" },
-    { href: `/${tableName}/`, title: tableName },
-    { href: "", title: "Events" },
-  ]);
+
   const [registeredEvents, setRegisteredEvents] = useState(initialRegisteredEvents);
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();
 

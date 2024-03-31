@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useContext } from "react";
+import { ReactNode, useContext, useEffect } from "react";
 import Breadcrumbs from "../comp/Breadcrumbs";
 import { Store, useStore } from "../StoreProvider";
 
@@ -11,9 +11,8 @@ type Props = {
 }
 export default function layout({ params: { tableName }, children }: Props) {
   // const store = useStore();
-  Store.setTableName(tableName);
-  return <div>
-    {/* <Breadcrumbs crumbs={store.breadcrumbs} /> */}
-    {children}
-  </div>;
+  useEffect(() => {
+    Store.setTableName(tableName);
+  }, [tableName]);
+  return children;
 }

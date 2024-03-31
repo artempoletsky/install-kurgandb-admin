@@ -2,7 +2,7 @@
 
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { ActionIcon, Button } from "@mantine/core";
 import type { FGetInvalidRecords, FSetCurrentTableValidator, FUnsetCurrentTableValidator, RGetTableValidation, RUpdateValidationPage } from "../../api/methods";
 import { API_ENDPOINT, ROOT_PATH } from "../../generated";
@@ -31,11 +31,6 @@ export default function TestComponent({
   invalidRecords: invalidRecordsInitial
 }: Props) {
 
-  Store.setBreadcrumbs([
-    { href: "/", title: "Tables" },
-    { href: `/${tableName}/`, title: tableName },
-    { href: "", title: "Validation rules" },
-  ]);
   const [currentValidator, setCurrentValidator] = useState(initialCurrentValidator);
   const [invalidRecords, setInvalidRecords] = useState<PlainObject[]>(invalidRecordsInitial);
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();

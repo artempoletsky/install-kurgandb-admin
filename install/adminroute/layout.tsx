@@ -20,10 +20,6 @@ type Props = {
 
 export default async function layout({ children }: Props) {
 
-
-  let items: ReactNode[] = [];
-
-
   const authorised = await isAdmin();
 
   const setupRequired = authorised === undefined;
@@ -41,12 +37,7 @@ export default async function layout({ children }: Props) {
             ? <div className="relative p-3 bg-stone-300 min-h-screen">
               <StoreProvider>
                 <Header></Header>
-                <div className="">
-                  <div className="">
-                    {/* {breadcrumbs && <Breadcrumbs className="mb-3">{items}</Breadcrumbs>} */}
-                    {children}
-                  </div>
-                </div>
+                {children}
               </StoreProvider>
             </div>
             : <LoginForm />}
