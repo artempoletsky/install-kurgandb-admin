@@ -282,7 +282,7 @@ export default function EditDocumentForm({
 
 
     fields.push(<div className="mr-1" key={fieldName}>
-      <FieldLabel fieldName={fieldName} scheme={scheme} />
+      <FieldLabel queryFilter={record[fieldName]} fieldName={fieldName} scheme={scheme} />
       {printFieldScripts(fieldName, type, tags)}
     </div>);
   }

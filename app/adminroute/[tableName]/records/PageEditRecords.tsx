@@ -17,6 +17,7 @@ import type { AQueryRecords, ATableOnly } from "../../api/schemas";
 import ComponentLoader, { Mutator } from "../../comp/ComponentLoader";
 import RecordsList from "./RecordsList";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
+import { Store, useStore } from "../../StoreProvider";
 // import { Store } from "../../StoreProvider";
 
 
@@ -61,13 +62,15 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
   const [pageData, setPageData] = useState<RQueryRecords | undefined>(undefined);
   // const [page, setPage] = useState<number>(1);
 
+
   const queryDefault = "table.all()";
+  const { queryString } = useStore();
 
   const { autoincId, primaryKey } = getSchemeProps(scheme);
 
   // let [queryString, setQueryString] = useState<string>(queryDefault);
 
-  const queryInput = useRef<HTMLTextAreaElement>(null);
+  // const queryInput = useRef<HTMLTextAreaElement>(null);
   let [insertMode, setInsertMode] = useState<boolean>(false);
 
   const [setRequestError, , requestError] = useErrorResponse();
@@ -96,12 +99,13 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
     fcOpenRecord.action(id)();
   }
 
-  const loadPage = useCallback((page: number) => {
+  const loadPage = (page: number) => {
     setRequestError();
     setRecord(undefined);
     // setPage(page);
 
-    const queryString = !queryInput.current ? queryDefault : queryInput.current.value;
+    // const queryString = !queryInput.current ? queryDefault : queryInput.current.value;
+
     if (queryString != queryDefault) {
       window.location.hash = "#q=" + queryString;
     } else {
@@ -119,7 +123,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
     //   tableName
     // }).then(setPageData)
     //   .catch(setRequestError);
-  }, [tableName, setRequestError])
+  };
   // function loadPage() {
 
   // }
@@ -129,8 +133,21 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
       setInsertMode(true);
     });
 
-  function onDocCreated() {
-    loadPage(queryArgs.page);
+  function onDocDeleted() {
+    loadPage(queryArgs!.page);
+    setRecord(undefined);
+  }
+
+  function onDocCreated(id: string | number) {
+    // loadPage(queryArgs!.page);
+    const idStr = typeof id == "string" ? `"${id}"` : id + "";
+    const queryString = `t.where("${primaryKey}", ${idStr})`;
+    Store.setQueryString(queryString);
+    setQueryArgs({
+      page: 1,
+      tableName,
+      queryString,
+    });
     setRecord(undefined);
   }
 
@@ -164,17 +181,27 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
       const userQuery = q && (q);
 
 
-      if (userQuery && queryInput.current) {
-        queryInput.current.innerHTML = userQuery;
-        queryInput.current.value = userQuery;
+      if (userQuery) {
+        Store.setQueryString(userQuery);
+        setQueryArgs({
+          page: 1,
+          queryString: userQuery,
+          tableName,
+        });
+      } else {
+        Store.setQueryString(queryDefault);
+        setQueryArgs({
+          page: 1,
+          queryString: queryDefault,
+          tableName,
+        });
       }
     } catch (err) {
       console.log(err);
     }
 
-    loadPage(1);
 
-  }, [loadPage]);
+  }, []);
 
 
 
@@ -186,16 +213,10 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
   const startsWith = `t.where("${"id"}", value => value.startsWith("a"))`;
 
   function setQuery(string: string) {
-    if (!queryInput.current) throw new Error("Error");
-
-    queryInput.current.value = string;
+    Store.setQueryString(string);
   }
 
-  const [queryArgs, setQueryArgs] = useState<AQueryRecords>({
-    page: 1,
-    tableName,
-    queryString: queryDefault,
-  });
+  const [queryArgs, setQueryArgs] = useState<AQueryRecords | null>(null);
   const mutator = new Mutator<RQueryRecords>();
   function onUpdateId(oldId: string | number, newId: string | number) {
     if (!pageData) throw new Error("no page data");
@@ -214,12 +235,14 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
     <div>
       <div className="mt-3 mb-1 flex gap-1">
         <div className="">
-          <Textarea defaultValue={queryDefault} className="min-w-[500px]" resize="vertical" ref={queryInput} />
+          <Textarea value={queryString}
+            onChange={e => Store.setQueryString(e.target.value)}
+            className="min-w-[500px]"
+            resize="vertical"
+          />
           <div className="flex gap-3 mt-2">
             <i onClick={e => setQuery(queryDefault)}
               className="pseudo">All</i>
-            <i onClick={e => setQuery(whereRequest)}
-              className="pseudo">Where</i>
             <i onClick={e => setQuery(startsWith)}
               className="pseudo">Stars with</i>
             <i onClick={e => setQuery(getInvalidRecordsRequest)}
@@ -257,13 +280,13 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
             tableName={tableName}
             scheme={scheme}
             record={record}
-            onDeleted={onDocCreated}
+            onDeleted={onDocDeleted}
             onCreated={onDocCreated}
             onDuplicate={fcOnDuplicate.action()}
             onRequestError={setRequestError}
           />}
         </div>
-        {pageData && <Paginator page={queryArgs.page} pagesCount={pageData.pagesCount} onSetPage={loadPage}></Paginator>}
+        {pageData && <Paginator page={queryArgs!.page} pagesCount={pageData.pagesCount} onSetPage={loadPage}></Paginator>}
       </div>
 
     </div>

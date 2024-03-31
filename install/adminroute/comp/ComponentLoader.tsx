@@ -21,7 +21,7 @@ export class Mutator<RT>  {
 type Props<AT, RT, PT> = {
   method: (arg: AT) => Promise<RT>;
   Component: ComponentType<RT & AT & PT>;
-  args: AT;
+  args: AT | null;
   props?: PT;
   children?: ReactNode;
   onData?: (res: RT) => void;
@@ -32,6 +32,7 @@ type Props<AT, RT, PT> = {
 export default function ComponentLoader
   <AT, RT, PT>
   ({ Component, children, args, method: methodHack, props, onData, error, mutator }: Props<AT, RT, PT>) {
+  if (!args) return "";
   const methodName = methodHack as unknown as string;
 
   const _props: PT = props || {} as PT;
