@@ -3,7 +3,7 @@ import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 
 // import Button from "./Button";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { getAPIMethod, JSONErrorResponse } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod, JSONErrorResponse, RequestErrorSetter } from "@artempoletsky/easyrpc/client";
 import type { FCreateDocument, FDeleteDocument, FUpdateDocument } from "../../api/methods";
 
 import FieldLabel from "../../comp/FieldLabel";
@@ -34,7 +34,7 @@ type Props = {
   onCreated: (id: string | number) => void;
   onDeleted: () => void;
   onDuplicate: () => void;
-  onRequestError: (e: JSONErrorResponse) => void;
+  onRequestError: RequestErrorSetter;
   onClose: () => void;
   onUpdateId: (oldId: string | number, newId: string | number) => void;
   primaryKey: string;

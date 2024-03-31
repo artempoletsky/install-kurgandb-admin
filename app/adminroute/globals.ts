@@ -18,7 +18,7 @@ export type TableComponentProps = {
 }
 
 export type DocumentComponentProps = {
-  onRequestError: (e: JSONErrorResponse) => void
+  onRequestError: RequestErrorSetter;
   // onUpdateRecord: (record: PlainObject) => void
   tableName: string
   record: PlainObject
