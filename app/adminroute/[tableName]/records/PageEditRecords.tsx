@@ -2,15 +2,12 @@
 
 import Paginator from "../../comp/paginator";
 import EditDocumentForm from "./EditDocumentForm";
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { FGetDraft, FGetFreeId, FQueryRecords, FGetScheme, FReadDocument, RQueryRecords, RGetSchemePage } from "../../api/methods";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { useEffect, useState } from "react";
+import type { RQueryRecords, RGetSchemePage } from "../../api/methods";
 
 import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 import { Button, Textarea } from "@mantine/core";
 import RequestError from "../../comp/RequestError";
-import { API_ENDPOINT } from "../../generated";
-
 
 import { PlainObject } from "@artempoletsky/kurgandb/globals";
 import type { AQueryRecords, ATableOnly } from "../../api/schemas";
@@ -18,17 +15,15 @@ import ComponentLoader, { Mutator } from "../../comp/ComponentLoader";
 import RecordsList from "./RecordsList";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { Store, useStore } from "../../StoreProvider";
-// import { Store } from "../../StoreProvider";
+import { adminRPC } from "../../globals";
 
 
-
-
-const readDocument = getAPIMethod<FReadDocument>(API_ENDPOINT, "readDocument");
-const queryRecords = "queryRecords" as unknown as FQueryRecords;
-// getAPIMethod<FQueryRecords>(API_ENDPOINT, "queryRecords");
-const getDraft = getAPIMethod<FGetDraft>(API_ENDPOINT, "getDraft");
-const getFreeId = getAPIMethod<FGetFreeId>(API_ENDPOINT, "getFreeId");
-
+const {
+  readDocument,
+  // queryRecords,
+  getDraft,
+  getFreeId,
+} = adminRPC().methods("readDocument", "queryRecords", "getDraft", "getFreeId");
 
 type Props = ATableOnly & RGetSchemePage;
 
@@ -260,7 +255,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
         <div className="flex">
           <ComponentLoader
             Component={RecordsList}
-            method={queryRecords}
+            method={adminRPC().hack("queryRecords")}
             args={queryArgs}
             onData={setPageData}
             props={{

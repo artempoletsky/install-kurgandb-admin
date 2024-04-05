@@ -1,18 +1,13 @@
 "use client";
 
 import { Button, TextInput } from "@mantine/core";
-import { API_ENDPOINT, ROOT_PATH } from "../generated";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { fetchCatch } from "@artempoletsky/easyrpc/react";
-import type { FExecuteScript, ScriptsLogRecord } from "../api/methods";
+import type { ScriptsLogRecord } from "../api/methods";
 import { useRef } from "react";
-import { invalidate } from "../comp/Link";
-import { useRouter } from "next/navigation";
-import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
 import { formatName } from "./PageScripts";
+import { adminRPC } from "../globals";
 
-const executeScript = getAPIMethod<FExecuteScript>(API_ENDPOINT, "executeScript");
-
+const executeScript = adminRPC().method("executeScript")
 
 type Props = {
   description: string
@@ -25,7 +20,7 @@ type Props = {
 
 export default function FunctionComponent({ className, description, args, path, name, onLog }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
-  
+
   const onExecuteClick = fetchCatch({
     method: executeScript,
     before: () => {

@@ -1,9 +1,8 @@
 "use client";
 import type { TableScheme } from "@artempoletsky/kurgandb/globals";
-import { ReactNode, useEffect, useState } from "react";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { ReactNode, useState } from "react";
 import { useErrorResponse, fetchCatch } from "@artempoletsky/easyrpc/react";
-import type { FAddField, FChangeFieldIndex, FGetScheme, FRemoveField, FRenameField, FToggleTag, RGetSchemePage } from "../../api/methods";
+import type { RGetSchemePage } from "../../api/methods";
 import FieldLabel from "../../comp/FieldLabel";
 import { ActionIcon, Button, Select, Tooltip } from "@mantine/core";
 import { FieldTag } from "@artempoletsky/kurgandb/globals";
@@ -11,19 +10,19 @@ import { FieldTag } from "@artempoletsky/kurgandb/globals";
 import CreateNewField from "./CreateNewField";
 import { ChevronDown, ChevronUp, Trash } from 'tabler-icons-react';
 import RequestError from "../../comp/RequestError";
-import { API_ENDPOINT } from "../../generated";
-import { blinkBoolean } from "../../utils_client";
 import { AAddField, ATableOnly } from "../../api/schemas";
 import { generateCreateTable, generateRecordTypesFromScheme } from "./generateType";
 import Code from "../../comp/Code";
-import { Store } from "../../StoreProvider";
+import { adminRPC } from "../../globals";
 
-const toggleTag = getAPIMethod<FToggleTag>(API_ENDPOINT, "toggleTag");
-const removeField = getAPIMethod<FRemoveField>(API_ENDPOINT, "removeField");
-const addField = getAPIMethod<FAddField>(API_ENDPOINT, "addField");
-const changeFieldIndex = getAPIMethod<FChangeFieldIndex>(API_ENDPOINT, "changeFieldIndex");
-const renameField = getAPIMethod<FRenameField>(API_ENDPOINT, "renameField");
-const getScheme = getAPIMethod<FGetScheme>(API_ENDPOINT, "getScheme");
+const {
+  toggleTag,
+  removeField,
+  addField,
+  changeFieldIndex,
+  renameField,
+  getScheme,
+} = adminRPC().methods("toggleTag", "removeField", "addField", "changeFieldIndex", "renameField", "getScheme");
 
 
 type Props = ATableOnly & RGetSchemePage;

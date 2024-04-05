@@ -1,19 +1,14 @@
 "use client";
 
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { useErrorResponse, fetchCatch } from "@artempoletsky/easyrpc/react";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import { RegisteredEvents } from "@artempoletsky/kurgandb/globals";
-import { ActionIcon, Button } from "@mantine/core";
-import { FGetTableEvents, FToggleAdminEvent, FUnregisterEvent } from "../../api/methods";
-import { API_ENDPOINT } from "../../generated";
-import { Trash } from "tabler-icons-react";
+import { Button } from "@mantine/core";
 import { ParsedFunctionComponent } from "../../comp/ParsedFunctionComponent";
-import { Store } from "../../StoreProvider";
 
-const toggleAdminEvent = getAPIMethod<FToggleAdminEvent>(API_ENDPOINT, "toggleAdminEvent");
-const unregisterEvent = getAPIMethod<FUnregisterEvent>(API_ENDPOINT, "unregisterEvent");
+import { adminRPC } from "../../globals";
 
+const { toggleAdminEvent, unregisterEvent } = adminRPC().methods("toggleAdminEvent", "unregisterEvent");
 
 type Props = {
   tableName: string;

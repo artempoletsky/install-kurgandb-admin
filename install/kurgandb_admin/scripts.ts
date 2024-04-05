@@ -50,8 +50,8 @@ export const Next_routes = {
 }
 
 export const Project_setup = {
-  async Generate_globals_and_db_files() {
-    // Generate globals.ts and db.ts according to your database structure
+  async Generate_globals_db_and_rpc_files() {
+    // Generate globals.ts, db.ts and rpc.ts according to your database structure
 
     return await generateDB();
   },

@@ -7,6 +7,7 @@ import { FGetTableEvents } from "../api/methods";
 import { API_ENDPOINT } from "../generated";
 import RequestError from "./RequestError";
 import { Loader } from "@mantine/core";
+import { adminRPC } from "../globals";
 
 
 export class Mutator<RT>  {

@@ -2,18 +2,16 @@
 
 import { Button, Checkbox, Select, Tooltip } from "@mantine/core";
 import TextInput from "./TextInput";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { useErrorResponse } from "@artempoletsky/easyrpc/react";
-import type { FCreateTable } from "../api/methods";
 import { useState } from "react";
 import CheckboxTooltip from "./CheckboxTooltip";
 import RequestError from "./RequestError";
-import { API_ENDPOINT } from "../generated";
 import { useForm, zodResolver } from "@mantine/form";
 import { ACreateTable, createTable as ZCreateTable } from "../api/schemas";
+import { adminRPC } from "../globals";
 
-const createTable = getAPIMethod<FCreateTable>(API_ENDPOINT, "createTable");
 
+const createTable = adminRPC().method("createTable");
 
 export default function CreateNewTable() {
 

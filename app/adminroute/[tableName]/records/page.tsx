@@ -6,6 +6,7 @@ import PageEditRecords from "./PageEditRecords";
 import ComponentLoader from "../../comp/ComponentLoader";
 import TableNotFound from "../TableNotFound";
 import { Metadata } from "next";
+import { adminRPC } from "../../globals";
 
 
 
@@ -33,11 +34,11 @@ export default async function page({ params }: Props) {
   // })
 
   metadata.title = `${tableName} records`;
-  const getSchemePage: FGetSchemePage = "getSchemePage" as any;
+  // const getSchemePage: FGetSchemePage = "getSchemePage" as any;
   return (
     <>
       <ComponentLoader
-        method={getSchemePage}
+        method={adminRPC().hack("getSchemePage")}
         Component={PageEditRecords}
         args={{ tableName }}
         error={<TableNotFound tableName={tableName} />}

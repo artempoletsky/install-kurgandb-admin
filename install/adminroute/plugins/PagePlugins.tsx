@@ -1,21 +1,16 @@
 "use client";
 
 
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 
 import { ReactNode, useEffect, useState } from "react";
-import { API_ENDPOINT } from "../generated";
-import type { FGetLog, FTogglePlugin, RGetPlugins } from "../api/methods";
-import Paginator from "../comp/paginator";
-import type { LogEntry } from "@artempoletsky/kurgandb/globals";
-import { before } from "node:test";
+import type { RGetPlugins } from "../api/methods";
 import { Button } from "@mantine/core";
 import { ParsedFunctionComponent } from "../comp/ParsedFunctionComponent";
 import { Store } from "../StoreProvider";
+import { adminRPC } from "../globals";
 
-const togglePlugin = getAPIMethod<FTogglePlugin>(API_ENDPOINT, "togglePlugin");
-
+const togglePlugin = adminRPC().method("togglePlugin")
 
 type Props = {
   plugins: string[];

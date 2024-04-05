@@ -1,19 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import TextInput from "./TextInput";
 import { Button } from "@mantine/core";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { useErrorResponse } from "@artempoletsky/easyrpc/react";
-import { FAuthorize } from "../api/methods";
-import { API_ENDPOINT } from "../generated";
-
 
 import { useForm, zodResolver } from '@mantine/form';
 import { AAuthorize, authorize as ZAuthorize } from "../api/schemas";
+import { adminRPC } from "../globals";
 
-const authorize = getAPIMethod<FAuthorize>(API_ENDPOINT, "authorize");
-
+const authorize = adminRPC().method("authorize");
 
 export default function LoginForm() {
   // const [incorrect, setIncorrect] = useState(false);

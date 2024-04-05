@@ -72,6 +72,7 @@ export default async function generateDB(rewrite: boolean = false): Promise<stri
 
   const dbOut = process.cwd() + "/db.ts";
   const globalsOut = process.cwd() + "/globals.ts";
+  const rpcOut = process.cwd() + "/rpc.ts";
   const sourcePath = `${process.cwd()}/app/kurgandb_admin/codegen/db`;
 
 
@@ -84,8 +85,6 @@ export default async function generateDB(rewrite: boolean = false): Promise<stri
     result += "db.ts generated; ";
   }
 
-
-
   if (fs.existsSync(globalsOut) && !rewrite) {
     result += "globals.ts exists, skipping... ";
   } else {
@@ -93,6 +92,14 @@ export default async function generateDB(rewrite: boolean = false): Promise<stri
       $$SCHEMAS$$: generateTablesSchemas(scheme),
     });
     result += "globals.ts generated; ";
+  }
+
+  if (fs.existsSync(rpcOut) && !rewrite) {
+    result += "rpc.ts exists, skipping... ";
+  } else {
+    generateCodeFile(sourcePath + "/rpc.ts.txt", rpcOut, {
+    });
+    result += "rpc.ts generated; ";
   }
 
   return result;

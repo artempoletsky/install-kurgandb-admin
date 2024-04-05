@@ -3,8 +3,7 @@ import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 
 // import Button from "./Button";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { getAPIMethod, JSONErrorResponse, RequestErrorSetter } from "@artempoletsky/easyrpc/client";
-import type { FCreateDocument, FDeleteDocument, FUpdateDocument } from "../../api/methods";
+import { RequestErrorSetter } from "@artempoletsky/easyrpc/client";
 
 import FieldLabel from "../../comp/FieldLabel";
 import { ActionIcon, Button, Checkbox, CloseButton, Menu, MenuTarget, Modal, TextInput, Textarea, Tooltip } from "@mantine/core";
@@ -13,17 +12,18 @@ import { blinkBoolean } from "../../utils_client";
 import { FieldTag, FieldType, PlainObject } from "@artempoletsky/kurgandb/globals";
 
 import { fieldScripts } from "../../../kurgandb_admin/field_scripts";
-import { ScriptsRecord } from "../../globals";
+import { ScriptsRecord, adminRPC } from "../../globals";
 import CustomComponentRecord from "../../../kurgandb_admin/components/CustomComponentRecord";
 import { Calendar, Dots, Edit } from "tabler-icons-react";
 import { useDisclosure } from "@mantine/hooks";
-import { DateInput, DatePicker, DateTimePicker, DateValue } from "@mantine/dates";
+import { DatePicker, DateValue } from "@mantine/dates";
 import EditJSON from "./EditJSON";
 
-const updateDocument = getAPIMethod<FUpdateDocument>(API_ENDPOINT, "updateDocument");
-const createDocument = getAPIMethod<FCreateDocument>(API_ENDPOINT, "createDocument");
-const deleteDocument = getAPIMethod<FDeleteDocument>(API_ENDPOINT, "deleteDocument");
-
+const {
+  updateDocument,
+  createDocument,
+  deleteDocument,
+} = adminRPC().methods("updateDocument", "createDocument", "deleteDocument");
 
 type Props = {
   record: PlainObject;

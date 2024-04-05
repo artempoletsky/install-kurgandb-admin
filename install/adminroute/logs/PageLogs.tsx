@@ -1,18 +1,14 @@
 "use client";
 
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 
 import { useEffect, useState } from "react";
-import { API_ENDPOINT } from "../generated";
-import type { FGetLog } from "../api/methods";
 import Paginator from "../comp/paginator";
 import type { LogEntry } from "@artempoletsky/kurgandb/globals";
-import { before } from "node:test";
 import { Store } from "../StoreProvider";
+import { adminRPC } from "../globals";
 
-const getLog = getAPIMethod<FGetLog>(API_ENDPOINT, "getLog");
-
+const getLog = adminRPC().method("getLog");
 
 type Props = {
   logsList: string[];

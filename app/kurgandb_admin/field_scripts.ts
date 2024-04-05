@@ -1,12 +1,8 @@
 
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
-import type { FExapleCustomMethod } from "./api";
-import { API_ENDPOINT } from "../adminroute/generated";
-import { FieldScriptsObject } from "../adminroute/globals";
+import { FieldScriptsObject, adminRPCCustom } from "../adminroute/globals";
 import { encodePassword } from "@artempoletsky/kurgandb/globals";
 
-
-const exampleCustomMethod = getAPIMethod<FExapleCustomMethod>(API_ENDPOINT, "exampleCustomMethod");
+const exampleCustomMethod = adminRPCCustom().method("exampleCustomMethod");
 
 type UserFull = { username: string, password: string };
 export const fieldScripts: FieldScriptsObject = {

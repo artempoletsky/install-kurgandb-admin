@@ -1,24 +1,22 @@
 "use client";
 
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
-import { ReactNode, useEffect, useState } from "react";
-import { ActionIcon, Button } from "@mantine/core";
-import type { FGetInvalidRecords, FSetCurrentTableValidator, FUnsetCurrentTableValidator, RGetTableValidation, RUpdateValidationPage } from "../../api/methods";
-import { API_ENDPOINT, ROOT_PATH } from "../../generated";
-import { Trash } from "tabler-icons-react";
-import { ParsedFunction } from "@artempoletsky/kurgandb/function";
+import { useState } from "react";
+import { Button } from "@mantine/core";
+import type { RGetTableValidation, RUpdateValidationPage } from "../../api/methods";
+import { ROOT_PATH } from "../../generated";
 import { ParsedFunctionComponent } from "../../comp/ParsedFunctionComponent";
 import type { PlainObject } from "@artempoletsky/kurgandb/globals";
 import type { ATableOnly } from "../../api/schemas";
 import { LightRecordDetails } from "./LigthRecordDetails";
 import Link from "../../comp/Link";
-import { Store } from "../../StoreProvider";
+import { adminRPC } from "../../globals";
 
-const setCurrentTableValidator = getAPIMethod<FSetCurrentTableValidator>(API_ENDPOINT, "setCurrentTableValidator");
-const unsetCurrentTableValidator = getAPIMethod<FUnsetCurrentTableValidator>(API_ENDPOINT, "unsetCurrentTableValidator");
-const getInvalidRecords = getAPIMethod<FGetInvalidRecords>(API_ENDPOINT, "getInvalidRecords");
-
+const {
+  setCurrentTableValidator,
+  unsetCurrentTableValidator,
+  getInvalidRecords,
+} = adminRPC().methods("setCurrentTableValidator", "unsetCurrentTableValidator", "getInvalidRecords");
 
 
 type Props = RGetTableValidation & ATableOnly;

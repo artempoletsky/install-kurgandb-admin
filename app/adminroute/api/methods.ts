@@ -55,7 +55,7 @@ export type FCreateDocument = typeof createDocument;
 
 export const readDocument = methodFactory(({ }, { tableName, id }: AReadDocument, { db, $ }) => {
   let t = db.getTable<any, any, any>(tableName);
-  return t.at(id, $.full);
+  return t.at<any>(id, $.full);
 });
 
 
