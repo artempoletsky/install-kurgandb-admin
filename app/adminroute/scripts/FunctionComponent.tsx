@@ -10,18 +10,22 @@ import { adminRPC } from "../globals";
 const executeScript = adminRPC().method("executeScript")
 
 type Props = {
-  description: string
-  args: string[]
-  path: string
-  name: string
-  className?: string
-  onLog: (args: ScriptsLogRecord) => void
+  description: string;
+  args: string[];
+  path: string;
+  name: string;
+  className?: string;
+  onLog: (args: ScriptsLogRecord) => void;
+  confirm?: boolean;
 }
 
-export default function FunctionComponent({ className, description, args, path, name, onLog }: Props) {
+export default function FunctionComponent({ className, description, args, path, name, onLog, confirm: useConfirm }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
 
   const onExecuteClick = fetchCatch({
+    async confirm() {
+      return !useConfirm || confirm("Are you sure you want to execute this script?");
+    },
     method: executeScript,
     before: () => {
       const form = formRef.current;

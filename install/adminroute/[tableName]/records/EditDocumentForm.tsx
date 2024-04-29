@@ -84,6 +84,11 @@ export default function EditDocumentForm({
       proxy[fieldName] = e.target.value;
     }
   }
+  function reset() {
+    setRecord({
+      ...initialRecord,
+    });
+  }
 
   function save() {
 
@@ -176,8 +181,8 @@ export default function EditDocumentForm({
     function onScriptTrigger(key: string) {
 
       if (!form.current) throw new Error("no form ref");
-      const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
-      if (!input) throw new Error("input not found");
+      // const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
+      // if (!input) throw new Error("input not found");
       scripts[key](proxy);
     }
     if (scriptKeys.length == 1) {
@@ -296,7 +301,13 @@ export default function EditDocumentForm({
   const [savedTooltip, setSavedTooltip] = useState(false);
 
 
-  return <div className="pl-5 flex gap-3 grow">
+  return <div className="pl-5 flex gap-3 grow" onKeyDown={e => {
+    if (e.ctrlKey && e.key == "s") {
+      e.preventDefault();
+      e.stopPropagation();
+      save();
+    }
+  }}>
     <div className="min-w-[500px] relative pt-5">
       <div className="absolute right-0 top-0">
         <CloseButton onClick={onClose} />
@@ -310,6 +321,7 @@ export default function EditDocumentForm({
           </Tooltip>
           <Button onClick={remove}>Remove</Button>
           <Button onClick={onDuplicate}>Duplicate</Button>
+          <Button onClick={reset}>Reset</Button>
         </div>
       }
     </div>

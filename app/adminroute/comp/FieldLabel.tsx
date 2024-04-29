@@ -2,6 +2,7 @@ import { TableScheme } from "@artempoletsky/kurgandb/globals"
 import { ActionIcon } from "@mantine/core"
 import { Edit, Filter } from "tabler-icons-react"
 import { Store } from "../StoreProvider";
+import FieldFilterButton from "./FieldFilterButton";
 
 type Props = {
   scheme: TableScheme;
@@ -25,12 +26,7 @@ export default function FieldLabel({ scheme, fieldName, onRename, queryFilter }:
         <Edit />
       </ActionIcon>}
     {queryFilter !== undefined &&
-      <ActionIcon
-        className="bg-stone-400 mr-1"
-        size="xs"
-        onClick={e => Store.setQueryString(`t.where("${fieldName}", "${queryFilter}")`)}>
-        <Filter />
-      </ActionIcon>}
+      <FieldFilterButton fieldName={fieldName} value={queryFilter} />}
     <label className="text-lg font-medium">{fieldName}</label>
     <span> ({type})</span>
     <span> {tags.join(", ")}</span>

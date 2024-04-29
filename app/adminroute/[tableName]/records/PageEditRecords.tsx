@@ -201,6 +201,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
 
 
   function onClose() {
+    setCurrentId(undefined);
     setRecord(undefined);
   }
   const getInvalidRecordsRequest = `t.filter($.invalid)`;
@@ -259,6 +260,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
             args={queryArgs}
             onData={setPageData}
             props={{
+              current: currentId,
               onRecordSelect: openDocument
             }}
             mutator={mutator}

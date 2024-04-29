@@ -87,7 +87,7 @@ export default function PageTableScheme({ tableName, scheme: schemeInitial }: Pr
   }
 
   const fcMoveField = fc.method(changeFieldIndex)
-    .before((fieldName: string, direction: number) => {
+    .before<{ fieldName: string, direction: number }>(({ fieldName, direction }) => {
       if (!scheme) throw new Error("no scheme");
 
       const newIndex = scheme.fieldsOrderUser.indexOf(fieldName) + direction;
@@ -135,14 +135,14 @@ export default function PageTableScheme({ tableName, scheme: schemeInitial }: Pr
             disabled={i == 0}
             // className="absolute left-3 top-0"
             size={18}
-            onClick={fcMoveField.action(fieldName, -1)}>
+            onClick={fcMoveField.action({ fieldName, direction: -1 })}>
             <ChevronUp />
           </ActionIcon>
           <ActionIcon
             disabled={i == scheme.fieldsOrderUser.length - 1}
             // className="absolute left-3 bottom-0"
             size={18}
-            onClick={fcMoveField.action(fieldName, 1)}>
+            onClick={fcMoveField.action({ fieldName, direction: 1 })}>
             <ChevronDown />
           </ActionIcon>
         </div>

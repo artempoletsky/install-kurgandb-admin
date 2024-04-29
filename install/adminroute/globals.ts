@@ -19,13 +19,13 @@ export type TableComponentProps = {
   meta: any;
 }
 
-export type DocumentComponentProps = {
+export type DocumentComponentProps<Type = PlainObject> = {
   onRequestError: RequestErrorSetter;
-  // onUpdateRecord: (record: PlainObject) => void
-  tableName: string
-  record: PlainObject
-  insertMode?: boolean
-  recordId: string | number | undefined
+  // onUpdateRecord: (record: PlainObject) => void;
+  tableName: string;
+  record: Type & PlainObject;
+  insertMode?: boolean;
+  recordId: string | number | undefined;
 }
 
 

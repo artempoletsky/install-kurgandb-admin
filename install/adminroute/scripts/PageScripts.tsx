@@ -25,6 +25,9 @@ type Props = {
 }
 
 export function formatName(key: string) {
+  if (key.startsWith("confirm")){
+    key = key.slice(8);
+  }
   return key.replaceAll("_", " ");
 }
 
@@ -50,7 +53,15 @@ export default function PageScripts({ scripts }: Props) {
         items.push(printGroup(item.children, newPath, key));
       } else {
         if (item.fun) {
-          items.push(<FunctionComponent onLog={onLog} className="mb-3" key={newPath} {...item.fun} path={newPath} name={formatName(key)} />);
+          items.push(<FunctionComponent
+            onLog={onLog}
+            className="mb-3"
+            key={newPath}
+            {...item.fun}
+            path={newPath}
+            name={formatName(key)}
+            confirm={key.startsWith("confirm_")}
+          />);
         } else {
           items.push(<div key={newPath} className="mb-3 text-red-600">Failed to parse function: &#39;{newPath}&#39;</div>);
         }
