@@ -10,14 +10,27 @@ type Props = {
 
 
 export default function FieldFilterButton({ fieldName, value }: Props) {
-  const valueStr = typeof value == "string" ? `"${value}"` : `${value}`;
   const { queryString } = useStore();
-  const handleClick = (add: string) => (e: MouseEvent) => {
+  const handleClick = (type: "exact" | "includes" | "startsWith") => (e: MouseEvent) => {
+    let add = "";
+    switch (type) {
+      case "exact": add = `.where("${fieldName}",${getValue()})`; break;
+      case "includes": add = `.where("${fieldName}",v=>v.includes(${getValue()}))`; break;
+      case "startsWith": add = `.where("${fieldName}",v=>v.startsWith(${getValue()}))`; break;
+      default:
+        break;
+    }
     let result = "t" + add;
     if (e.shiftKey) {
       result = queryString + add;
     }
+
     Store.setQueryString(result);
+  }
+  function getValue() {
+    const selection = window.getSelection()!.toString();
+    if (!selection) return typeof value == "string" ? `"${value}"` : `${value}`;
+    return `"${selection}"`;
   }
 
   const prevent = (e: MouseEvent) => {
@@ -36,9 +49,9 @@ export default function FieldFilterButton({ fieldName, value }: Props) {
       ><Filter /></ActionIcon >
     </Menu.Target>
     <Menu.Dropdown>
-      <Menu.Item onClick={handleClick(`.where("${fieldName}",${valueStr})`)}>Exact</Menu.Item>
-      <Menu.Item onClick={handleClick(`t.where("${fieldName}",v=>v.includes(${valueStr}))`)}>Includes</Menu.Item>
-      <Menu.Item onClick={handleClick(`t.where("${fieldName}",v=>v.startsWith(${valueStr}))`)}>Starts with</Menu.Item>
+      <Menu.Item onClick={handleClick("exact")}>Exact</Menu.Item>
+      <Menu.Item onClick={handleClick("includes")}>Includes</Menu.Item>
+      <Menu.Item onClick={handleClick("startsWith")}>Starts with</Menu.Item>
     </Menu.Dropdown>
   </Menu>
 }

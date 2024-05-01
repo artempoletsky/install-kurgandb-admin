@@ -23,6 +23,11 @@ export const fieldScripts: FieldScriptsObject = {
       Encode(record: UserFull) {
         record.password = encodePassword(record.password);
       }
+    },
+    data: {
+      Test123123() {
+
+      }
     }
   }
 }

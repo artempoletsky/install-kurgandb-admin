@@ -18,6 +18,7 @@ import { Calendar, Dots, Edit } from "tabler-icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { DatePicker, DateValue } from "@mantine/dates";
 import EditJSON from "./EditJSON";
+import EditFormField from "./EditFormField";
 
 const {
   updateDocument,
@@ -73,16 +74,14 @@ export default function EditDocumentForm({
 }: Props) {
 
   const form = useRef<HTMLFormElement>(null);
-  const [record, setRecord] = useState<PlainObject>({});
+  const [record, setRecord] = useState<PlainObject>(initialRecord);
   const proxy = createProxy(record, setRecord);
   const [editJSONModalOpened, disclosureJSON] = useDisclosure(false);
   const [editingJSON, setEditingJSON] = useState("");
 
-
-  function onChange(fieldName: string) {
-    return (e: any) => {
-      proxy[fieldName] = e.target.value;
-    }
+  function onJSONEdit(fieldName: string) {
+    setEditingJSON(fieldName);
+    disclosureJSON.open();
   }
   function reset() {
     setRecord({
@@ -136,159 +135,48 @@ export default function EditDocumentForm({
   //   }
   //   formTextDefaults[fieldName] = value;
   // }
-  function updateDateInput(fieldName: string) {
-    if (!form.current) throw new Error("no form ref");
-    const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
-    if (input) {
-      input.value = record[fieldName].toUTCString();
-    }
-  }
-
-  useEffect(() => {
-    if (!form.current) throw new Error("no form ref");
-    const rec: PlainObject = {};
-    for (const fieldName in scheme.fields) {
-      const type = scheme.fields[fieldName];
-
-      if (type == "date") {
-        const date = new Date(initialRecord[fieldName]);
-        rec[fieldName] = date;
-        const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
-        if (input) {
-          input.value = date.toUTCString();
-        }
-      } else {
-        rec[fieldName] = initialRecord[fieldName];
-      }
-    }
-
-    setRecord(rec);
-  }, [recordId, scheme, initialRecord]);
-
-  function printScripts(scripts: ScriptsRecord, fieldName: string) {
-
-    const scriptNames: Record<string, string> = {};
-    for (const key in scripts) {
-      scriptNames[key] = key.replaceAll("_", " ");
-    }
-    const scriptKeys = Object.keys(scriptNames);
 
 
-    if (scriptKeys.length == 0) {
-      return "";
-    }
+  // useEffect(() => {
+  //   if (!form.current) throw new Error("no form ref");
+  //   const rec: PlainObject = {};
+  //   for (const fieldName in scheme.fields) {
+  //     const type = scheme.fields[fieldName];
 
-    function onScriptTrigger(key: string) {
+  //     if (type == "date") {
+  //       const date = new Date(initialRecord[fieldName]);
+  //       rec[fieldName] = date;
+  //       const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
+  //       if (input) {
+  //         input.value = date.toUTCString();
+  //       }
+  //     } else {
+  //       rec[fieldName] = initialRecord[fieldName];
+  //     }
+  //   }
 
-      if (!form.current) throw new Error("no form ref");
-      // const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
-      // if (!input) throw new Error("input not found");
-      scripts[key](proxy);
-    }
-    if (scriptKeys.length == 1) {
-      const key = scriptKeys[0];
-      return <Button onClick={e => onScriptTrigger(key)} className="shrink">{scriptNames[key]}</Button>
-    }
-
-    return <Menu>
-      <Menu.Target>
-        <ActionIcon size={36}><Dots /></ActionIcon>
-      </Menu.Target>
-      <Menu.Dropdown>
-        {scriptKeys.map(key => <Menu.Item onClick={e => onScriptTrigger(key)} key={key}>{scriptNames[key]}</Menu.Item>)}
-      </Menu.Dropdown>
-    </Menu>
-  }
-
-  function onDateChange(fieldName: string) {
-    return (d: DateValue) => {
-      if (!d) return;
-      const date: Date = record[fieldName];
-      // console.log(d.getSeconds());
-
-      // date.setDate(d.getDate());
-      date.setFullYear(d.getFullYear(), d.getMonth(), d.getDate());
-      // console.log(d);
-
-      proxy[fieldName] = date;
-      updateDateInput(fieldName)
-    }
-  }
-  function printField(fieldName: string, type: FieldType, tags: Set<FieldTag>): ReactNode {
-    if (record[fieldName] === undefined) return "";
-    if (type == "json") {
-      return <div className="flex"><div className="grow break-words overflow-hidden overflow-ellipsis max-w-[462px] max-h-[50px]">{JSON.stringify(record[fieldName])}</div>
-        <ActionIcon onClick={e => {
-          setEditingJSON(fieldName);
-          disclosureJSON.open();
-        }} size={32}><Edit /></ActionIcon>
-      </div>
-    }
-    if (type == "date") {
-      // const value = (record[fieldName] as Date).toUTCString();
-      return <div className="flex gap-3">
-        <Menu>
-          <Menu.Target>
-            <ActionIcon size={36}><Calendar /></ActionIcon>
-          </Menu.Target>
-          <Menu.Dropdown >
-            <DatePicker defaultDate={record[fieldName]} value={record[fieldName]} onChange={onDateChange(fieldName)} />
-          </Menu.Dropdown>
-        </Menu>
-        <div className="grow"><TextInput
-          name={fieldName}
-          defaultValue={record[fieldName].toUTCString()}
-          onBlur={e => {
-            const d = new Date(e.target.value);
-
-            if (!isNaN(d as any)) {
-              proxy[fieldName] = d;
-            }
-            updateDateInput(fieldName);
-          }} autoComplete="off" size="sm" /></div>
-
-      </div>
-
-      // return <DateInput
-      //   defaultDate={record[fieldName]}
-      //   name={fieldName}
-      //   valueFormat="DD/MM/YYYY HH:mm:ss"
-      // />
-    }
-    if (tags.has("textarea")) return <Textarea resize="both" name={fieldName} value={record[fieldName]} onChange={onChange(fieldName)} />;
-
-    if (type == "boolean") {
-      return <Checkbox checked={record[fieldName]} onChange={e => proxy[fieldName] = e.target.checked} name={fieldName} />
-    }
-
-    return <TextInput value={record[fieldName]} onChange={onChange(fieldName)} autoComplete="off" size="sm" variant="default" type="text" name={fieldName} />;
-  }
-
-  function printFieldScripts(fieldName: string, type: FieldType, tags: Set<FieldTag>): ReactNode {
-    const scriptsObject = currentFieldScripts[fieldName];
-    if (scriptsObject) {
-      return <div className="flex gap-3">
-        <div className="grow">
-          {printField(fieldName, type, tags)}
-        </div>
-        <div className="shrink">
-          {printScripts(scriptsObject, fieldName)}
-        </div>
-      </div>
-    }
-    return printField(fieldName, type, tags);
-  }
+  //   setRecord(rec);
+  // }, [recordId, scheme, initialRecord]);
 
   const fields: ReactNode[] = [];
   for (const fieldName of scheme.fieldsOrderUser) {
     const type = scheme.fields[fieldName];
-    const tags = new Set(scheme.tags[fieldName] || []);
+    const tags = new Set(scheme.tags[fieldName]);
     if (tags.has("autoinc") && insertMode) continue;
 
-
+    // if (record[fieldName] === undefined) debugger;
     fields.push(<div className="mr-1" key={fieldName}>
       <FieldLabel queryFilter={record[fieldName]} fieldName={fieldName} scheme={scheme} />
-      {printFieldScripts(fieldName, type, tags)}
+      {<EditFormField
+        proxy={proxy}
+        fieldName={fieldName}
+        value={proxy[fieldName]}
+        tags={tags}
+        type={type}
+        onJSONEdit={onJSONEdit}
+        scriptsObject={currentFieldScripts[fieldName]}
+        onChange={value => proxy[fieldName] = value}
+      />}
     </div>);
   }
   <TextInput
