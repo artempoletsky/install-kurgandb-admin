@@ -124,39 +124,10 @@ export default function EditDocumentForm({
   }
 
   const currentFieldScripts = fieldScripts[tableName] || {};
-  // const formTextDefaults: Record<string, any> = {};
-  // for (const fieldName of scheme.fieldsOrderUser) {
-  //   let value: any = "";
-  //   const type = scheme.fields[fieldName];
-  //   if (type == "json") {
-  //     value = JSON.stringify(value, null, 0);
-  //   } else if (type == "boolean") {
-  //     value = false;
-  //   }
-  //   formTextDefaults[fieldName] = value;
-  // }
 
-
-  // useEffect(() => {
-  //   if (!form.current) throw new Error("no form ref");
-  //   const rec: PlainObject = {};
-  //   for (const fieldName in scheme.fields) {
-  //     const type = scheme.fields[fieldName];
-
-  //     if (type == "date") {
-  //       const date = new Date(initialRecord[fieldName]);
-  //       rec[fieldName] = date;
-  //       const input = form.current.querySelector<HTMLInputElement>(`[name=${fieldName}]`);
-  //       if (input) {
-  //         input.value = date.toUTCString();
-  //       }
-  //     } else {
-  //       rec[fieldName] = initialRecord[fieldName];
-  //     }
-  //   }
-
-  //   setRecord(rec);
-  // }, [recordId, scheme, initialRecord]);
+  useEffect(() => {
+    setRecord(initialRecord);
+  }, [recordId, scheme, initialRecord]);
 
   const fields: ReactNode[] = [];
   for (const fieldName of scheme.fieldsOrderUser) {
