@@ -68,15 +68,15 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
   // const queryInput = useRef<HTMLTextAreaElement>(null);
   let [insertMode, setInsertMode] = useState<boolean>(false);
 
-  const [setRequestError, , requestError] = useErrorResponse();
+  // const [setRequestError, , requestError] = useErrorResponse();
 
   const fc = fetchCatch({
     before: () => ({ tableName }),
-    errorCatcher: setRequestError,
   });
 
+  const { errorSetter: setRequestError, errorResponse } = fc.useCatch();
+
   const fcOpenRecord = fc.method(readDocument)
-    .catch(setRequestError)
     .before((id: string | number) => {
       setCurrentId(id);
       return {
@@ -249,7 +249,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
         <div className="border-l border-gray-500 mx-3 h-[34px]"></div>
         <Button className="align-top" onClick={fcInsert.action()}>New record</Button>
         <div className="grow ml-3">
-          <RequestError requestError={requestError} />
+          <RequestError requestError={errorResponse} />
         </div>
       </div>
       <div className="">

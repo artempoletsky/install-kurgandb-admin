@@ -19,6 +19,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { DatePicker, DateValue } from "@mantine/dates";
 import EditJSON from "./EditJSON";
 import EditFormField from "./EditFormField";
+import { fetchCatch } from "@artempoletsky/easyrpc/react";
 
 const {
   updateDocument,
@@ -79,6 +80,8 @@ export default function EditDocumentForm({
   const [editJSONModalOpened, disclosureJSON] = useDisclosure(false);
   const [editingJSON, setEditingJSON] = useState("");
 
+  const fc = fetchCatch().catch(onRequestError);
+
   function onJSONEdit(fieldName: string) {
     setEditingJSON(fieldName);
     disclosureJSON.open();
@@ -108,20 +111,20 @@ export default function EditDocumentForm({
       .catch(onRequestError);
   }
 
-  function create() {
-    createDocument({ tableName, document: record })
-      .then(onCreated)
-      .catch(onRequestError);
-  }
+  const create = fc.method(createDocument).before(() => ({
+    tableName,
+    document: record,
+  })).then(onCreated).action();
 
-  function remove() {
+  const remove = fc.method(deleteDocument).before(() => {
     if (recordId === undefined) throw new Error("id is undefined");
-
-    if (!confirm("Are you sure you want delete this document?")) return;
-    deleteDocument({ tableName, id: recordId })
-      .then(onDeleted)
-      .catch(onRequestError);
-  }
+    return {
+      tableName,
+      id: recordId,
+    }
+  }).confirm(async () => {
+    return confirm("Are you sure you want delete this document?");
+  }).then(onDeleted).action();
 
   const currentFieldScripts = fieldScripts[tableName] || {};
 
