@@ -5,8 +5,8 @@ import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { useEffect, useState } from "react";
 import Paginator from "../comp/paginator";
 import type { LogEntry } from "@artempoletsky/kurgandb/globals";
-import { Store } from "../StoreProvider";
 import { adminRPC } from "../globals";
+import { useStoreEffectSet } from "../store";
 
 const getLog = adminRPC().method("getLog");
 
@@ -14,11 +14,8 @@ type Props = {
   logsList: string[];
 };
 export default function PageLogs({ logsList }: Props) {
-  useEffect(() => {
-    Store.setTableName("");
-  }, []);
+  useStoreEffectSet("tableName", "");
 
-  const [pageEntries, setPageEntries] = useState<string[]>([])
   const [page, setPage] = useState(1);
 
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
@@ -28,21 +25,14 @@ export default function PageLogs({ logsList }: Props) {
   const [setErrorResponse, mainErrorMessage] = useErrorResponse();
 
   const fcOpenLog = fetchCatch(getLog)
-    .before(fileName => ({
+    .before((fileName: string) => ({
       fileName,
     }))
     .catch(setErrorResponse)
     .then(setLogEntries);
 
-  function showPage(num: number) {
-    setPage(num);
-    const start = (num - 1) * pageSize;
-    setPageEntries(logsList.slice(start, start + pageSize));
-  }
-
-  useEffect(() => {
-    showPage(1);
-  }, []);
+  const start = (page - 1) * pageSize;
+  const pageEntries: string[] = logsList.slice(start, start + pageSize);
 
   return (
     <div className="">
@@ -68,7 +58,7 @@ export default function PageLogs({ logsList }: Props) {
         </ul>
       </div>
       <div className="text-red-600 min-h-[24px]">{mainErrorMessage}</div>
-      <Paginator page={page} pagesCount={pagesCount} onSetPage={showPage} />
+      <Paginator page={page} pagesCount={pagesCount} onSetPage={setPage} />
     </div>
   );
 }

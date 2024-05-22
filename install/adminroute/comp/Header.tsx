@@ -6,13 +6,13 @@ import { ROOT_PATH } from "../generated";
 import { useContext } from "react";
 
 import TableHeader from "./TableHeader";
-import { useStore } from "../StoreProvider";
+import { useStore } from "../store";
 
 
 
 
 export default function Header() {
-  const { tableName } = useStore();
+  const [tableName] = useStore("tableName");
   return <div className="flex gap-3 mb-3">
     <Link href={`/${ROOT_PATH}/`}><Button>Tables</Button></Link>
 

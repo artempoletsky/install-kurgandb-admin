@@ -6,7 +6,7 @@ import PageCustomComponent from "./PageCustomComponent";
 import { FGetTableCustomPageData } from "../../api/methods";
 import ComponentLoader from "../../comp/ComponentLoader";
 import TableNotFound from "../TableNotFound";
-import { Store } from "../../StoreProvider";
+import { adminRPC } from "../../globals";
 
 type Payload = {
   tableName: string,
@@ -23,11 +23,9 @@ export default async function page({ params }: Props) {
   const { tableName } = params;
 
   metadata.title = `${tableName} custom page`;
-
-  const getTableCustomPageData: FGetTableCustomPageData = "getTableCustomPageData" as any;
   return <>
     <ComponentLoader
-      method={getTableCustomPageData}
+      method={adminRPC().hack("getTableCustomPageData")}
       Component={PageCustomComponent}
       args={{ tableName }}
       error={<TableNotFound tableName={tableName} />}

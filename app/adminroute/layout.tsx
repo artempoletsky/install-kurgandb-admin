@@ -8,17 +8,17 @@ import { isAdmin } from "../kurgandb_admin/auth";
 import LoginForm from "./comp/LoginForm";
 import Header from "./comp/Header";
 
-import StoreProvider from "./StoreProvider";
+import "./store";
+import { StoreProvider } from "@artempoletsky/easystore";
+
 import "./admin.css"
-
-
 
 
 type Props = {
   children: ReactNode;
 }
 
-export default async function layout({ children }: Props) {
+export default async function Layout({ children }: Props) {
 
   const authorised = await isAdmin();
 

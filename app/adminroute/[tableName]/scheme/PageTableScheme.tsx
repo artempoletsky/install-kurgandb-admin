@@ -54,14 +54,14 @@ export default function PageTableScheme({ tableName, scheme: schemeInitial }: Pr
 
 
   const fcRemoveField = fc.method(removeField)
+    .before((fieldName: string) => ({
+      tableName,
+      fieldName,
+    }))
     .confirm(async (fieldName: string) => {
       const delStr = prompt(`Write '${fieldName}' to confirm removing this field`);
       return delStr == fieldName;
     })
-    .before((fieldName: string) => ({
-      tableName,
-      fieldName,
-    }));
 
 
   const fcRenameField = fc.method(renameField)

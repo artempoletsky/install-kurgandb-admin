@@ -20,7 +20,11 @@ export default function FieldSwitch<Type>(props: Props<Type>) {
     return <FieldDate value={new Date(props.value as any)} onChange={props.onChange as any} name={props.name} />
   }
   else if (type == "textarea") {
-    return <Textarea resize="both"  {...props as any} />;
+    return <Textarea resize="both"
+      name={props.name}
+      value={props.value as any}
+      onChange={e => props.onChange(e.target.value as any)}
+    />;
   } else if (type == "boolean") {
     return <Checkbox checked={props.value as any} onChange={e => props.onChange(e.target.checked as any)} name={props.name} />
   } else if (type == "text") {

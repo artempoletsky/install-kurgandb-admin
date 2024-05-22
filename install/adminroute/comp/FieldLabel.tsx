@@ -1,7 +1,6 @@
 import { TableScheme } from "@artempoletsky/kurgandb/globals"
 import { ActionIcon } from "@mantine/core"
 import { Edit, Filter } from "tabler-icons-react"
-import { Store } from "../StoreProvider";
 import FieldFilterButton from "./FieldFilterButton";
 
 type Props = {

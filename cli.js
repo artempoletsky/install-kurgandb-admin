@@ -63,7 +63,7 @@ const util = require('node:util');
 const exec = util.promisify(require('node:child_process').exec);
 
 async function installDependencies() {
-  const packageFilePath = `${__dirname}/package.json`;
+  const packageFilePath = `${process.cwd()}/package.json`;
   const jsonData = JSON.parse(fs.readFileSync(packageFilePath));
   console.log("installing dependencies, please wait...");
   const deps = [
@@ -79,6 +79,10 @@ async function installDependencies() {
   const dbName = "@artempoletsky/kurgandb";
   if (!jsonData.dependencies[dbName] || !jsonData.dependencies[dbName].startsWith("file:")) {
     deps.push(dbName);
+  }
+  const storeName = "@artempoletsky/easystore";
+  if (!jsonData.dependencies[storeName] || !jsonData.dependencies[storeName].startsWith("file:")) {
+    deps.push(storeName);
   }
   // console.log(deps.join(" "));
 

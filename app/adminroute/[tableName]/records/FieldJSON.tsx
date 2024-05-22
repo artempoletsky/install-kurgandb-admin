@@ -8,7 +8,7 @@ type Props = {
 }
 
 function formatJSON(value: any): string {
-  return JSON.stringify(value).slice(12);
+  return JSON.stringify(value).slice(0, 12);
 }
 export default function FieldJSON({ value, onEdit, name }: Props) {
 

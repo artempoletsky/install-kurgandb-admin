@@ -1,7 +1,8 @@
 import { ActionIcon, Menu } from "@mantine/core";
 import { Filter } from "tabler-icons-react";
-import { Store, useStore } from "../StoreProvider";
+
 import { MouseEvent } from "react";
+import { useStore } from "../store";
 
 type Props = {
   fieldName: string;
@@ -10,7 +11,9 @@ type Props = {
 
 
 export default function FieldFilterButton({ fieldName, value }: Props) {
-  const { queryString } = useStore();
+  
+  const [queryString, setQueryString] = useStore("queryString");
+
   const handleClick = (type: "exact" | "includes" | "startsWith") => (e: MouseEvent) => {
     let add = "";
     switch (type) {
@@ -25,7 +28,7 @@ export default function FieldFilterButton({ fieldName, value }: Props) {
       result = queryString + add;
     }
 
-    Store.setQueryString(result);
+    setQueryString(result);
   }
   function getValue() {
     const selection = window.getSelection()!.toString();

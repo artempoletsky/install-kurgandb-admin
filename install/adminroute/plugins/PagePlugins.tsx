@@ -7,8 +7,8 @@ import { ReactNode, useEffect, useState } from "react";
 import type { RGetPlugins } from "../api/methods";
 import { Button } from "@mantine/core";
 import { ParsedFunctionComponent } from "../comp/ParsedFunctionComponent";
-import { Store } from "../StoreProvider";
 import { adminRPC } from "../globals";
+import { useStoreEffectSet } from "../store";
 
 const togglePlugin = adminRPC().method("togglePlugin")
 
@@ -16,9 +16,7 @@ type Props = {
   plugins: string[];
 };
 export default function PagePlugins({ registeredPlugins: pluginsInitial, adminPlugins }: RGetPlugins) {
-  useEffect(() => {
-    Store.setTableName("");
-  }, []);
+  useStoreEffectSet("tableName", "");
 
   const [plugins, setPlugins] = useState(pluginsInitial);
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();

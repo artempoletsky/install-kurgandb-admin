@@ -1,7 +1,7 @@
 "use client";
 import { ReactNode, useContext, useEffect } from "react";
 import Breadcrumbs from "../comp/Breadcrumbs";
-import { Store, useStore } from "../StoreProvider";
+import { useStore, useStoreEffectSet } from "../store";
 
 type Props = {
   children: ReactNode;
@@ -9,10 +9,7 @@ type Props = {
     tableName: string;
   }
 }
-export default function layout({ params: { tableName }, children }: Props) {
-  // const store = useStore();
-  useEffect(() => {
-    Store.setTableName(tableName);
-  }, [tableName]);
+export default function Layout({ params: { tableName }, children }: Props) {
+  useStoreEffectSet("tableName", tableName);
   return children;
 }

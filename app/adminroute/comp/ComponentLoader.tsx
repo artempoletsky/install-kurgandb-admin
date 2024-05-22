@@ -33,17 +33,18 @@ type Props<AT, RT, PT> = {
 export default function ComponentLoader
   <AT, RT, PT>
   ({ Component, children, args, method: methodHack, props, onData, error, mutator }: Props<AT, RT, PT>) {
-  if (!args) return "";
   const methodName = methodHack as unknown as string;
 
   const _props: PT = props || {} as PT;
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();
   const method = getAPIMethod<(arg: AT) => Promise<RT>>(API_ENDPOINT, methodName);
 
+  
   const [data, setData] = useState<RT>();
   useEffect(() => {
     setData(undefined);
     setErrorResponse();
+    if (!args) return;
     method(args).then(res => {
       setData(res);
       if (onData) onData(res);
@@ -54,9 +55,9 @@ export default function ComponentLoader
     if (mutator) {
       mutator.setter = setData;
     }
-  }, [args]);
+  }, [args]); // eslint-disable-line
 
-
+  if (!args) return "";
   if (!data && !errorResponse) {
     if (children) return children;
     return <Loader type="dots" />

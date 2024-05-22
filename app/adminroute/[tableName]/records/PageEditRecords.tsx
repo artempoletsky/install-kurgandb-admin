@@ -14,8 +14,8 @@ import type { AQueryRecords, ATableOnly } from "../../api/schemas";
 import ComponentLoader, { Mutator } from "../../comp/ComponentLoader";
 import RecordsList from "./RecordsList";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
-import { Store, useStore } from "../../StoreProvider";
 import { adminRPC } from "../../globals";
+import { useStore } from "../../store";
 
 
 const {
@@ -59,7 +59,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
 
 
   const queryDefault = "table.all()";
-  const { queryString } = useStore();
+  const [queryString, setQueryString] = useStore("queryString");
 
   const { autoincId, primaryKey } = getSchemeProps(scheme);
 
@@ -137,7 +137,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
     // loadPage(queryArgs!.page);
     const idStr = typeof id == "string" ? `"${id}"` : id + "";
     const queryString = `t.where("${primaryKey}", ${idStr})`;
-    Store.setQueryString(queryString);
+    setQueryString(queryString)
     setQueryArgs({
       page: 1,
       tableName,
@@ -177,14 +177,14 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
 
 
       if (userQuery) {
-        Store.setQueryString(userQuery);
+        setQueryString(userQuery);
         setQueryArgs({
           page: 1,
           queryString: userQuery,
           tableName,
         });
       } else {
-        Store.setQueryString(queryDefault);
+        setQueryString(queryDefault);
         setQueryArgs({
           page: 1,
           queryString: queryDefault,
@@ -196,9 +196,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
     }
 
 
-  }, []);
-
-
+  }, [tableName]);
 
   function onClose() {
     setCurrentId(undefined);
@@ -208,9 +206,6 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
   const whereRequest = `t.where("${"id"}", "new_id")`;
   const startsWith = `t.where("${"id"}", value => value.startsWith("a"))`;
 
-  function setQuery(string: string) {
-    Store.setQueryString(string);
-  }
 
   const [queryArgs, setQueryArgs] = useState<AQueryRecords | null>(null);
   const mutator = new Mutator<RQueryRecords>();
@@ -232,16 +227,16 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
       <div className="mt-3 mb-1 flex gap-1">
         <div className="">
           <Textarea value={queryString}
-            onChange={e => Store.setQueryString(e.target.value)}
+            onChange={e => setQueryString(e.target.value)}
             className="min-w-[500px]"
             resize="vertical"
           />
           <div className="flex gap-3 mt-2">
-            <i onClick={e => setQuery(queryDefault)}
+            <i onClick={e => setQueryString(queryDefault)}
               className="pseudo">All</i>
-            <i onClick={e => setQuery(startsWith)}
+            <i onClick={e => setQueryString(startsWith)}
               className="pseudo">Stars with</i>
-            <i onClick={e => setQuery(getInvalidRecordsRequest)}
+            <i onClick={e => setQueryString(getInvalidRecordsRequest)}
               className="pseudo">Invalid</i>
           </div>
         </div>
