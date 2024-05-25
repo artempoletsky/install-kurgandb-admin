@@ -1,6 +1,13 @@
 
 This is a [KurganDB](https://github.com/artempoletsky/kurgandb) admin panel for [Next.js](https://nextjs.org/)
- 
+
+## Key features
+
+1. Everything is extendable. You can add custom buttons to edit fields, add custom views for editing table records and the table itself.
+2. Also it has extendable API so you can write your own API methods and use them in the admin. 
+3. Code generation. When starting a new project you can design you database structure first and then use code generation to have all needed typescript types in your project.
+4. Scripts tab. Just export a javascript function from the `scripts.ts` and the admin panel will have a button to run this script.
+5. It doesn't depend on any authentication method. It means you have to provide for the admin panel the authentication status. You can integrate it with your authentication system, for example Next Auth.
 
 ## Getting Started
 
