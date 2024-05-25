@@ -2,8 +2,8 @@
 import { Breadcrumbs, Button, MantineProvider } from "@mantine/core"
 
 import { ReactNode, useState } from "react"
-import "@mantine/core/styles.layer.css";
-import "@mantine/dates/styles.layer.css";
+// import "@mantine/core/styles.layer.css";
+// import "@mantine/dates/styles.layer.css";
 import { isAdmin } from "../kurgandb_admin/auth";
 import LoginForm from "./comp/LoginForm";
 import Header from "./comp/Header";
@@ -26,6 +26,10 @@ export default async function Layout({ children }: Props) {
 
   return (
     <html>
+      <head>
+        <link rel="stylesheet" href="https://unpkg.com/@mantine/core@7.7.1/styles.layer.css" />
+        <link rel="stylesheet" href="https://unpkg.com/@mantine/dates@7.7.1/styles.layer.css" />
+      </head>
       <body>
         <MantineProvider>
           {setupRequired &&
