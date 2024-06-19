@@ -4,6 +4,7 @@ import { isAdmin } from "../../kurgandb_admin/auth";
 
 import * as schemas from "./schemas";
 import * as API from "./methods";
+import * as Prisma_API from "./methods_prisma";
 
 import { customAPI, customRules } from "../../kurgandb_admin/api";
 import { JSONErrorResponse } from "@artempoletsky/easyrpc/client";
@@ -37,7 +38,7 @@ export const POST = async function name(request: NextRequest) {
     ...schemas,
     ...customRules,
   }, {
-    ...API,
+    ...Prisma_API,
     ...customAPI,
   });
 

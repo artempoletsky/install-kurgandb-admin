@@ -1,13 +1,17 @@
 {
   "name": "@artempoletsky/install-kurgandb-admin",
-  "version": "1.0.8",
+  "version": "1.0.7",
   "description": "KurganDB admin panel for next.js",
   "main": "cli.js",
   "bin": "cli.js",
   "scripts": {
     "update": "node ./update.js",
     "inst": "node ./cli.js adminroute",
-    "fast": "node ./cli.js adminroute --fast"
+    "fast": "node ./cli.js adminroute --fast",
+    "lint": "next lint",
+    "start": "next start -p 3001",
+    "build": "next build",
+    "next": "next dev -p 3001"
   },
   "keywords": [
     "admin-panel",
@@ -19,8 +23,32 @@
     "/install/**/*",
     "/cli.js"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "@artempoletsky/easyrpc": "^1.2.2",
+    "@artempoletsky/easystore": "^0.3.0",
+    "@artempoletsky/kurgandb": "^1.1.5",
+    "@mantine/core": "^7.6.1",
+    "@mantine/dates": "^7.6.1",
+    "@mantine/form": "^7.6.1",
+    "@mantine/hooks": "^7.6.1",
+    "@prisma/client": "^5.14.0",
+    "next": "14.1.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "rimraf": "^5.0.5",
+    "tabler-icons-react": "^1.56.0",
+    "zod": "^3.22.4"
+  },
   "devDependencies": {
-    "rimraf": "^5.0.5"
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.1.0",
+    "postcss": "^8",
+    "prisma": "^5.14.0",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
   }
 }
