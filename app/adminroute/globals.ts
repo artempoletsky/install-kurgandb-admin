@@ -36,3 +36,5 @@ export function adminRPC() {
 export function adminRPCCustom() {
   return RPC<typeof customAPI>(API_ENDPOINT);
 }
+
+export type DATABASE_TYPE = "kurgandb" | "prisma";

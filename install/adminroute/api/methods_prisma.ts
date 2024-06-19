@@ -1,3 +1,5 @@
+import { PrismaClient } from "@prisma/client";
+
 import { Predicate } from "@artempoletsky/kurgandb";
 import { PluginFactory, Table, TableScheme } from "@artempoletsky/kurgandb/globals";
 import { queryUniversal as query } from "@artempoletsky/kurgandb";
@@ -29,6 +31,7 @@ import type {
   ATogglePlugin
 } from "./schemas";
 
+const prisma:any = new PrismaClient();
 
 export type CompType<Type extends (arg: any) => Promise<any>> = Awaited<ReturnType<Type>> & Parameters<Type>[0];
 
@@ -98,10 +101,14 @@ export const getSchemeSafe = methodFactory(({ }, { tableName }: AGetScheme, { db
   return db.getScheme(tableName) || null;
 });
 
-export const getScheme = methodFactory(({ }, { tableName }: AGetScheme, { db }) => {
-  let t = db.getTable(tableName);
-  return t.scheme;
-});
+
+export async function getScheme({ tableName }: AGetScheme): Promise<TableScheme> {
+  
+  const scheme = getPrismaScheme();
+  if (!scheme[tableName]) throw ResponseError.notFound("Table {{}} not found", [tableName]);
+
+  return scheme[tableName];
+};
 
 export type FGetScheme = typeof getScheme;
 
@@ -358,16 +365,15 @@ export const getDBVersion = methodFactory(({ }, { }: {}, { db }) => {
 
 export type FGetDBVersion = typeof getDBVersion;
 
-export const getAllTables = methodFactory(({ }, { }: {}, { db }) => {
-  const tables = db.getTables();
-  return Object.keys(tables)
-});
+export async function getAllTables() {
+  return getPrismaModels();
+};
 
 export type FGetAllTables = typeof getAllTables;
 
 export async function getAllTablesPage() {
   return {
-    tables: await getAllTables({}),
+    tables: await getAllTables(),
   }
 }
 export type FGetAllTablesPage = typeof getAllTablesPage;
@@ -545,6 +551,8 @@ export type RGetPlugins = {
   adminPlugins: string[];
 }
 import * as Plugins from "../../kurgandb_admin/plugins";
+import { object } from "zod";
+import { getPrismaModels, getPrismaScheme } from "../prisma";
 export const getPlugins = methodFactory<{}, Record<string, ParsedFunction>, RGetPlugins>(({ }, { }, { db }) => {
   return db.getPlugins();
 }, (registeredPlugins) => {

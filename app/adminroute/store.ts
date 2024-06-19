@@ -7,15 +7,13 @@ export type Store = {
   breadcrumbs: BreadcrumbsArray | null;
   tableName: string;
   queryString: string;
-  dbType: "kurgandb" | "prisma";
 };
 
 createStore<Store>({
   initialValues: {
     breadcrumbs: null,
     tableName: "",
-    queryString: "table.all()",
-    dbType: "prisma",
+    queryString: "table.all()"
   },
 });
 

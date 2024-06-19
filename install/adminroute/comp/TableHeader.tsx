@@ -3,7 +3,7 @@
 import { fetchCatch } from "@artempoletsky/easyrpc/react";
 import { ActionIcon, Tooltip } from "@mantine/core";
 import Link from "next/link";
-import { ROOT_PATH } from "../generated";
+import { DB_TYPE, ROOT_PATH } from "../generated";
 
 import { Alarm, Asset, Edit, FileDatabase, Trash, ZoomExclamation } from 'tabler-icons-react';
 import { ReactNode } from "react";
@@ -25,7 +25,7 @@ type Item = {
 export default function TableHeader({ tableName }: Props) {
 
 
-  const Items: Item[] = [
+  let Items: Item[] = [
     {
       label: "Edit records",
       icon: <FileDatabase />,
@@ -53,6 +53,21 @@ export default function TableHeader({ tableName }: Props) {
     },
   ];
 
+  if (DB_TYPE == "prisma") {
+    Items = [
+      {
+        label: "Edit records",
+        icon: <FileDatabase />,
+        href: `/${ROOT_PATH}/${tableName}/records`,
+      },
+      {
+        label: "Custom",
+        icon: <Asset />,
+        href: `/${ROOT_PATH}/${tableName}/custom`,
+      },
+    ];
+  }
+
 
   const router = useRouter();
   const doConfirmRemoveTable = fetchCatch(removeTable)
@@ -70,8 +85,8 @@ export default function TableHeader({ tableName }: Props) {
       </Tooltip>
     ))}
     <div className="grow"></div>
-    <Tooltip key="remove" label="Remove table">
+    {DB_TYPE == "kurgandb" && <Tooltip key="remove" label="Remove table">
       <ActionIcon onClick={doConfirmRemoveTable} size={36}><Trash /></ActionIcon>
-    </Tooltip>
+    </Tooltip>}
   </div>
 }
