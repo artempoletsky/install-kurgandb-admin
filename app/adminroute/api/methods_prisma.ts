@@ -31,7 +31,7 @@ import type {
   ATogglePlugin
 } from "./schemas";
 
-const prisma:any = new PrismaClient();
+const prisma = new PrismaClient();
 
 export type CompType<Type extends (arg: any) => Promise<any>> = Awaited<ReturnType<Type>> & Parameters<Type>[0];
 
@@ -103,7 +103,7 @@ export const getSchemeSafe = methodFactory(({ }, { tableName }: AGetScheme, { db
 
 
 export async function getScheme({ tableName }: AGetScheme): Promise<TableScheme> {
-  
+
   const scheme = getPrismaScheme();
   if (!scheme[tableName]) throw ResponseError.notFound("Table {{}} not found", [tableName]);
 
@@ -133,38 +133,32 @@ export type RQueryRecords = {
 }
 
 
-export const queryRecords = methodFactory<AQueryRecords, RQueryRecords>(({ }, { tableName, queryString, page }, scope) => {
-  const { db, $, _, z } = scope;
 
-  let t = db.getTable(tableName);
+export async function queryRecords({ tableName, queryString, page }: AQueryRecords): Promise<RQueryRecords> {
+  let t = (prisma as any)[tableName];
+  if (!t) throw ResponseError.notFound("Table {{}} not found", [tableName]);
   let table = t;
-  let tq: any;
-  if (!queryString) {
-    tq = t.all().limit(0);
-  } else {
-    try {
-      tq = eval(queryString).limit(0);
-    } catch (err) {
-      throw new $.ResponseError(`Query string contains errors: {...}`, [err + ""]);
-    }
-  }
-  let ids: any[];
-  try {
-    ids = tq.select($.primary);
-  } catch (err) {
-    throw new $.ResponseError("Query has failed with error {...}", [err + ""]);
-  }
+  const pageSize = 20;
+  const scheme = getPrismaScheme()[tableName];
 
-  function paginage<Type>(array: Type[], page: number, pageSize: number) {
-    // console.log(page);
-    return {
-      documents: array.slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize),
-      pagesCount: Math.ceil(array.length / pageSize),
-    }
-  }
+  let primaryKey = Object.keys(scheme.tags).find(id => {
+    return scheme.tags[id]?.includes("primary") || false;
+  })!;
 
-  return paginage(ids, page, 20);
-});
+  const documents = await t.findMany({
+    skip: page * pageSize,
+    take: pageSize,
+    select: {
+      [primaryKey]: true,
+    }
+  });
+
+  const pagesCount = Math.ceil(await t.count() / pageSize);
+  return {
+    pagesCount,
+    documents,
+  }
+};
 
 export type FQueryRecords = typeof queryRecords;
 
