@@ -38,3 +38,10 @@ export function adminRPCCustom() {
 }
 
 export type DATABASE_TYPE = "kurgandb" | "prisma";
+
+
+export function getPrimaryKeyFromScheme(scheme: TableScheme) {
+  return Object.keys(scheme.tags).find(id => {
+    return scheme.tags[id]?.includes("primary") || false;
+  })!;
+}
