@@ -31,7 +31,6 @@ import type {
   ATogglePlugin
 } from "./schemas";
 
-const prisma:any = new PrismaClient();
 
 export type CompType<Type extends (arg: any) => Promise<any>> = Awaited<ReturnType<Type>> & Parameters<Type>[0];
 
@@ -46,50 +45,59 @@ function methodFactory<Payload extends PlainObject, PredicateReturnType, ReturnT
   }
 }
 
-export const createDocument = methodFactory<ACreateDocument, string | number>((T, { tableName, document }, { db }) => {
-  let t = db.getTable(tableName);
-  const id = t.insert(document);
-  return id;
-});
+export async function createDocument({ tableName, document }: ACreateDocument) {
+  const helper = getPrismaHelper(tableName);
+
+  const rec = await helper.table.create({
+    data: document,
+  });
+
+  return rec[helper.primaryKey];
+}
 
 export type FCreateDocument = typeof createDocument;
 /////////////////////////////////////////////////////
 
 
-export const readDocument = methodFactory(({ }, { tableName, id }: AReadDocument, { db, $ }) => {
-  let t = db.getTable<any, any, any>(tableName);
-  return t.at<any>(id, $.full);
-});
+export async function readDocument({ tableName, id }: AReadDocument) {
+  // const prisma = getPrismaClient();
+  const helper = getPrismaHelper(tableName);
+
+  return await helper.table.findUnique({
+    where: {
+      [helper.primaryKey]: id,
+    }
+  });
+};
 
 
 export type FReadDocument = typeof readDocument;
 /////////////////////////////////////////////////////
 
 
-export const updateDocument = methodFactory(({ }, { tableName, document, id }: AUpdateDocument, { db }) => {
-
-  let t = db.getTable<string, any>(tableName);
-
-  t.where(<any>t.primaryKey, <any>id).update(doc => {
-    for (const key in document) {
-      const newValue = document[key];
-      if (doc.$get(key) != newValue) {
-        doc.$set(key as any, newValue);
-      }
-    }
+export async function updateDocument({ tableName, document, id }: AUpdateDocument) {
+  const helper = getPrismaHelper(tableName);
+  await helper.table.update({
+    where: {
+      [helper.primaryKey]: id,
+    },
+    data: document,
   });
-});
+};
 
 export type FUpdateDocument = typeof updateDocument;
 
 /////////////////////////////////////////////////////
 
 
-export const deleteDocument = methodFactory(({ }, { tableName, id }: ADeleteDocument, { db }) => {
-  let t = db.getTable<string, any>(tableName);
-
-  t.where(<any>t.primaryKey, <any>id).delete();
-});
+export async function deleteDocument({ tableName, id }: ADeleteDocument) {
+  const helper = getPrismaHelper(tableName);
+  await helper.table.delete({
+    where: {
+      [helper.primaryKey]: id,
+    }
+  });
+};
 
 export type FDeleteDocument = typeof deleteDocument;
 
@@ -103,11 +111,8 @@ export const getSchemeSafe = methodFactory(({ }, { tableName }: AGetScheme, { db
 
 
 export async function getScheme({ tableName }: AGetScheme): Promise<TableScheme> {
-  
-  const scheme = getPrismaScheme();
-  if (!scheme[tableName]) throw ResponseError.notFound("Table {{}} not found", [tableName]);
-
-  return scheme[tableName];
+  const helper = getPrismaHelper(tableName);
+  return helper.kdbScheme;
 };
 
 export type FGetScheme = typeof getScheme;
@@ -133,38 +138,27 @@ export type RQueryRecords = {
 }
 
 
-export const queryRecords = methodFactory<AQueryRecords, RQueryRecords>(({ }, { tableName, queryString, page }, scope) => {
-  const { db, $, _, z } = scope;
 
-  let t = db.getTable(tableName);
-  let table = t;
-  let tq: any;
-  if (!queryString) {
-    tq = t.all().limit(0);
-  } else {
-    try {
-      tq = eval(queryString).limit(0);
-    } catch (err) {
-      throw new $.ResponseError(`Query string contains errors: {...}`, [err + ""]);
+export async function queryRecords({ tableName, queryString, page }: AQueryRecords): Promise<RQueryRecords> {
+
+  // let table = t;
+  const pageSize = 20;
+  const helper = getPrismaHelper(tableName);
+
+  const records: any[] = await helper.table.findMany({
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+    select: {
+      [helper.primaryKey]: true,
     }
-  }
-  let ids: any[];
-  try {
-    ids = tq.select($.primary);
-  } catch (err) {
-    throw new $.ResponseError("Query has failed with error {...}", [err + ""]);
-  }
+  });
 
-  function paginage<Type>(array: Type[], page: number, pageSize: number) {
-    // console.log(page);
-    return {
-      documents: array.slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize),
-      pagesCount: Math.ceil(array.length / pageSize),
-    }
+  const pagesCount = Math.ceil(await helper.table.count() / pageSize);
+  return {
+    pagesCount,
+    documents: records.map(rec => rec[helper.primaryKey]),
   }
-
-  return paginage(ids, page, 20);
-});
+};
 
 export type FQueryRecords = typeof queryRecords;
 
@@ -197,10 +191,9 @@ export type FGetFreeId = typeof getFreeId;
 ///////////////////////////////////////////
 
 
-export const getDraft = methodFactory<AGetDraft, any>(({ }, { tableName }, { db }) => {
-  let t = db.getTable(tableName);
-  return t.getRecordDraft();
-});
+export async function getDraft({ tableName }: AGetDraft) {
+  return getPrismaHelper(tableName).getDraft();
+}
 
 export type FGetDraft = typeof getDraft;
 
@@ -552,7 +545,8 @@ export type RGetPlugins = {
 }
 import * as Plugins from "../../kurgandb_admin/plugins";
 import { object } from "zod";
-import { getPrismaModels, getPrismaScheme } from "../prisma";
+import { getPrismaClient, getPrismaHelper, getPrismaModels } from "../prisma";
+import { getPrimaryKeyFromScheme } from "../globals";
 export const getPlugins = methodFactory<{}, Record<string, ParsedFunction>, RGetPlugins>(({ }, { }, { db }) => {
   return db.getPlugins();
 }, (registeredPlugins) => {

@@ -18,7 +18,7 @@ export default function EditFormField<Type>({
   onJSONEdit
 }: Props<Type>) {
   let t: any = tags.has("textarea") ? "textarea" : type;
-  if (t == "string" || t == "number") {
+  if (t == "string") {
     t = "text";
   }
   if (scriptsObject) {

@@ -76,7 +76,7 @@ export type FReadDocument = typeof readDocument;
 
 
 export async function updateDocument({ tableName, document, id }: AUpdateDocument) {
-  const helper = getPrismaHelper(tableName);   
+  const helper = getPrismaHelper(tableName);
   await helper.table.update({
     where: {
       [helper.primaryKey]: id,
@@ -90,11 +90,14 @@ export type FUpdateDocument = typeof updateDocument;
 /////////////////////////////////////////////////////
 
 
-export const deleteDocument = methodFactory(({ }, { tableName, id }: ADeleteDocument, { db }) => {
-  let t = db.getTable<string, any>(tableName);
-
-  t.where(<any>t.primaryKey, <any>id).delete();
-});
+export async function deleteDocument({ tableName, id }: ADeleteDocument) {
+  const helper = getPrismaHelper(tableName);
+  await helper.table.delete({
+    where: {
+      [helper.primaryKey]: id,
+    }
+  });
+};
 
 export type FDeleteDocument = typeof deleteDocument;
 

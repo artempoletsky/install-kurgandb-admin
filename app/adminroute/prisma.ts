@@ -25,23 +25,48 @@ export type PrismaField = {
   relationToFields?: string[];
 }
 
-export type PrismaTable = {
-  name: string;
-  fields: PrismaField[];
+export interface PrismaTable {
+  create(arg: any): Promise<any>;
+  findUnique(arg: any): Promise<any>;
+  update(arg: any): Promise<void>;
+  findMany(arg: any): Promise<any[]>;
+  count(): Promise<number>;
+  delete(arg: any): Promise<void>;
 }
 
 export type PrismaSchema = {
   tables: PrismaTable;
 }
 
+// wraps all prisma methods 
+async function prismaMethodProxy(table: PrismaTable, method: keyof PrismaTable, args: any) {
+  try {
+    return await table[method].apply(table, args);
+  } catch (err: any) {
+    throw new ResponseError({
+      message: "Prisma error: " + err.message,
+      statusCode: 400,
+    });
+  }
+}
+
 export class PrismaTableHelper {
   public readonly primaryKey: string;
   public readonly tableName: string;
   public readonly fields: PrismaField[];
-  public readonly table: any;
+  public readonly table: PrismaTable;
   public readonly kdbScheme: TableScheme;
   constructor(tableName: string, scheme: TableScheme, fields: PrismaField[]) {
-    this.table = (prisma as any)[tableName];
+    this.table = new Proxy((prisma as any)[tableName], {
+      get(target, key: string) {
+        if (typeof target[key] == "function") {
+          return (...args: any[]) => {
+            return prismaMethodProxy(target, key as any, args);
+          }
+        }
+        return target[key];
+      }
+    });
     this.tableName = tableName;
     this.kdbScheme = scheme;
     this.primaryKey = getPrimaryKeyFromScheme(scheme);
