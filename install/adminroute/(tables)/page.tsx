@@ -6,6 +6,8 @@ import { getDBVersion, type FGetAllTablesPage } from "../api/methods";
 import { Metadata } from "next";
 import PageTables from "./PageTables";
 import ComponentLoader from "../comp/ComponentLoader";
+import { useStore } from "../store";
+import { DB_TYPE } from "../generated";
 
 
 export const metadata: Metadata = {
@@ -17,6 +19,7 @@ export const dynamic = "force-dynamic";
 export default async function page() {
 
   const { adminVersion, dbVersion } = await getDBVersion({});
+
 
   metadata.title = adminVersion;
   const getAllTablesPage = "getAllTablesPage" as unknown as FGetAllTablesPage;
@@ -32,7 +35,7 @@ export default async function page() {
             args={{}}
           />
         </div>
-        <CreateNewTable />
+        {DB_TYPE == "kurgandb" && <CreateNewTable />}
       </div>
     </>
   );

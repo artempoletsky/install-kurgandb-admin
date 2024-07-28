@@ -36,3 +36,12 @@ export function adminRPC() {
 export function adminRPCCustom() {
   return RPC<typeof customAPI>(API_ENDPOINT);
 }
+
+export type DATABASE_TYPE = "kurgandb" | "prisma";
+
+
+export function getPrimaryKeyFromScheme(scheme: TableScheme) {
+  return Object.keys(scheme.tags).find(id => {
+    return scheme.tags[id]?.includes("primary") || false;
+  })!;
+}

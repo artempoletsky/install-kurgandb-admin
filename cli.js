@@ -1,4 +1,5 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
+
 'use strict';
 const fs = require("fs");
 const pkg = require("./package.json");
@@ -47,13 +48,18 @@ function editGitignore(linesToAdd) {
 }
 
 function generateTSFile(targetDir) {
+  const dataBaseType = "prisma";
   const generatedFilePath = targetDir + "generated.ts";
 
-  fs.writeFileSync(generatedFilePath, `export const ROOT_PATH = "${ADMIN_ROOT}";
+  fs.writeFileSync(generatedFilePath, `import type { DATABASE_TYPE } from "./globals";
+    
+    export const ROOT_PATH = "${ADMIN_ROOT}";
 
 export const API_ENDPOINT = "/" + ROOT_PATH + "/api/";
 
 export const ADMIN_VERSION = "${pkg.version}";
+
+export const DB_TYPE: DATABASE_TYPE = "${dataBaseType}";
 `);
 }
 

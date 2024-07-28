@@ -10,9 +10,11 @@ export type Store = {
 };
 
 createStore<Store>({
-  breadcrumbs: null,
-  tableName: "",
-  queryString: "table.all()",
+  initialValues: {
+    breadcrumbs: null,
+    tableName: "",
+    queryString: "table.all()"
+  },
 });
 
 export function useStore<KeyT extends keyof Store>(key: KeyT) {
