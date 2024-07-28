@@ -27,8 +27,8 @@ export default async function Layout({ children }: Props) {
   return (
     <html>
       <head>
-        <link rel="stylesheet" href="https://unpkg.com/@mantine/core@7.7.1/styles.layer.css" />
-        <link rel="stylesheet" href="https://unpkg.com/@mantine/dates@7.7.1/styles.layer.css" />
+        <link rel="stylesheet" href="https://unpkg.com/@mantine/core@7.11.2/styles.layer.css" />
+        <link rel="stylesheet" href="https://unpkg.com/@mantine/dates@7.11.2/styles.layer.css" />
       </head>
       <body>
         <MantineProvider>
