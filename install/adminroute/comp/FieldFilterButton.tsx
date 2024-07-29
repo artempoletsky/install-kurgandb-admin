@@ -7,11 +7,12 @@ import { useStore } from "../store";
 type Props = {
   fieldName: string;
   value: any;
+  className?: string;
 };
 
 
-export default function FieldFilterButton({ fieldName, value }: Props) {
-  
+export default function FieldFilterButton({ fieldName, value, className }: Props) {
+
   const [queryString, setQueryString] = useStore("queryString");
 
   const handleClick = (type: "exact" | "includes" | "startsWith") => (e: MouseEvent) => {
@@ -47,7 +48,7 @@ export default function FieldFilterButton({ fieldName, value }: Props) {
         onMouseDown={prevent}
         onMouseUp={prevent}
         onClick={prevent}
-        className="bg-stone-400 mr-1"
+        className={`bg-stone-400 mr-1 ${className || ""}`}
         size="xs"
       ><Filter /></ActionIcon >
     </Menu.Target>

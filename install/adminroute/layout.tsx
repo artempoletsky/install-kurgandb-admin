@@ -12,10 +12,15 @@ import "./store";
 import { StoreProvider } from "@artempoletsky/easystore";
 
 import "./admin.css"
+import { Metadata } from "next";
 
 
 type Props = {
   children: ReactNode;
+}
+
+export const metadata: Metadata = {
+  robots: "noindex,nofollow,noarchive",
 }
 
 export default async function Layout({ children }: Props) {

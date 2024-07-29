@@ -5,7 +5,7 @@ import TableMeta from "./TableMeta";
 
 
 
-export default function CustomComponentTable({ scheme, meta }: TableComponentProps) {
+export default function CustomComponentTable({ meta }: TableComponentProps) {
 
   return (
     <div className="">

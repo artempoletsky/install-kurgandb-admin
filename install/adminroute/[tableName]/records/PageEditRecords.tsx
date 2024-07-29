@@ -15,7 +15,7 @@ import ComponentLoader, { Mutator } from "../../comp/ComponentLoader";
 import RecordsList from "./RecordsList";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { adminRPC } from "../../globals";
-import { useStore } from "../../store";
+import { Store, useStore, useStoreEffectSet } from "../../store";
 
 
 const {
@@ -66,7 +66,6 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
   // let [queryString, setQueryString] = useState<string>(queryDefault);
 
   // const queryInput = useRef<HTMLTextAreaElement>(null);
-  let [insertMode, setInsertMode] = useState<boolean>(false);
 
   // const [setRequestError, , requestError] = useErrorResponse();
 
@@ -74,7 +73,11 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
     before: () => ({ tableName }),
   });
 
-  const { errorSetter: setRequestError, errorResponse } = fc.useCatch();
+  const { errorSetter, errorResponse } = fc.useCatch();
+
+  useStoreEffectSet("onRequestError", errorSetter);
+  useStoreEffectSet("tableScheme", scheme);
+  useStoreEffectSet("tableName", tableName);
 
   const fcOpenRecord = fc.method(readDocument)
     .before((id: string | number) => {
@@ -85,7 +88,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
       }
     })
     .then(rec => {
-      setInsertMode(false);
+      setCurrentId(rec[primaryKey]);
       setRecord(rec);
     });
 
@@ -95,7 +98,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
   }
 
   const loadPage = (page: number) => {
-    setRequestError();
+    Store.onRequestError();
     setRecord(undefined);
     // setPage(page);
 
@@ -125,7 +128,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
   const fcInsert = fc.method(getDraft)
     .then(draft => {
       setRecord(draft);
-      setInsertMode(true);
+      setCurrentId(undefined);
     });
 
   function onDocDeleted() {
@@ -153,7 +156,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
       const newDoc = { ...record };
       delete newDoc[primaryKey];
       setRecord(newDoc);
-      setInsertMode(true);
+      setCurrentId(undefined);
       return false;
     })
     .then(newId => {
@@ -161,7 +164,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
         ...record,
         [primaryKey]: newId
       });
-      setInsertMode(true);
+      setCurrentId(undefined);
     });
 
   useEffect(() => {
@@ -209,16 +212,14 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
 
   const [queryArgs, setQueryArgs] = useState<AQueryRecords | null>(null);
   const mutator = new Mutator<RQueryRecords>();
-  function onUpdateId(oldId: string | number, newId: string | number) {
+  function onRecordUpdate(newRecord: PlainObject) {
     if (!pageData) throw new Error("no page data");
 
-    const iOf = pageData.documents.indexOf(oldId);
+    const iOf = pageData.documents.indexOf(currentId);
+    const newId = (newRecord as any)[primaryKey];
     pageData.documents.splice(iOf, 1, newId);
     setCurrentId(newId);
-    setRecord({
-      ...record,
-      [primaryKey]: newId,
-    });
+    setRecord(JSON.parse(JSON.stringify(newRecord)));
     mutator.trigger(pageData);
   }
 
@@ -240,7 +241,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
               className="pseudo">Invalid</i>
           </div>
         </div>
-        <Button className="align-top" onClick={e => loadPage(1)}>Select</Button>
+        <Button className="align-top" onClick={e => loadPage(1)} id="run_query">Select</Button>
         <div className="border-l border-gray-500 mx-3 h-[34px]"></div>
         <Button className="align-top" onClick={fcInsert.action()}>New record</Button>
         <div className="grow ml-3">
@@ -248,7 +249,7 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
         </div>
       </div>
       <div className="">
-        <div className="flex">
+        <div className="flex relative w-full">
           <ComponentLoader
             Component={RecordsList}
             method={adminRPC().hack("queryRecords")}
@@ -264,18 +265,13 @@ export default function PageEditRecords({ tableName, scheme }: Props) {
               {pageData.documents.map(id => <li className={css.item} key={id} onClick={fcOpenRecord.action(id)}>{id}</li>)}
             </ul> */}
           {scheme && record && <EditDocumentForm
-            primaryKey={primaryKey}
-            onUpdateId={onUpdateId}
+            onUpdate={onRecordUpdate}
             onClose={onClose}
-            insertMode={insertMode}
             recordId={currentId}
-            tableName={tableName}
-            scheme={scheme}
             record={record}
             onDeleted={onDocDeleted}
             onCreated={onDocCreated}
             onDuplicate={fcOnDuplicate.action()}
-            onRequestError={setRequestError}
           />}
         </div>
         {pageData && <Paginator page={queryArgs!.page} pagesCount={pageData.pagesCount} onSetPage={loadPage}></Paginator>}

@@ -1,3 +1,4 @@
+import { Store } from "../../adminroute/store";
 import { DocumentComponentProps } from "../../adminroute/globals";
 import { Button, Checkbox, TextInput } from "@mantine/core";
 
@@ -18,7 +19,7 @@ export default function CustomComponentRecord(params: DocumentComponentProps) {
     <div className="max-w-[550px]">
       <p className="text-red-900 mb-3">Customize records editing by modifying /app/kurgandb_admin/components/CustomComponentRecord.tsx</p>
       <Button onClick={e => alert("Yippee!")}>It&#39;s awesome!</Button>
-      {params.tableName == "users" && recordUser(params)}
+      {Store.tableName == "users" && recordUser(params)}
     </div>
   );
 }

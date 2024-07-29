@@ -39,7 +39,7 @@ export interface PrismaTable {
   update(arg: any): Promise<void>;
   findMany(arg: any): Promise<any[]>;
   count(): Promise<number>;
-  delete(arg: any): Promise<void>;
+  delete(arg: any): Promise<any>;
 }
 
 export type PrismaSchema = {
@@ -58,12 +58,53 @@ async function prismaMethodProxy(table: PrismaTable, method: keyof PrismaTable, 
   }
 }
 
+
+export class KDBQueryBuilder {
+  private h: PrismaTableHelper;
+  private whereFields: Record<string, any>;
+  constructor(prismaHelper: PrismaTableHelper) {
+    this.h = prismaHelper;
+    this.whereFields = {};
+  }
+
+  all() {
+    this.whereFields = {};
+    return this;
+  }
+
+  where(key: string, value: any) {
+    this.whereFields[key] = value;
+    return this;
+  }
+
+  build() {
+    return this.h.table.findMany({
+      where: this.whereFields,
+    });
+  }
+}
+
+function getDefaultValueForType(type: FieldType) {
+  if (type == "date") {
+    return new Date();
+  } else if (type == "boolean") {
+    return false;
+  } else if (type == "number") {
+    return 0;
+  } else if (type == "json") {
+    return null;
+  } else if (type == "string") {
+    return "";
+  }
+  throw new Error("wrong type");
+}
 export class PrismaTableHelper {
   public readonly primaryKey: string;
   public readonly tableName: string;
   public readonly fields: PrismaField[];
   public readonly table: PrismaTable;
   public readonly kdbScheme: TableScheme;
+  private kdbQueryBuilder: KDBQueryBuilder;
   constructor(tableName: string, scheme: TableScheme, fields: PrismaField[]) {
     this.table = new Proxy((prisma as any)[tableName], {
       get(target, key: string) {
@@ -79,29 +120,42 @@ export class PrismaTableHelper {
     this.kdbScheme = scheme;
     this.primaryKey = getPrimaryKeyFromScheme(scheme);
     this.fields = fields;
+    this.kdbQueryBuilder = new KDBQueryBuilder(this);
   }
 
   getDraft() {
     const result: Record<string, any> = {};
 
-    for (const fieldName in this.kdbScheme.fields) {
-      const type = this.kdbScheme.fields[fieldName];
-      const tags = new Set(this.kdbScheme.tags[fieldName]);
+
+    for (const f of this.fields) {
+      const type = this.kdbScheme.fields[f.name];
+      if (!type) continue;
+
+      const tags = new Set(this.kdbScheme.tags[f.name]);
       if (tags.has("autoinc")) continue;
-      // console.log(type);
-      let value: any = "";
-      if (type == "date") {
-        value = new Date();
-      } else if (type == "boolean") {
-        value = false;
-      } else if (type == "number") {
-        value = 0;
-      } else if (type == "json") {
-        value = null;
+
+      if (f.default !== undefined && type != "date") {
+        result[f.name] = type == "json" ? JSON.parse(f.default) : f.default;
+        // console.log(f.default);
+      } else {
+        result[f.name] = getDefaultValueForType(type);
       }
-      result[fieldName] = value;
     }
     return result;
+  }
+
+  getFreeId() {
+    const primaryKeyType = this.kdbScheme.fields[this.primaryKey];
+    if (primaryKeyType == "number") return 0;
+    return "";
+  }
+
+  async kdbQuery<PrimaryKeyType>(query: string): Promise<PrimaryKeyType[]> {
+    let table = this.kdbQueryBuilder;
+    let t = table;
+    t.all();
+    eval(query);
+    return (await table.build()).map((o) => o[this.primaryKey]);
   }
 }
 
@@ -154,7 +208,7 @@ function init(): Record<string, TableScheme> {
       tags: kurganTags,
     };
 
-    const lName = name.toLowerCase();
+    const lName = name.charAt(0).toLowerCase() + name.slice(1);
     result[lName] = s;
     helpers[lName] = new PrismaTableHelper(lName, s, fields);
 

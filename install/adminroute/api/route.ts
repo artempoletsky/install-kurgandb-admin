@@ -1,4 +1,4 @@
-import validate, { APIRequest } from "@artempoletsky/easyrpc";
+import validate, { APIRequest, requestToRPCRequest } from "@artempoletsky/easyrpc";
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "../../kurgandb_admin/auth";
 
@@ -17,11 +17,23 @@ if (DB_TYPE == "kurgandb") {
 
 
 export const POST = async function name(request: NextRequest) {
-  const req: APIRequest = await request.json();
+
+
   let bIsAdmin = await isAdmin();
   if (bIsAdmin === undefined) {
     bIsAdmin = true;
   }
+  let req: APIRequest<Record<string, any>>;
+
+
+  try {
+    req = await requestToRPCRequest(request);
+  } catch (err) {
+    return NextResponse.json(err, {
+      status: (<JSONErrorResponse>err).statusCode
+    });
+  }
+
   if (!bIsAdmin && req.method !== "authorize") {
     const err: JSONErrorResponse = {
       message: "You must authorize to perform this action",

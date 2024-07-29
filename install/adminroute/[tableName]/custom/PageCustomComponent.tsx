@@ -4,6 +4,7 @@ import { useErrorResponse } from "@artempoletsky/easyrpc/react";
 import CustomComponentTable from "../../../kurgandb_admin/components/CustomComponentTable";
 import RequestError from "../../comp/RequestError";
 import { TableScheme } from "@artempoletsky/kurgandb/globals";
+import { useStoreEffectSet } from "../../store";
 
 
 type Props = {
@@ -15,11 +16,13 @@ type Props = {
 export default function PageCustomComponent(props: Props) {
 
   const [setRequestError, , requestError] = useErrorResponse();
+  useStoreEffectSet("onRequestError", setRequestError);
+  useStoreEffectSet("tableName", props.tableName);
+  useStoreEffectSet("tableScheme", props.scheme);
   return (
     <div className="">
       <CustomComponentTable
         {...props}
-        onRequestError={setRequestError}
       />
       <RequestError requestError={requestError} />
     </div>

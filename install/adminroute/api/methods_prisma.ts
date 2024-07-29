@@ -1,4 +1,3 @@
-
 import { Predicate } from "@artempoletsky/kurgandb";
 import { PluginFactory, Table, TableScheme } from "@artempoletsky/kurgandb/globals";
 import { queryUniversal as query } from "@artempoletsky/kurgandb";
@@ -137,26 +136,27 @@ export type RQueryRecords = {
 }
 
 
-
+import customRequests from "../../kurgandb_admin/$$";
 export async function queryRecords({ tableName, queryString, page }: AQueryRecords): Promise<RQueryRecords> {
 
-  // let table = t;
   const pageSize = 20;
-  const helper = getPrismaHelper(tableName);
 
-  const records: any[] = await helper.table.findMany({
-    skip: (page - 1) * pageSize,
-    take: pageSize,
-    select: {
-      [helper.primaryKey]: true,
+  function paginage<Type>(array: Type[], page: number, pageSize: number) {
+    // console.log(page);
+    return {
+      documents: array.slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize),
+      pagesCount: Math.ceil(array.length / pageSize),
     }
-  });
-
-  const pagesCount = Math.ceil(await helper.table.count() / pageSize);
-  return {
-    pagesCount,
-    documents: records.map(rec => rec[helper.primaryKey]),
   }
+
+  if (queryString.startsWith("$$")) {
+    let $$ = customRequests;
+    const documents = await eval(`${queryString}`);
+    return paginage(documents, page, pageSize);
+  }
+  
+  const helper = getPrismaHelper(tableName);
+  return paginage(await helper.kdbQuery(queryString), page, pageSize);
 };
 
 export type FQueryRecords = typeof queryRecords;
@@ -178,10 +178,10 @@ export type FToggleTag = typeof toggleTag;
 
 
 
-export const getFreeId = methodFactory<AGetFreeId, number | string>(({ }, { tableName }, { db }) => {
-  let t = db.getTable(tableName);
-  return t.getFreeId();
-});
+
+export async function getFreeId({ tableName }: AGetFreeId) {
+  return getPrismaHelper(tableName).getFreeId();
+}
 
 export type FGetFreeId = typeof getFreeId;
 
@@ -444,13 +444,14 @@ export const unregisterEvent = methodFactory(({ }, { tableName, namespaceId, eve
 export type FUnregisterEvent = typeof unregisterEvent;
 
 
-export const getTableCustomPageData = methodFactory(({ }, { tableName }: ATableOnly, { db }) => {
-  const t = db.getTable(tableName);
+export async function getTableCustomPageData({ tableName }: ATableOnly) {
+  const helper = getPrismaHelper(tableName);
+
   return {
-    scheme: t.scheme,
-    meta: t.meta as any,
+    scheme: helper.kdbScheme,
+    meta: {},
   }
-});
+};
 export type FGetTableCustomPageData = typeof getTableCustomPageData;
 export type RGetTableCustomPageData = Awaited<ReturnType<FGetTableCustomPageData>>;
 
