@@ -5,7 +5,7 @@
   "main": "cli.js",
   "bin": "cli.js",
   "scripts": {
-    "publish": "node ./publish.js",
+    "publish": "node ./update.js && node ./publish.js",
     "update": "node ./update.js",
     "inst": "node ./cli.js adminroute",
     "fast": "node ./cli.js adminroute --fast",
