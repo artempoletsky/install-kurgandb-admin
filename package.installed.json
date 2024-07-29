@@ -5,6 +5,7 @@
   "main": "cli.js",
   "bin": "cli.js",
   "scripts": {
+    "publish": "node ./publish.js",
     "update": "node ./update.js",
     "inst": "node ./cli.js adminroute",
     "fast": "node ./cli.js adminroute --fast",
@@ -25,7 +26,7 @@
   ],
   "dependencies": {
     "@artempoletsky/easyrpc": "^1.2.2",
-    "@artempoletsky/easystore": "^0.2.0",
+    "@artempoletsky/easystore": "^0.3.0",
     "@artempoletsky/kurgandb": "^1.1.5",
     "@mantine/core": "^7.6.1",
     "@mantine/dates": "^7.6.1",

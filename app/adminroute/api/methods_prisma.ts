@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client";
 
 import { Predicate } from "@artempoletsky/kurgandb";
 import { PluginFactory, Table, TableScheme } from "@artempoletsky/kurgandb/globals";

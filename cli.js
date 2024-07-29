@@ -48,7 +48,7 @@ function editGitignore(linesToAdd) {
 }
 
 function generateTSFile(targetDir) {
-  const dataBaseType = "prisma";
+  const dataBaseType = "kurgandb";
   const generatedFilePath = targetDir + "generated.ts";
 
   fs.writeFileSync(generatedFilePath, `import type { DATABASE_TYPE } from "./globals";

@@ -1,13 +1,11 @@
 {
   "name": "@artempoletsky/install-kurgandb-admin",
-  "version": "1.0.9",
+  "version": "1.0.7",
   "description": "KurganDB admin panel for next.js",
   "main": "cli.js",
   "bin": "cli.js",
   "scripts": {
-    "update": "node ./update.js",
-    "inst": "node ./cli.js adminroute",
-    "fast": "node ./cli.js adminroute --fast"
+    "setup": "node ./setup.js"
   },
   "keywords": [
     "admin-panel",

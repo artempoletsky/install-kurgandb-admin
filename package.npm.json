@@ -5,9 +5,7 @@
   "main": "cli.js",
   "bin": "cli.js",
   "scripts": {
-    "update": "node ./update.js",
-    "inst": "node ./cli.js adminroute",
-    "fast": "node ./cli.js adminroute --fast"
+    "setup": "node ./setup.js"
   },
   "keywords": [
     "admin-panel",
@@ -19,8 +17,8 @@
     "/install/**/*",
     "/cli.js"
   ],
-  "dependencies": {},
-  "devDependencies": {
+  "dependencies": {
     "rimraf": "^5.0.5"
-  }
+  },
+  "devDependencies": {}
 }
