@@ -25,14 +25,14 @@
     "/cli.js"
   ],
   "dependencies": {
-    "@artempoletsky/easyrpc": "^1.2.2",
+    "@artempoletsky/easyrpc": "^1.4.0",
     "@artempoletsky/easystore": "^0.3.0",
     "@artempoletsky/kurgandb": "^1.1.5",
     "@mantine/core": "^7.6.1",
     "@mantine/dates": "^7.6.1",
     "@mantine/form": "^7.6.1",
     "@mantine/hooks": "^7.6.1",
-    "next": "14.1.0",
+    "next": "^14.2.5",
     "react": "^18",
     "react-dom": "^18",
     "rimraf": "^5.0.5",

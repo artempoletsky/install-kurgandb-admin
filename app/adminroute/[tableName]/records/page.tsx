@@ -1,7 +1,5 @@
 
 
-import { FGetSchemePage, getScheme } from "../../api/methods";
-import { TableScheme } from "@artempoletsky/kurgandb/globals";
 import PageEditRecords from "./PageEditRecords";
 import ComponentLoader from "../../comp/ComponentLoader";
 import TableNotFound from "../TableNotFound";

@@ -20,6 +20,8 @@ import { DatePicker, DateValue } from "@mantine/dates";
 import EditJSON from "./EditJSON";
 import EditFormField from "./EditFormField";
 import { fetchCatch } from "@artempoletsky/easyrpc/react";
+import CRUDButtons from "./CRUDButtons";
+import { Store } from "../../store";
 
 const {
   updateDocument,
@@ -27,19 +29,14 @@ const {
   deleteDocument,
 } = adminRPC().methods("updateDocument", "createDocument", "deleteDocument");
 
-type Props = {
+export type EditDocumentFormProps = {
   record: PlainObject;
-  scheme: TableScheme;
-  insertMode?: boolean;
-  tableName: string;
   recordId: string | number | undefined;
   onCreated: (id: string | number) => void;
   onDeleted: () => void;
   onDuplicate: () => void;
-  onRequestError: RequestErrorSetter;
   onClose: () => void;
-  onUpdateId: (oldId: string | number, newId: string | number) => void;
-  primaryKey: string;
+  onUpdate: (newRecord: PlainObject) => void;
 };
 
 function createProxy<T>(record: T, setRecord: (newRecord: T) => void): T {
@@ -59,37 +56,35 @@ function createProxy<T>(record: T, setRecord: (newRecord: T) => void): T {
 
 
 
-export default function EditDocumentForm({
-  onDeleted,
-  recordId,
-  record: initialRecord,
-  scheme,
-  insertMode,
-  tableName,
-  onCreated,
-  onDuplicate,
-  onRequestError,
-  onClose,
-  onUpdateId,
-  primaryKey,
-}: Props) {
+export default function EditDocumentForm(formProps: EditDocumentFormProps) {
 
+  let {
+    onDeleted,
+    recordId,
+    record: initialRecord,
+    onCreated,
+    onDuplicate,
+    onClose,
+    onUpdate,
+  } = formProps;
   const form = useRef<HTMLFormElement>(null);
-  const [record, setRecord] = useState<PlainObject>(initialRecord);
+  const [record, setRecord] = useState<PlainObject>(JSON.parse(JSON.stringify(initialRecord)));
   const proxy = createProxy(record, setRecord);
   const [editJSONModalOpened, disclosureJSON] = useDisclosure(false);
   const [editingJSON, setEditingJSON] = useState("");
 
-  const fc = fetchCatch().catch(onRequestError);
+  const tableName = Store.tableName;
+  const scheme = Store.tableScheme;
+  if (!scheme) throw new Error("No table scheme!");
+
+  const fc = fetchCatch().catch(Store.onRequestError);
 
   function onJSONEdit(fieldName: string) {
     setEditingJSON(fieldName);
     disclosureJSON.open();
   }
   function reset() {
-    setRecord({
-      ...initialRecord,
-    });
+    setRecord(JSON.parse(JSON.stringify(initialRecord)));
   }
 
   function save() {
@@ -102,13 +97,9 @@ export default function EditDocumentForm({
       document: record
     }).then(() => {
       blinkBoolean(setSavedTooltip);
-      if (recordId != record[primaryKey]) {
-        console.log(recordId, record[primaryKey]);
-
-        onUpdateId(recordId, record[primaryKey]);
-      }
+      onUpdate(record);
     })
-      .catch(onRequestError);
+      .catch(Store.onRequestError);
   }
 
   const create = fc.method(createDocument).before(() => ({
@@ -128,15 +119,13 @@ export default function EditDocumentForm({
 
   const currentFieldScripts = fieldScripts[tableName] || {};
 
-  useEffect(() => {
-    setRecord(initialRecord);
-  }, [recordId, scheme, initialRecord]);
+  useEffect(reset, [recordId, scheme, initialRecord]);
 
   const fields: ReactNode[] = [];
   for (const fieldName of scheme.fieldsOrderUser) {
     const type = scheme.fields[fieldName];
     const tags = new Set(scheme.tags[fieldName]);
-    if (tags.has("autoinc") && insertMode) continue;
+    if (tags.has("autoinc") && recordId === undefined) continue;
 
     // if (record[fieldName] === undefined) debugger;
     fields.push(<div className="mr-1" key={fieldName}>
@@ -153,13 +142,6 @@ export default function EditDocumentForm({
       />}
     </div>);
   }
-  <TextInput
-
-    id="standard-error-helper-text"
-
-    defaultValue="Hello World"
-
-  />
   const [savedTooltip, setSavedTooltip] = useState(false);
 
 
@@ -170,29 +152,27 @@ export default function EditDocumentForm({
       save();
     }
   }}>
-    <div className="min-w-[500px] relative pt-5">
+    <div className={`min-w-[500px] relative pt-5 record__${tableName}`}>
       <div className="absolute right-0 top-0">
         <CloseButton onClick={onClose} />
       </div>
       <form className="mb-5" ref={form}>{fields}</form>
-      {insertMode
-        ? <div><Button onClick={create}>Create</Button></div>
-        : <div className="flex gap-1">
-          <Tooltip opened={savedTooltip} label="Saved!">
-            <Button onClick={save}>Save</Button>
-          </Tooltip>
-          <Button onClick={remove}>Remove</Button>
-          <Button onClick={onDuplicate}>Duplicate</Button>
-          <Button onClick={reset}>Reset</Button>
-        </div>
-      }
+      <CRUDButtons
+        onCreated={onCreated}
+        onDeleted={onDeleted}
+        onUpdate={onUpdate}
+        onDuplicate={onDuplicate}
+        recordId={recordId}
+        record={record}
+        initialRecord={initialRecord}
+      />
     </div>
     <div className="grow">
       <CustomComponentRecord
-        onRequestError={onRequestError}
-        tableName={tableName}
+        initialRecord={initialRecord}
         record={proxy as any}
         recordId={recordId}
+        formProps={formProps}
       />
     </div>
     <Modal title="Edit JSON field" opened={editJSONModalOpened} onClose={disclosureJSON.close} size={750}>

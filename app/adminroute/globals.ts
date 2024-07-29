@@ -5,6 +5,7 @@ import { RPC } from "@artempoletsky/easyrpc/client";
 import * as API from "./api/methods";
 import { API_ENDPOINT } from "./generated";
 import { customAPI } from "../kurgandb_admin/api";
+import { EditDocumentFormProps } from "./[tableName]/records/EditDocumentForm";
 
 
 
@@ -13,19 +14,16 @@ export type FieldScriptsObject = Record<string, Record<string, ScriptsRecord>>;
 
 
 export type TableComponentProps = {
-  onRequestError: RequestErrorSetter;
-  tableName: string;
-  scheme: TableScheme;
   meta: any;
 }
 
 export type DocumentComponentProps<Type = PlainObject> = {
-  onRequestError: RequestErrorSetter;
   // onUpdateRecord: (record: PlainObject) => void;
-  tableName: string;
   record: Type & PlainObject;
+  initialRecord: Type & PlainObject;
   insertMode?: boolean;
   recordId: string | number | undefined;
+  formProps: EditDocumentFormProps;
 }
 
 
@@ -44,4 +42,8 @@ export function getPrimaryKeyFromScheme(scheme: TableScheme) {
   return Object.keys(scheme.tags).find(id => {
     return scheme.tags[id]?.includes("primary") || false;
   })!;
+}
+
+export function deepClone(obj: any) {
+  return JSON.parse(JSON.stringify(obj));
 }

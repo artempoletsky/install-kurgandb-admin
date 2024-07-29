@@ -14,6 +14,7 @@ import { AAddField, ATableOnly } from "../../api/schemas";
 import { generateCreateTable, generateRecordTypesFromScheme } from "./generateType";
 import Code from "../../comp/Code";
 import { adminRPC } from "../../globals";
+import { useStore, useStoreEffectSet } from "../../store";
 
 const {
   toggleTag,
@@ -33,11 +34,15 @@ const TAGS_AVAILABLE: FieldTag[] = ["index", "unique", "textarea", "heavy", "hid
 export default function PageTableScheme({ tableName, scheme: schemeInitial }: Props) {
   const fields: ReactNode[] = [];
 
-  let [scheme, setScheme] = useState<TableScheme>(schemeInitial);
+  let [scheme, setScheme] = useStore("tableScheme");
 
 
   const [setRequestError, , requestError] = useErrorResponse();
-  const [typeCopiedTooltip, setTypeCopiedTooltip] = useState(false);
+  useStoreEffectSet("tableName", tableName);
+  useStoreEffectSet("tableScheme", schemeInitial);
+
+  if (!scheme) return;
+  // const [typeCopiedTooltip, setTypeCopiedTooltip] = useState(false);
 
   const fc = fetchCatch({
     errorCatcher: setRequestError,

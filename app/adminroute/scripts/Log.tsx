@@ -17,7 +17,7 @@ export default function Log({ log }: Props) {
     <p className="mb-3">Output:</p>
     <ul ref={scrollContainerRef} className="overflow-y-scroll max-w-[750px] h-[150px] bg-slate-700 text-gray-300 rounded">
       {log.map((el, i) => <li key={i} className="flex px-1">
-        <div className="grow">{el.result}</div>
+        <div className="grow whitespace-pre">{el.result}</div>
         {el.time != -1 && <div className="">{el.time}ms</div>}
       </li>)}
     </ul>

@@ -6,7 +6,6 @@ import { getDBVersion, type FGetAllTablesPage } from "../api/methods";
 import { Metadata } from "next";
 import PageTables from "./PageTables";
 import ComponentLoader from "../comp/ComponentLoader";
-import { useStore } from "../store";
 import { DB_TYPE } from "../generated";
 
 
@@ -16,7 +15,7 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function page() {
+export default async function Page() {
 
   const { adminVersion, dbVersion } = await getDBVersion({});
 
