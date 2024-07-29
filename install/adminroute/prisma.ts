@@ -1,8 +1,16 @@
 import { ResponseError } from "@artempoletsky/easyrpc";
 import { FieldTag, FieldType, TableScheme } from "@artempoletsky/kurgandb/globals";
-import { Prisma, PrismaClient } from "@prisma/client";
-import fs from "fs";
+// import { Prisma, PrismaClient } from "@prisma/client";
 import { getPrimaryKeyFromScheme } from "./globals";
+import { DB_TYPE } from "./generated";
+
+let PrismaClient;
+// console.log(DB_TYPE);
+if (DB_TYPE != "prisma") {
+  throw new Error("Prisma DB type is expected!");
+}else {
+  PrismaClient = eval(`require("@prisma/client").PrismaClient`);
+}
 
 const prisma = new PrismaClient();
 

@@ -3,11 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "../../kurgandb_admin/auth";
 
 import * as schemas from "./schemas";
-import * as API from "./methods";
-import * as Prisma_API from "./methods_prisma";
 
 import { customAPI, customRules } from "../../kurgandb_admin/api";
 import { JSONErrorResponse } from "@artempoletsky/easyrpc/client";
+import { DB_TYPE } from "../generated";
+
+let API;
+if (DB_TYPE == "kurgandb") {
+  API = require("./methods");
+} else {
+  API = require("./methods_prisma");
+}
 
 
 export const POST = async function name(request: NextRequest) {
@@ -38,7 +44,7 @@ export const POST = async function name(request: NextRequest) {
     ...schemas,
     ...customRules,
   }, {
-    ...Prisma_API,
+    ...API,
     ...customAPI,
   });
 
