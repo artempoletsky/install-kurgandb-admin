@@ -7,6 +7,7 @@ let args = process.argv.slice(2);
 
 const ENUM_OPTIONS = {
   fast: "--fast",
+  prisma: "--prisma",
 };
 
 
@@ -48,12 +49,12 @@ function editGitignore(linesToAdd) {
 }
 
 function generateTSFile(targetDir) {
-  const dataBaseType = "kurgandb";
+  const dataBaseType = argsSet.has(ENUM_OPTIONS.prisma) ? "prisma" : "kurgandb";
   const generatedFilePath = targetDir + "generated.ts";
 
   fs.writeFileSync(generatedFilePath, `import type { DATABASE_TYPE } from "./globals";
     
-    export const ROOT_PATH = "${ADMIN_ROOT}";
+export const ROOT_PATH = "${ADMIN_ROOT}";
 
 export const API_ENDPOINT = "/" + ROOT_PATH + "/api/";
 

@@ -1,21 +1,19 @@
 
+// import { getServerSession } from "next-auth";
 
+import * as adapter from "../adminroute/lib/nextauthAdapter";
 
 
 export async function isAdmin(): Promise<boolean> {
-  
+  // const session: any = await getServerSession(options);
+  // return session?.isAdmin || false;
 }
 
 
-let authorized = false;
-export async function login(user: string, password: string): Promise<boolean> {
-  // if (process.env.KURGANB_ADMIN_USER === user && process.env.KURGANB_ADMIN_PASSWORD === password) {
-  authorized = true;
-  // }
-  return false;
-  return authorized;
+export async function login(username: string, password: string): Promise<boolean> {
+  return await adapter.loginCredentials(username, password);
 }
 
 export async function logout(): Promise<void> {
-  authorized = false;
+  await adapter.logout();
 }
