@@ -212,7 +212,7 @@ function main() {
   fs.cpSync(sourceAdminrouteDir, targetAdminrouteDir, { recursive: true });
 
   const sourceUserDir = `${__dirname}/install/kurgandb_admin/`;
-  const targetUserDir = `${CWD}/app/kurgandb_admin/`;
+  const targetUserDir = `${CWD}/lib/kurgandb/`;
   fs.cpSync(sourceUserDir, targetUserDir, { recursive: true, force: false });
 
 
@@ -234,6 +234,7 @@ function main() {
   const files = fs.readdirSync(compDir).map(f => compDir + f);
 
   files.push(`${targetUserDir}field_scripts.ts`);
+  files.push(`${targetUserDir}auth.ts`);
   files.push(`${targetUserDir}codegen/db/generate_db.ts`);
   editImports(files);
 

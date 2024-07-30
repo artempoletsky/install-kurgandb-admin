@@ -8,12 +8,12 @@ import { RequestErrorSetter } from "@artempoletsky/easyrpc/client";
 import FieldLabel from "../../comp/FieldLabel";
 import { ActionIcon, Button, Checkbox, CloseButton, Menu, MenuTarget, Modal, TextInput, Textarea, Tooltip } from "@mantine/core";
 import { API_ENDPOINT } from "../../generated";
-import { blinkBoolean } from "../../utils_client";
+import { blinkBoolean } from "../../lib/utilsClient";
 import { FieldTag, FieldType, PlainObject } from "@artempoletsky/kurgandb/globals";
 
-import { fieldScripts } from "../../../kurgandb_admin/field_scripts";
+import { fieldScripts } from "../../../../lib/kurgandb/field_scripts";
 import { ScriptsRecord, adminRPC } from "../../globals";
-import CustomComponentRecord from "../../../kurgandb_admin/components/CustomComponentRecord";
+import CustomComponentRecord from "../../../../lib/kurgandb/components/CustomComponentRecord";
 import { Calendar, Dots, Edit } from "tabler-icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { DatePicker, DateValue } from "@mantine/dates";

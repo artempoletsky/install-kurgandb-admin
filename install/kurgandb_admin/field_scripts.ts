@@ -1,5 +1,5 @@
 
-import { FieldScriptsObject, adminRPCCustom } from "../adminroute/globals";
+import { FieldScriptsObject, adminRPCCustom } from "../../app/adminroute/globals";
 import { encodePassword } from "@artempoletsky/kurgandb/globals";
 
 const exampleCustomMethod = adminRPCCustom().method("exampleCustomMethod");

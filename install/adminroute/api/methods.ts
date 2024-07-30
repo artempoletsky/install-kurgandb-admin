@@ -3,7 +3,7 @@ import { PluginFactory, Table, TableScheme } from "@artempoletsky/kurgandb/globa
 import { queryUniversal as query } from "@artempoletsky/kurgandb";
 
 import { FieldTag, PlainObject } from "@artempoletsky/kurgandb/globals";
-import { login, logout as userLogout } from "../../kurgandb_admin/auth";
+import { login, logout as userLogout } from "../../../lib/kurgandb/auth";
 import type {
   AAddField,
   AAuthorize,
@@ -304,7 +304,7 @@ export type ScriptsLogRecord = {
   result: string
 };
 
-import * as scripts from "../../kurgandb_admin/scripts";
+import * as scripts from "../../../lib/kurgandb/scripts";
 import { ResponseError } from "@artempoletsky/easyrpc";
 export const executeScript = async ({ args, path }: AExecuteScript): Promise<ScriptsLogRecord> => {
   const steps = path.split(".");
@@ -391,7 +391,7 @@ export const getLog = methodFactory(({ }, { fileName }: AGetLog, { db }) => {
 });
 export type FGetLog = typeof getLog;
 
-import * as AdminEvents from "../../kurgandb_admin/events";
+import * as AdminEvents from "../../../lib/kurgandb/events";
 import { ParsedFunction, parseFunction } from "@artempoletsky/kurgandb/function";
 
 
@@ -457,7 +457,7 @@ export type FGetTableCustomPageData = typeof getTableCustomPageData;
 export type RGetTableCustomPageData = Awaited<ReturnType<FGetTableCustomPageData>>;
 
 
-import * as AdminValidators from "../../kurgandb_admin/validation";
+import * as AdminValidators from "../../../lib/kurgandb/validation";
 import { ADMIN_VERSION } from "../generated";
 
 export type RUpdateValidationPage = {
@@ -544,7 +544,7 @@ export type RGetPlugins = {
   registeredPlugins: Record<string, ParsedFunction>;
   adminPlugins: string[];
 }
-import * as Plugins from "../../kurgandb_admin/plugins";
+import * as Plugins from "../../../lib/kurgandb/plugins";
 export const getPlugins = methodFactory<{}, Record<string, ParsedFunction>, RGetPlugins>(({ }, { }, { db }) => {
   return db.getPlugins();
 }, (registeredPlugins) => {

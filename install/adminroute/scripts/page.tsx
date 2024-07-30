@@ -1,7 +1,7 @@
 
 
 
-import * as scriptsRaw from "../../kurgandb_admin/scripts";
+import * as scriptsRaw from "../../../lib/kurgandb/scripts";
 
 import PageScripts, { Group, ParsedFunction as ParsedFunctionClient } from "./PageScripts";
 import { PlainObject } from "@artempoletsky/kurgandb/globals";

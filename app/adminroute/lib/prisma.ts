@@ -1,8 +1,8 @@
 import { ResponseError } from "@artempoletsky/easyrpc";
 import { FieldTag, FieldType, TableScheme } from "@artempoletsky/kurgandb/globals";
 // import { Prisma, PrismaClient } from "@prisma/client";
-import { getPrimaryKeyFromScheme } from "./globals";
-import { DB_TYPE } from "./generated";
+import { getPrimaryKeyFromScheme } from "../globals";
+import { DB_TYPE } from "../generated";
 
 let PrismaClient;
 // console.log(DB_TYPE);

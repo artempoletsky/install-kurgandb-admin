@@ -3,7 +3,7 @@
 import { ActionIcon, Button, Tooltip } from "@mantine/core";
 import { useState } from "react";
 import { Copy } from "tabler-icons-react";
-import { blinkBoolean } from "../utils_client";
+import { blinkBoolean } from "../lib/utilsClient";
 
 type Props = {
   code: string;

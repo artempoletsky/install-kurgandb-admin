@@ -1,8 +1,8 @@
 
 // import { getServerSession } from "next-auth";
+// import options from "../../app/api/auth/[...nextauth]/options";
 
-import * as adapter from "../adminroute/lib/nextauthAdapter";
-
+import * as adapter from "../../app/adminroute/lib/nextauthAdapter";
 
 export async function isAdmin(): Promise<boolean> {
   // const session: any = await getServerSession(options);

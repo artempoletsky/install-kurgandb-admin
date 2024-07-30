@@ -3,7 +3,7 @@ import { queryUniversal as query } from "@artempoletsky/kurgandb";
 import fs from "fs";
 import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 import generateCodeFile from "../generate";
-import { generateRecordTypesFromScheme, getTypeNames, getTableTags, fieldTypeToZod, printFieldsWithTag } from "../../../adminroute/[tableName]/scheme/generateType";
+import { generateRecordTypesFromScheme, getTypeNames } from "../../../../app/adminroute/[tableName]/scheme/generateType";
 
 type AllTableSchemas = Record<string, TableScheme>;
 

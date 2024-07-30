@@ -1,5 +1,6 @@
-import { Store } from "../../adminroute/store";
-import { DocumentComponentProps } from "../../adminroute/globals";
+import { Store } from "../../../app/adminroute/store";
+
+import { DocumentComponentProps } from "../../../app/adminroute/globals";
 import { Button, Checkbox, TextInput } from "@mantine/core";
 
 function recordUser(params: DocumentComponentProps) {

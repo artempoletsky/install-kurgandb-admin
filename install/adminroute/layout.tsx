@@ -4,7 +4,7 @@ import { Breadcrumbs, Button, MantineProvider } from "@mantine/core"
 import { ReactNode, useState } from "react"
 // import "@mantine/core/styles.layer.css";
 // import "@mantine/dates/styles.layer.css";
-import { isAdmin } from "../kurgandb_admin/auth";
+import { isAdmin } from "../../lib/kurgandb/auth";
 import LoginForm from "./comp/LoginForm";
 import Header from "./comp/Header";
 

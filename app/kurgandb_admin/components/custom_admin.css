@@ -1,9 +1,0 @@
-.record__article,
-.record__routeGroup,
-.record__domainGroup {
-  display: none;
-}
-
-.mantine-Select-dropdown {
-  @apply border-gray-700;
-}

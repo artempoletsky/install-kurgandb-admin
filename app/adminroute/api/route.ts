@@ -1,10 +1,10 @@
 import validate, { APIRequest, requestToRPCRequest } from "@artempoletsky/easyrpc";
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin } from "../../kurgandb_admin/auth";
+import { isAdmin } from "../../../lib/kurgandb/auth";
 
 import * as schemas from "./schemas";
 
-import { customAPI, customRules } from "../../kurgandb_admin/api";
+import { customAPI, customRules } from "../../../lib/kurgandb/api";
 import { JSONErrorResponse } from "@artempoletsky/easyrpc/client";
 import { DB_TYPE } from "../generated";
 

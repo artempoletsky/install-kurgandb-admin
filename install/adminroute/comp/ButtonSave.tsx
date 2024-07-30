@@ -1,7 +1,7 @@
 import { FetcherCatcher } from "@artempoletsky/easyrpc/react";
 import { Button, Tooltip } from "@mantine/core";
 import { useState } from "react";
-import { blinkBoolean } from "../utils_client";
+import { blinkBoolean } from "../lib/utilsClient";
 
 
 type Props<ReturnType, AType> = {

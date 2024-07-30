@@ -1,7 +1,7 @@
 "use client";
 import { useErrorResponse } from "@artempoletsky/easyrpc/react";
 
-import CustomComponentTable from "../../../kurgandb_admin/components/CustomComponentTable";
+import CustomComponentTable from "../../../../lib/kurgandb/components/CustomComponentTable";
 import RequestError from "../../comp/RequestError";
 import { TableScheme } from "@artempoletsky/kurgandb/globals";
 import { useStoreEffectSet } from "../../store";

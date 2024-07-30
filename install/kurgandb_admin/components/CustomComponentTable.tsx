@@ -1,5 +1,5 @@
 
-import { TableComponentProps } from "../../adminroute/globals";
+import { TableComponentProps } from "../../../app/adminroute/globals";
 import { Button } from "@mantine/core"
 import TableMeta from "./TableMeta";
 

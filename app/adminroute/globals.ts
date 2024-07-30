@@ -4,7 +4,7 @@ import type { TableScheme } from "@artempoletsky/kurgandb/globals";
 import { RPC } from "@artempoletsky/easyrpc/client";
 import * as API from "./api/methods";
 import { API_ENDPOINT } from "./generated";
-import { customAPI } from "../kurgandb_admin/api";
+import { customAPI } from "../../lib/kurgandb/api";
 import { EditDocumentFormProps } from "./[tableName]/records/EditDocumentForm";
 
 
