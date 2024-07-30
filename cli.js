@@ -69,15 +69,16 @@ export const DB_TYPE: DATABASE_TYPE = "${dataBaseType}";
 const util = require('node:util');
 const exec = util.promisify(require('node:child_process').exec);
 
+
+const deps = [
+  "@mantine/hooks", "@mantine/dates", "@mantine/form", "@mantine/core",
+  "tabler-icons-react", "zod"
+];
+
 async function installDependencies() {
   const packageFilePath = `${process.cwd()}/package.json`;
   const jsonData = JSON.parse(fs.readFileSync(packageFilePath));
   console.log("installing dependencies, please wait...");
-  const deps = [
-    "@mantine/hooks", "@mantine/dates", "@mantine/form", "@mantine/core",
-    "tabler-icons-react", "zod"
-  ];
-
   // skip locally installed packages. It means that we are in the dev mode.
   const rpcName = "@artempoletsky/easyrpc";
   if (!jsonData.dependencies[rpcName] || !jsonData.dependencies[rpcName].startsWith("file:")) {
@@ -200,31 +201,40 @@ function modifyGlobalsCSS() {
 const rimraf = require("rimraf");
 
 function main() {
-  const sourceDir = `${__dirname}/install/adminroute/`;
-  const targetDir = `${CWD}/app/${ADMIN_ROOT}/`;
-  if (fs.existsSync(targetDir)) {
-    console.log(`Removing previous ${targetDir}`);
-    rimraf.sync(targetDir);
+  const sourceAdminrouteDir = `${__dirname}/install/adminroute/`;
+  const targetAdminrouteDir = `${CWD}/app/${ADMIN_ROOT}/`;
+  if (fs.existsSync(targetAdminrouteDir)) {
+    console.log(`Removing previous ${targetAdminrouteDir}`);
+    rimraf.sync(targetAdminrouteDir);
   }
 
-  console.log(`installing in '${targetDir}'`);
-  fs.cpSync(sourceDir, targetDir, { recursive: true });
+  console.log(`installing in '${targetAdminrouteDir}'`);
+  fs.cpSync(sourceAdminrouteDir, targetAdminrouteDir, { recursive: true });
 
-  const sourceDir1 = `${__dirname}/install/kurgandb_admin/`;
-  const targetDir1 = `${CWD}/app/kurgandb_admin/`;
-  fs.cpSync(sourceDir1, targetDir1, { recursive: true, force: false });
+  const sourceUserDir = `${__dirname}/install/kurgandb_admin/`;
+  const targetUserDir = `${CWD}/app/kurgandb_admin/`;
+  fs.cpSync(sourceUserDir, targetUserDir, { recursive: true, force: false });
 
-  generateTSFile(targetDir);
+
+  if (argsSet.has(ENUM_OPTIONS.prisma)) {
+    const sourcePrismaDir = `${__dirname}/install/prisma/`;
+    const targetPrismaDir = `${CWD}/prisma/`;
+    fs.cpSync(sourcePrismaDir, targetPrismaDir, { recursive: true, force: false });
+
+    deps.push("prisma");
+  }
+
+  generateTSFile(targetAdminrouteDir);
 
   // editGitignore([`/app/${ADMIN_ROOT}/`]);
 
   editEnvFile();
 
-  const compDir = `${targetDir1}components/`;
+  const compDir = `${targetUserDir}components/`;
   const files = fs.readdirSync(compDir).map(f => compDir + f);
 
-  files.push(`${targetDir1}field_scripts.ts`);
-  files.push(`${targetDir1}codegen/db/generate_db.ts`);
+  files.push(`${targetUserDir}field_scripts.ts`);
+  files.push(`${targetUserDir}codegen/db/generate_db.ts`);
   editImports(files);
 
   // modifyGlobalsCSS();
